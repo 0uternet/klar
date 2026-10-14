@@ -25,3 +25,10 @@ build/
 .DS_Store
 .idea/
 .vscode/
+
+# Klar. build and runtime artefacts
+src/klar/api/static/
+var/
+models/
+.pytest_cache/
+*.egg-info/
