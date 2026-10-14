@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
     {f:"kundennr",t:function(v){return /^\d{8}$/.test(v);},m:"Kundennummer: 8 Ziffern, siehe Rechnung oben rechts.",o:"text",x:"err-kundennr",mk:1,ln:0},
     {f:"inhaber",t:function(v){return v !== "";},m:"Bitte geben Sie die Kontoinhaberin oder den Kontoinhaber an.",o:"text",x:"err-inhaber",mk:1,ln:0},
     {f:"iban",t:function(v){return /^CH\d{19}$/.test(v.replace(/\s+/g, "").toUpperCase());},m:"IBAN: Schweizer IBAN mit 21 Zeichen, z. B. CH00 0000 0000 0000 0000 0.",o:"text",x:"err-iban",mk:1,ln:0},
-    {f:"mail",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"E-Mail: Bitte im Format name@beispiel.ch eingeben.",o:"text",x:"err-mail",mk:1,ln:0}
+    {f:"mail",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"E-Mail: Bitte im Format name@beispiel.example eingeben.",o:"text",x:"err-mail",mk:1,ln:0}
   ];
   form.addEventListener("submit", function (ev) {
     ev.preventDefault();

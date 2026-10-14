@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
     {f:"name",t:function(v){return v !== "";},m:"Bitte geben Sie Ihren Namen ein.",o:"text",x:"err-name",mk:1,ln:0},
     {f:"plz",t:function(v){return /^\d{4}$/.test(v);},m:"PLZ: ungültige Eingabe.",o:"text",x:"err-plz",mk:1,ln:0},
     {f:"ort",t:function(v){return v !== "";},m:"Bitte geben Sie Ihren Wohnort ein.",o:"text",x:"err-ort",mk:1,ln:0},
-    {f:"email",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"E-Mail: Bitte im Format name@beispiel.ch eingeben.",o:"text",x:"err-email",mk:1,ln:0}
+    {f:"email",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"E-Mail: Bitte im Format name@beispiel.example eingeben.",o:"text",x:"err-email",mk:1,ln:0}
   ];
   form.addEventListener("submit", function (ev) {
     ev.preventDefault();

@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var rules = [
     {f:"vorname",t:function(v){return v !== "";},m:"Vorname: Bitte ausfüllen.",o:"dlg",x:"",mk:1,ln:0},
     {f:"nachname",t:function(v){return v !== "";},m:"Nachname: Bitte ausfüllen.",o:"dlg",x:"",mk:1,ln:0},
-    {f:"mail",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"E-Mail-Adresse: Bitte eine vollständige Adresse im Format name@beispiel.ch eingeben.",o:"dlg",x:"",mk:1,ln:0}
+    {f:"mail",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"E-Mail-Adresse: Bitte eine vollständige Adresse im Format name@beispiel.example eingeben.",o:"dlg",x:"",mk:1,ln:0}
   ];
   var dbox = document.getElementById("hinweis"), dlist = document.getElementById("hinweis-liste");
   document.getElementById("hinweis-ok").addEventListener("click", function () { dbox.hidden = true; });

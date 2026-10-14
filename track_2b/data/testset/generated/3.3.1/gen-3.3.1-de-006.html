@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var done = document.getElementById("danke");
   var rules = [
     {f:"bogen",t:function(v){return /^\d+$/.test(v) && +v >= 1 && +v <= 20;},m:"Ungültige Eingabe",o:"text",x:"err-bogen",mk:1,ln:0},
-    {f:"mail",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"Bitte geben Sie eine E-Mail-Adresse im Format name@beispiel.ch ein.",o:"text",x:"err-mail",mk:1,ln:0}
+    {f:"mail",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"Bitte geben Sie eine E-Mail-Adresse im Format name@beispiel.example ein.",o:"text",x:"err-mail",mk:1,ln:0}
   ];
   form.addEventListener("submit", function (ev) {
     ev.preventDefault();

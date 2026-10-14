@@ -327,7 +327,7 @@ def build(rng):
         dict(f="kundennr", t=t_digits(8), m="Kundennummer: 8 Ziffern, siehe Rechnung oben rechts."),
         dict(f="inhaber", t=T_FILLED, m="Bitte geben Sie die Kontoinhaberin oder den Kontoinhaber an."),
         dict(f="iban", t=T_IBAN, m="IBAN: Schweizer IBAN mit 21 Zeichen, z. B. CH00 0000 0000 0000 0000 0."),
-        dict(f="mail", t=T_EMAIL, m="E-Mail: Bitte im Format name@beispiel.ch eingeben."),
+        dict(f="mail", t=T_EMAIL, m="E-Mail: Bitte im Format name@beispiel.example eingeben."),
     ]
     mk("de", "Gemeinde Beispielwil", "Lastschriftverfahren für Wasser- und Abwassergebühren",
        "<p>Mit dem Lastschriftverfahren (LSV) werden die Gebühren automatisch von Ihrem Konto abgebucht.</p>",

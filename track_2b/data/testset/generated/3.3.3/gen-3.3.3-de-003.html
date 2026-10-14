@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var done = document.getElementById("danke");
   var rules = [
     {f:"name",t:function(v){return v !== "";},m:"Bitte geben Sie Ihren Namen ein.",o:"text",x:"err-name",mk:1,ln:0},
-    {f:"mail",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"E-Mail: Bitte im Format name@beispiel.ch eingeben.",o:"text",x:"err-mail",mk:1,ln:0},
+    {f:"mail",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"E-Mail: Bitte im Format name@beispiel.example eingeben.",o:"text",x:"err-mail",mk:1,ln:0},
     {f:"nachricht",t:function(v){return v !== "";},m:"Bitte schreiben Sie uns eine Nachricht.",o:"text",x:"err-nachricht",mk:1,ln:0},
     {f:"kontrolle",t:function(v){return v === "7";},m:"Die Antwort auf die Kontrollfrage stimmt nicht.",o:"text",x:"err-kontrolle",mk:1,ln:0}
   ];

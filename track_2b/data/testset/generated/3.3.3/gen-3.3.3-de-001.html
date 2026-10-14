@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     {f:"kind",t:function(v){return v !== "";},m:"Bitte geben Sie Vorname und Name des Kindes ein.",o:"text",x:"err-kind",mk:1,ln:0},
     {f:"klasse",t:function(v){return v !== "";},m:"Bitte geben Sie die Klasse an, z. B. 2a.",o:"text",x:"err-klasse",mk:1,ln:0},
     {f:"schulhaus",t:function(v){return ["dorfmatt","schachen","oberfeld"].indexOf(v.toLowerCase()) >= 0;},m:"Schulhaus nicht gefunden.",o:"text",x:"err-schulhaus",mk:1,ln:0},
-    {f:"mail",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"E-Mail: Bitte eine Adresse im Format name@beispiel.ch eingeben.",o:"text",x:"err-mail",mk:1,ln:0}
+    {f:"mail",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"E-Mail: Bitte eine Adresse im Format name@beispiel.example eingeben.",o:"text",x:"err-mail",mk:1,ln:0}
   ];
   form.addEventListener("submit", function (ev) {
     ev.preventDefault();

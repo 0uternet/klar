@@ -121,7 +121,7 @@ def build(rng):
        + row(field("npa", "NPA du domicile", im="numeric", icon_slot=WARN_SVG), field("localite", "Localité", err=False))
        + field("courriel", "Courriel des parents", type="email", ac="email"),
        [dict(f="npa", t=PLZ, o="show"),
-        dict(f="courriel", t=EMAIL, m="Adresse e-mail incomplète : indiquez-la au format nom@exemple.ch.")],
+        dict(f="courriel", t=EMAIL, m="Adresse e-mail incomplète : indiquez-la au format nom@exemple.example.")],
        fid="parascolaire", target="#npa", expected="failed", rule="3.3.1/F3",
        notes="After submitting NPA '17000' the field only gets a red border and a red warning triangle (aria-hidden SVG); no text describes the error.",
        difficulty="medium")
@@ -148,7 +148,7 @@ def build(rng):
        + field("bogen", "Anzahl Bogen", im="numeric", size=4)
        + field("mail", "E-Mail für die Bestätigung", type="email", ac="email"),
        [dict(f="bogen", t=rng_int(1, 20), m="Ungültige Eingabe"),
-        dict(f="mail", t=EMAIL, m="Bitte geben Sie eine E-Mail-Adresse im Format name@beispiel.ch ein.")],
+        dict(f="mail", t=EMAIL, m="Bitte geben Sie eine E-Mail-Adresse im Format name@beispiel.example ein.")],
        fid="marken", target="#bogen", expected="failed", rule="3.3.1/F4",
        notes="Ordering '50' sheets (max. 20) shows 'Ungültige Eingabe' under the field: it says something is wrong but not what (cause/limit not described).",
        difficulty="medium")
@@ -177,7 +177,7 @@ def build(rng):
        [dict(f="nome", t=FILLED, m="Inserisca il nome."),
         dict(f="cognome", t=FILLED, m="Inserisca il cognome."),
         dict(f="inizio", t=DATE, m="Campo non valido"),
-        dict(f="email", t=EMAIL, m="Indirizzo e-mail incompleto: usi il formato nome@esempio.ch.")],
+        dict(f="email", t=EMAIL, m="Indirizzo e-mail incompleto: usi il formato nome@esempio.example.")],
        fid="abbonamento", target="#inizio", expected="failed", rule="3.3.1/F4",
        notes="Entering '1 dicembre' as start date shows 'Campo non valido': the message neither explains the cause nor the expected date format.",
        difficulty="medium")
@@ -191,7 +191,7 @@ def build(rng):
        [dict(f="vorname", t=FILLED, m="Bitte geben Sie Ihren Vornamen ein."),
         dict(f="nachname", t=FILLED, m="Bitte geben Sie Ihren Nachnamen ein."),
         dict(f="schild", t=PLATE, m="Kontrollschild: Bitte Kantonskürzel und Nummer eingeben, z. B. BE 123456."),
-        dict(f="email", t=EMAIL, m="Bitte geben Sie eine gültige E-Mail-Adresse ein, z. B. name@beispiel.ch.")],
+        dict(f="email", t=EMAIL, m="Bitte geben Sie eine gültige E-Mail-Adresse ein, z. B. name@beispiel.example.")],
        fid="parkkarte", target="#schild", expected="failed", rule="3.3.1/F5",
        notes="For plate '12345' the descriptive text is written into a visually-hidden container; sighted users only see a red border on the field.",
        difficulty="hard")
@@ -210,7 +210,7 @@ def build(rng):
        [dict(f="nome", t=FILLED, m="Inserisca il nome del bambino."),
         dict(f="cognome", t=FILLED, m="Inserisca il cognome del bambino."),
         dict(f="nascita", t=DATE, m="Data di nascita: inserisca la data nel formato GG.MM.AAAA, ad es. 05.03.2022."),
-        dict(f="email", t=EMAIL, m="E-mail: inserisca un indirizzo completo, ad es. nome@esempio.ch.")],
+        dict(f="email", t=EMAIL, m="E-mail: inserisca un indirizzo completo, ad es. nome@esempio.example.")],
        fid="iscrizione", target="#nascita", expected="passed", rule="3.3.1/P1",
        notes="Submitting '5 marzo 2022' shows a visible text naming the field and the expected format, linked with aria-describedby and aria-invalid.",
        difficulty="easy")
@@ -261,7 +261,7 @@ def build(rng):
        [dict(f="organisateur", t=FILLED, m="Nom ou société : ce champ est obligatoire.", o="list", ln=True),
         dict(f="date", t=DATE, m="Date souhaitée : cette date n'existe pas ou n'est pas au format JJ.MM.AAAA.", o="list", ln=True),
         dict(f="personnes", t=rng_int(1, 120), m="Nombre de personnes : indiquez un nombre entre 1 et 120.", o="list", ln=True),
-        dict(f="courriel", t=EMAIL, m="Courriel : l'adresse doit contenir un @ et un domaine, p. ex. nom@exemple.ch.", o="list", ln=True)],
+        dict(f="courriel", t=EMAIL, m="Courriel : l'adresse doit contenir un @ et un domaine, p. ex. nom@exemple.example.", o="list", ln=True)],
        top=('<div class="msgbox" id="erreurs" tabindex="-1" hidden><h2>Le formulaire contient des erreurs</h2>'
             '<ul id="erreurs-liste"></ul></div>'),
        summary=dict(box="erreurs", list="erreurs-liste"),
@@ -275,7 +275,7 @@ def build(rng):
        field("luogo", "Luogo del guasto", hint="Via e numero civico più vicino, oppure numero del palo.", err=False)
        + field("descrizione", "Descrizione", textarea=True, rows=3, err=False)
        + field("email", "E-mail per la conferma", type="email", ac="email", err_live="alert"),
-       [dict(f="email", t=EMAIL, m="E-mail per la conferma: l'indirizzo non è valido, manca il simbolo @ o il dominio (es. nome@esempio.ch).")],
+       [dict(f="email", t=EMAIL, m="E-mail per la conferma: l'indirizzo non è valido, manca il simbolo @ o il dominio (es. nome@esempio.example).")],
        fid="guasto", target="#email", expected="passed", rule="3.3.1/P3",
        notes="Submitting 'lucia.esempio.example' writes a message naming the field and the missing @ into a role=alert container under the field.",
        difficulty="easy")
@@ -365,7 +365,7 @@ def build(rng):
        + select("niveau", "Niveau", ["A1", "A2", "B1", "weiss nicht"], err=False),
        [dict(f="vorname", t=FILLED, m="Vorname: Bitte ausfüllen.", o="dlg"),
         dict(f="nachname", t=FILLED, m="Nachname: Bitte ausfüllen.", o="dlg"),
-        dict(f="mail", t=EMAIL, m="E-Mail-Adresse: Bitte eine vollständige Adresse im Format name@beispiel.ch eingeben.", o="dlg")],
+        dict(f="mail", t=EMAIL, m="E-Mail-Adresse: Bitte eine vollständige Adresse im Format name@beispiel.example eingeben.", o="dlg")],
        extra_after=('<div class="dialog" id="hinweis" role="alertdialog" aria-modal="true" aria-labelledby="hinweis-titel" hidden>'
                     '<h2 id="hinweis-titel">Bitte prüfen Sie Ihre Angaben</h2><ul id="hinweis-liste"></ul>'
                     '<button type="button" id="hinweis-ok">OK</button></div>'),

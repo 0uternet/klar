@@ -159,7 +159,7 @@ def f_label_angaben_de(rng):
 
 def f_label_wrong_it(rng):
     inner = "\n".join([F("pr-nome", "Nome e cognome"),
-                       F("pr-contatto", "Telefono", "email", ' placeholder="nome@esempio.ch"')])
+                       F("pr-contatto", "Telefono", "email", ' placeholder="nome@esempio.example"')])
     main = f"""<h1>Prenotazione del campo di calcio</h1>
 <p>Le società sportive e i privati possono prenotare il campo sintetico. Riceverete la conferma per e-mail.</p>
 <form action="campo-prenotato.html" method="post">
@@ -167,7 +167,7 @@ def f_label_wrong_it(rng):
 <p><button type="submit">Prenotare</button></p>
 </form>"""
     return _c(rng, "it", "failed", "2.4.6/F4", "Campo di calcio", main, 'label[for="pr-contatto"]',
-              "The field is an e-mail field (type=email, placeholder 'nome@esempio.ch', confirmation sent by e-mail) but is labelled 'Telefono'; the label misdescribes its purpose.",
+              "The field is an e-mail field (type=email, placeholder 'nome@esempio.example', confirmation sent by e-mail) but is labelled 'Telefono'; the label misdescribes its purpose.",
               org="Società sportiva Valfittizia", css=FORM_CSS, diff="hard")
 
 

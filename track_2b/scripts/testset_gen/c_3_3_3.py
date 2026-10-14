@@ -45,7 +45,7 @@ def build(rng):
         dict(f="name", t=T_FILLED, m="Bitte geben Sie Ihren Namen ein."),
         dict(f="plz", t=T_PLZ, m="PLZ: ungültige Eingabe."),
         dict(f="ort", t=T_FILLED, m="Bitte geben Sie Ihren Wohnort ein."),
-        dict(f="email", t=T_EMAIL, m="E-Mail: Bitte im Format name@beispiel.ch eingeben.")],
+        dict(f="email", t=T_EMAIL, m="E-Mail: Bitte im Format name@beispiel.example eingeben.")],
        fid="fundbuero", target="#plz", expected="failed", rule="3.3.3/F1",
        notes="For PLZ '301' the page answers 'PLZ: ungültige Eingabe.' although the rule (exactly 4 digits) is known to the script; no format or example is suggested.",
        difficulty="easy")
@@ -98,7 +98,7 @@ def build(rng):
        + field("courriel", "Courriel des parents", type="email", ac="email"),
        [dict(f="enfant", t=T_FILLED, m="Indiquez le nom et le prénom de l'enfant."),
         dict(f="naissance", t=T_DATE, m="Date de naissance non valable."),
-        dict(f="courriel", t=T_EMAIL, m="Courriel : saisissez une adresse du type nom@exemple.ch.")],
+        dict(f="courriel", t=T_EMAIL, m="Courriel : saisissez une adresse du type nom@exemple.example.")],
        fid="camp", target="#naissance", expected="failed", rule="3.3.3/F1",
        notes="For '2019-04-12' the message 'Date de naissance non valable.' does not mention the expected JJ.MM.AAAA format, which the script enforces.",
        difficulty="medium")
@@ -159,7 +159,7 @@ def build(rng):
        [dict(f="kind", t=T_FILLED, m="Bitte geben Sie Vorname und Name des Kindes ein."),
         dict(f="klasse", t=T_FILLED, m="Bitte geben Sie die Klasse an, z. B. 2a."),
         dict(f="schulhaus", t=t_oneof(["Dorfmatt", "Schachen", "Oberfeld"]), m="Schulhaus nicht gefunden."),
-        dict(f="mail", t=T_EMAIL, m="E-Mail: Bitte eine Adresse im Format name@beispiel.ch eingeben.")],
+        dict(f="mail", t=T_EMAIL, m="E-Mail: Bitte eine Adresse im Format name@beispiel.example eingeben.")],
        fid="mittagstisch", target="#schulhaus", expected="failed", rule="3.3.3/F2",
        notes="Typing 'Dorf' returns 'Schulhaus nicht gefunden.'; the three valid school buildings are known to the script but not proposed.",
        difficulty="medium")
@@ -202,7 +202,7 @@ def build(rng):
        + field("email", "E-mail del genitore", type="email", ac="email"),
        [dict(f="bambino", t=T_FILLED, m="Indichi nome e cognome del bambino."),
         dict(f="nascita", t=T_DATE, m="Data di nascita: inserire la data nel formato GG.MM.AAAA, ad esempio 05.03.2019."),
-        dict(f="email", t=T_EMAIL, m="E-mail: inserisca un indirizzo completo, ad es. nome@esempio.ch.")],
+        dict(f="email", t=T_EMAIL, m="E-mail: inserisca un indirizzo completo, ad es. nome@esempio.example.")],
        fid="tessera", target="#nascita", expected="passed", rule="3.3.3/P1",
        notes="For '5/3/2019' the message gives the expected format GG.MM.AAAA and an example date.",
        difficulty="easy")
@@ -275,7 +275,7 @@ def build(rng):
        + field("nachricht", "Nachricht", textarea=True, rows=5)
        + field("kontrolle", "Kontrollfrage zum Spamschutz: Wie viel ist drei plus vier?", im="numeric", size=4),
        [dict(f="name", t=T_FILLED, m="Bitte geben Sie Ihren Namen ein."),
-        dict(f="mail", t=T_EMAIL, m="E-Mail: Bitte im Format name@beispiel.ch eingeben."),
+        dict(f="mail", t=T_EMAIL, m="E-Mail: Bitte im Format name@beispiel.example eingeben."),
         dict(f="nachricht", t=T_FILLED, m="Bitte schreiben Sie uns eine Nachricht."),
         dict(f="kontrolle", t='v === "7"', m="Die Antwort auf die Kontrollfrage stimmt nicht.")],
        fid="kontakt", target="#kontrolle", expected="passed", rule="3.3.3/T1", trap=True,

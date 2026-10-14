@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     {f:"nome",t:function(v){return v !== "";},m:"Inserisca il nome del bambino.",o:"text",x:"err-nome",mk:1,ln:0},
     {f:"cognome",t:function(v){return v !== "";},m:"Inserisca il cognome del bambino.",o:"text",x:"err-cognome",mk:1,ln:0},
     {f:"nascita",t:function(v){return (function(){var m=/^(\d{2})\.(\d{2})\.(\d{4})$/.exec(v);if(!m){return false;}var d=new Date(+m[3],+m[2]-1,+m[1]);return d.getDate()===+m[1]&&d.getMonth()===+m[2]-1;})();},m:"Data di nascita: inserisca la data nel formato GG.MM.AAAA, ad es. 05.03.2022.",o:"text",x:"err-nascita",mk:1,ln:0},
-    {f:"email",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"E-mail: inserisca un indirizzo completo, ad es. nome@esempio.ch.",o:"text",x:"err-email",mk:1,ln:0}
+    {f:"email",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"E-mail: inserisca un indirizzo completo, ad es. nome@esempio.example.",o:"text",x:"err-email",mk:1,ln:0}
   ];
   form.addEventListener("submit", function (ev) {
     ev.preventDefault();

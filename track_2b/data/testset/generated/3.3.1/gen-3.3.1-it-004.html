@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var form = document.getElementById("guasto");
   var done = document.getElementById("grazie");
   var rules = [
-    {f:"email",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"E-mail per la conferma: l'indirizzo non è valido, manca il simbolo @ o il dominio (es. nome@esempio.ch).",o:"text",x:"err-email",mk:1,ln:0}
+    {f:"email",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"E-mail per la conferma: l'indirizzo non è valido, manca il simbolo @ o il dominio (es. nome@esempio.example).",o:"text",x:"err-email",mk:1,ln:0}
   ];
   form.addEventListener("submit", function (ev) {
     ev.preventDefault();

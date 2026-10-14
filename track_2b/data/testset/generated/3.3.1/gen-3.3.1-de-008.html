@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     {f:"vorname",t:function(v){return v !== "";},m:"Bitte geben Sie Ihren Vornamen ein.",o:"text",x:"err-vorname",mk:1,ln:0},
     {f:"nachname",t:function(v){return v !== "";},m:"Bitte geben Sie Ihren Nachnamen ein.",o:"text",x:"err-nachname",mk:1,ln:0},
     {f:"schild",t:function(v){return /^[A-Z]{2} ?\d{1,6}$/.test(v.toUpperCase());},m:"Kontrollschild: Bitte Kantonskürzel und Nummer eingeben, z. B. BE 123456.",o:"text",x:"err-schild",mk:1,ln:0},
-    {f:"email",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"Bitte geben Sie eine gültige E-Mail-Adresse ein, z. B. name@beispiel.ch.",o:"text",x:"err-email",mk:1,ln:0}
+    {f:"email",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"Bitte geben Sie eine gültige E-Mail-Adresse ein, z. B. name@beispiel.example.",o:"text",x:"err-email",mk:1,ln:0}
   ];
   form.addEventListener("submit", function (ev) {
     ev.preventDefault();

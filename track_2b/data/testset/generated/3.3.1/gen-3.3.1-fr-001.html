@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var done = document.getElementById("merci");
   var rules = [
     {f:"npa",t:function(v){return /^\d{4}$/.test(v);},m:"",o:"show",x:"err-npa",mk:1,ln:0},
-    {f:"courriel",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"Adresse e-mail incomplète : indiquez-la au format nom@exemple.ch.",o:"text",x:"err-courriel",mk:1,ln:0}
+    {f:"courriel",t:function(v){return /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);},m:"Adresse e-mail incomplète : indiquez-la au format nom@exemple.example.",o:"text",x:"err-courriel",mk:1,ln:0}
   ];
   form.addEventListener("submit", function (ev) {
     ev.preventDefault();
