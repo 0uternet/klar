@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gemeinde Musterwil</title>
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/site.css">
+<script>document.documentElement.classList.add('js');</script>
+<script src="assets/js/site.js" defer></script>
+<script src="assets/js/accordion.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+<div class="topbar">
+  <div class="container topbar-inner">
+    <p class="topbar-note">Gemeinde Musterwil · Region Aarenwald</p>
+    <nav class="lang-switch" aria-label="Sprache" data-testid="lang-switch"><ul><li><a href="oeffnungszeiten.html" lang="de" hreflang="de" aria-current="true">DE</a></li><li><a href="fr/horaires.html" lang="fr" hreflang="fr">FR</a></li><li><a href="it/orari.html" lang="it" hreflang="it">IT</a></li></ul></nav>
+  </div>
+</div>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="index.html"><img src="assets/img/logo.svg" alt="Gemeinde Musterwil – Startseite" width="272" height="56" data-testid="site-logo"></a>
+    <form class="site-search" role="search" action="suche.html" method="get">
+      <label class="sr-only" for="site-q">Suchbegriff</label>
+      <input id="site-q" name="q" type="search" placeholder="Suchbegriff eingeben">
+      <button type="submit" class="search-btn" data-testid="header-search-button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span>Suche</span></button>
+    </form>
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="main-nav-list" data-nav-toggle><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Menü</button>
+  </div>
+  <nav class="main-nav" aria-label="Hauptnavigation" data-testid="main-nav">
+    <div class="container">
+      <ul id="main-nav-list">
+        <li><a href="index.html">Startseite</a></li><li><a href="online-schalter.html">Online-Schalter</a></li><li><a href="anleitung.html">eUmzug</a></li><li><a href="oeffnungszeiten.html" aria-current="page">Öffnungszeiten</a></li><li><a href="abfallkalender.html">Abfallkalender</a></li><li><a href="freizeit.html">Freizeit</a></li><li><a href="zweisprachig.html">Mitteilungen</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="main" tabindex="-1">
+<div class="container page-tools">
+  <nav class="breadcrumb" aria-label="Brotkrümelnavigation"><ol><li><a href="index.html">Startseite</a></li><li aria-current="page">Öffnungszeiten</li></ol></nav>
+  <button type="button" class="tool-btn" data-print data-testid="print-button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>Drucken</button>
+</div>
+<div class="container page-head">
+  <h1>Öffnungszeiten</h1>
+  <p class="lead">Öffnungszeiten der Gemeindeverwaltung, des Werkhofs und der Gemeindebibliothek.</p>
+</div>
+<div class="container layout-main-aside">
+  <div class="main-col">
+    <section aria-labelledby="h-admin">
+      <h2 id="h-admin" data-testid="admin-heading">Gemeindeverwaltung</h2>
+      <div class="table-wrap">
+        <table class="data-table" data-testid="hours-admin">
+          <caption>Schalteröffnungszeiten ab 1. November 2026</caption>
+          <thead><tr><th scope="col">Tag</th><th scope="col">Vormittag</th><th scope="col">Nachmittag</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Montag</th><td>08.00–11.30</td><td>14.00–17.00</td></tr>
+            <tr><th scope="row">Dienstag</th><td>08.00–11.30</td><td>14.00–17.00</td></tr>
+            <tr><th scope="row">Mittwoch</th><td>08.00–11.30</td><td>geschlossen</td></tr>
+            <tr><th scope="row">Donnerstag</th><td>08.00–11.30</td><td>14.00–18.30</td></tr>
+            <tr><th scope="row">Freitag</th><td>08.00–11.30</td><td>14.00–16.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Termine ausserhalb der Öffnungszeiten vereinbaren wir gerne telefonisch.</p>
+    </section>
+    <section>
+      <h2 data-testid="werkhof-heading">Allgemeines</h2>
+      <p>Werkhof und Entsorgungsstelle Moosmatt, Industriestrasse 8</p>
+      <div class="table-wrap">
+        <table class="data-table" data-testid="hours-werkhof">
+          <tr class="thead-like"><td><strong>Tag</strong></td><td><strong>Öffnungszeit</strong></td></tr>
+          <tr><td>Mittwoch</td><td>13.30–17.00</td></tr>
+          <tr><td>Samstag</td><td>09.00–12.00</td></tr>
+        </table>
+      </div>
+    </section>
+    <section id="bibliothek" aria-labelledby="h-lib">
+      <h2 id="h-lib">Gemeindebibliothek</h2>
+      <p>Bibliothek an der Bahnhofstrasse 12, neue Öffnungszeiten ab 2. November 2026:</p>
+      <dl class="hours-grid" data-testid="hours-library"><dt class="hg-day hg-r1">Montag</dt><dt class="hg-day hg-r2">Dienstag</dt><dt class="hg-day hg-r3">Mittwoch</dt><dt class="hg-day hg-r4">Donnerstag</dt><dt class="hg-day hg-r5">Freitag</dt><dt class="hg-day hg-r6">Samstag</dt><dd class="hg-time hg-r1">geschlossen</dd><dd class="hg-time hg-r2">15.00–18.00</dd><dd class="hg-time hg-r3">14.00–18.00</dd><dd class="hg-time hg-r4">15.00–19.00</dd><dd class="hg-time hg-r5">geschlossen</dd><dd class="hg-time hg-r6">09.30–12.00</dd></dl>
+    </section>
+    <section id="standort" aria-labelledby="h-loc">
+      <h2 id="h-loc">Standort und Anreise</h2>
+      <div class="loc-grid">
+        <img src="assets/img/map-standort.svg" alt="Lageplan: Die Gemeindeverwaltung liegt an der Dorfstrasse 1, rund 100 Meter von der Bushaltestelle Musterwil Dorf entfernt." width="800" height="450" data-testid="location-map">
+        <div>
+          <p>Gemeindeverwaltung Musterwil<br>Dorfstrasse 1<br>9999 Musterwil</p>
+          <p>Bus Linie 12 bis Haltestelle «Musterwil Dorf». Hinter dem Gemeindehaus stehen vier Besucherparkplätze zur Verfügung.</p>
+        </div>
+      </div>
+    </section>
+    <section aria-labelledby="h-faq">
+      <h2 id="h-faq">Häufige Fragen</h2>
+      <div class="accordion">
+        <div class="acc-item">
+          <div class="acc-toggle" data-testid="faq-toggle-1">Ist die Verwaltung zwischen Weihnachten und Neujahr geöffnet?</div>
+          <div class="acc-panel"><p>Vom 24. Dezember 2026 bis und mit 3. Januar 2027 bleibt die Verwaltung geschlossen. Bei Todesfällen erreichen Sie das Bestattungsamt unter 032 000 12 99.</p></div>
+        </div>
+        <div class="acc-item">
+          <div class="acc-toggle" data-testid="faq-toggle-2">Kann ich ausserhalb der Öffnungszeiten vorbeikommen?</div>
+          <div class="acc-panel"><p>Ja, nach telefonischer Vereinbarung. Rufen Sie uns während der Telefonzeiten an.</p></div>
+        </div>
+        <div class="acc-item">
+          <div class="acc-toggle" data-testid="faq-toggle-3">Wo kann ich mein Velo abstellen?</div>
+          <div class="acc-panel"><p>Vor dem Haupteingang gibt es einen gedeckten Veloständer mit zwölf Plätzen.</p></div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="aside-col">
+    <section class="box" aria-labelledby="phone-hours">
+      <h2 id="phone-hours">Telefonzeiten</h2>
+      <p>Mo–Fr 08.00–11.30 und 14.00–16.00 Uhr<br>Telefon <a href="tel:+41320001234">032 000 12 34</a></p>
+    </section>
+  </div>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <h2 class="footer-title">Gemeindeverwaltung Musterwil</h2>
+      <address>Dorfstrasse 1<br>9999 Musterwil<br>Telefon <a href="tel:+41320001234">032 000 12 34</a><br><a href="mailto:gemeinde@musterwil.example">gemeinde@musterwil.example</a></address>
+    </div>
+    <div>
+      <h2 class="footer-title">Schalteröffnungszeiten</h2>
+      <p>Mo–Fr 08.00–11.30 Uhr<br>Mo, Di 14.00–17.00 Uhr<br>Do 14.00–18.30 Uhr<br>Fr 14.00–16.00 Uhr</p>
+      <p><a href="oeffnungszeiten.html">Alle Öffnungszeiten</a></p>
+    </div>
+    <div>
+      <h2 class="footer-title">Service</h2>
+      <ul><li><a href="online-schalter.html">Online-Schalter</a></li><li><a href="sitemap.html">Sitemap</a></li><li><a href="suche.html">Suche</a></li><li><a href="barrierefreiheit.html">Barrierefreiheit</a></li></ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <p>© 2026 Gemeinde Musterwil</p>
+    <p>Musterwil ist eine fiktive Gemeinde. Alle Namen, Adressen und Zahlen auf dieser Demonstrationswebsite sind erfunden.</p>
+  </div>
+</footer>
+</body>
+</html>

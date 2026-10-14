@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Commander une attestation de domicile – Commune de Valfictif</title>
+<style>body{margin:0;font-family:Arial, Helvetica, sans-serif;color:#16181d;background:#ffffff;line-height:1.5}a{color:#1f4fd8}.site-header{background:#2b2f3a;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #d4d7de;color:#50555e;padding:16px 24px;font-size:.9rem}.box{background:#f1f2f5;padding:16px;border-radius:8px}.muted{color:#50555e}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #2b2f3a;background:#2b2f3a;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #d4d7de;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #d4d7de;border-radius:10px;padding:12px;background:#ffffff}.fld{margin:0 0 14px}.fld label{margin-top:0}.hint{margin:2px 0 4px;font-size:.92rem;color:#4b5563}.err{margin:4px 0 0;color:#a3001b;font-weight:600;min-height:0}.is-invalid{border:2px solid #c8102e;background:#fff1f2}.msgbox{border:2px solid #a3001b;background:#fff6f6;padding:10px 14px;border-radius:6px;margin:0 0 16px}.okbox{border:2px solid #2f6b3a;background:#eef7ef;padding:10px 14px;border-radius:6px;margin:16px 0}.row{display:flex;flex-wrap:wrap;gap:0 18px}.row .fld{flex:1 1 180px}fieldset{border:1px solid #c5ccd3;border-radius:8px;padding:8px 16px 4px;margin:0 0 16px}legend{font-weight:700;padding:0 4px}.req{color:#a3001b}.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.icon-slot svg{vertical-align:middle;margin-left:6px}.actions{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}.btn-sec{background:#ffffff;color:#1d2327;border:1px solid #6b7280}aside.box{margin-top:24px}.dialog{position:fixed;left:50%;top:20%;transform:translateX(-50%);max-width:440px;background:#ffffff;border:2px solid #1d2327;border-radius:10px;padding:16px 20px;box-shadow:0 8px 30px rgba(0,0,0,.25)}.crumbs{font-size:.9rem;margin:0 0 8px}</style>
+</head>
+<body>
+<header class="site-header"><a class="site-name" href="index.html">Commune de Valfictif</a><nav class="site-nav" aria-label="Navigation principale"><ul><li><a href="accueil.html">Accueil</a></li><li><a href="actualites.html">Actualités</a></li><li><a href="administration.html">Administration</a></li><li><a href="vie-pratique.html">Vie pratique</a></li><li><a href="loisirs.html">Loisirs</a></li></ul></nav></header>
+<main>
+<h1>Commander une attestation de domicile</h1>
+<p>L'attestation de domicile coûte CHF 20.–. Elle vous est envoyée par courrier avec un bulletin de versement.</p>
+<form id="attestation" novalidate><div class="row"><div class="fld"><label for="nom">Nom</label><input id="nom" name="nom" type="text"></div><div class="fld"><label for="prenom">Prénom</label><input id="prenom" name="prenom" type="text"></div></div><div class="fld"><label for="naissance">Date de naissance</label><input id="naissance" name="naissance" type="text" aria-describedby="hint-naissance"><p class="hint" id="hint-naissance">JJ.MM.AAAA</p></div><div class="fld"><label for="nombre">Nombre d&#x27;exemplaires</label><select id="nombre" name="nombre"><option>1</option><option>2</option><option>3</option></select></div><div class="actions"><button type="submit">Continuer</button></div></form><section id="recapitulatif" hidden><h2 tabindex="-1">Récapitulatif de votre commande</h2><p>Vérifiez vos données. La commande devient définitive en cliquant sur « Commander (CHF 20.–) ».</p><dl id="recap-liste"></dl><div class="actions"><button type="button" class="btn-sec" id="modifier">Modifier</button><button type="button" id="commander">Commander (CHF 20.–)</button></div></section><div class="okbox" id="recu" tabindex="-1" hidden><p>Merci, votre commande a été transmise.</p></div>
+</main>
+<footer class="site-footer"><p>Commune de Valfictif · Rue des Tilleuls 6 · <a href="kontakt.html">Contact</a></p></footer>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var form = document.getElementById("attestation"), review = document.getElementById("recapitulatif");
+  var list = document.getElementById("recap-liste"), receipt = document.getElementById("recu");
+  var fields = [["nom", "Nom"], ["prenom", "Prénom"], ["naissance", "Date de naissance"], ["nombre", "Exemplaires"]];
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    while (list.firstChild) { list.removeChild(list.firstChild); }
+    fields.forEach(function (p) {
+      var dt = document.createElement("dt"), dd = document.createElement("dd");
+      var el = document.getElementById(p[0]);
+      dt.textContent = p[1];
+      dd.textContent = el.value || "–";
+      list.appendChild(dt); list.appendChild(dd);
+    });
+    form.hidden = true; review.hidden = false;
+    review.querySelector("h2").focus();
+  });
+  document.getElementById("modifier").addEventListener("click", function () {
+    review.hidden = true; form.hidden = false; form.querySelector("input, select, textarea").focus();
+  });
+  document.getElementById("commander").addEventListener("click", function () {
+    review.hidden = true; receipt.hidden = false; receipt.focus();
+  });
+});
+</script>
+</body>
+</html>

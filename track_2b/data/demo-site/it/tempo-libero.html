@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="it-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tempo libero e turismo – Comune di Musterwil</title>
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/css/site.css">
+<script>document.documentElement.classList.add('js');</script>
+<script src="../assets/js/site.js" defer></script>
+<script src="../assets/js/carousel.js" defer></script>
+<script src="../assets/js/filter.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Vai al contenuto</a>
+<div class="topbar">
+  <div class="container topbar-inner">
+    <p class="topbar-note">Comune di Musterwil · Regione Aarenwald</p>
+    <nav class="lang-switch" aria-label="Lingua" data-testid="lang-switch"><ul><li><a href="../freizeit.html" lang="de" hreflang="de">DE</a></li><li><a href="../fr/loisirs.html" lang="fr" hreflang="fr">FR</a></li><li><a href="tempo-libero.html" lang="it" hreflang="it" aria-current="true">IT</a></li></ul></nav>
+  </div>
+</div>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="index.html"><img src="../assets/img/logo.svg" alt="Comune di Musterwil – Pagina iniziale" width="272" height="56" data-testid="site-logo"></a>
+    <form class="site-search" role="search" action="ricerca.html" method="get">
+      <label class="sr-only" for="site-q">Termine di ricerca</label>
+      <input id="site-q" name="q" type="search" placeholder="Inserire un termine di ricerca">
+      <button type="submit" class="search-btn" data-testid="header-search-button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span>Cerca</span></button>
+    </form>
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="main-nav-list" data-nav-toggle><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Menu</button>
+  </div>
+  <nav class="main-nav" aria-label="Navigazione principale" data-testid="main-nav">
+    <div class="container">
+      <ul id="main-nav-list">
+        <li><a href="index.html">Pagina iniziale</a></li><li><a href="sportello-online.html">Sportello online</a></li><li><a href="istruzioni.html">eTrasloco</a></li><li><a href="orari.html">Orari</a></li><li><a href="calendario-rifiuti.html">Rifiuti</a></li><li><a href="tempo-libero.html" aria-current="page">Tempo libero</a></li><li><a href="bilingue.html">Avvisi</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="main" tabindex="-1">
+<div class="container page-tools">
+  <nav class="breadcrumb" aria-label="Percorso di navigazione"><ol><li><a href="index.html">Pagina iniziale</a></li><li aria-current="page">Tempo libero e turismo</li></ol></nav>
+  <button type="button" class="tool-btn" data-print data-testid="print-button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>Stampa</button>
+</div>
+<div class="container page-head">
+  <h1>Tempo libero e turismo</h1>
+  <p class="lead">Riva del lago, bosco dell’Aarenwald e un paese pieno di vita: scoprite Musterwil in ogni stagione.</p>
+</div>
+<div class="container">
+  <div class="carousel" role="region" aria-label="Immagini di Musterwil" data-carousel data-interval="5000" data-testid="carousel">
+    <div class="carousel-track">
+      <figure class="slide is-active"><img src="../assets/img/slide-seeufer.svg" alt="Pontile e barca a vela sul lago nella luce della sera" width="1200" height="500"><figcaption>Riva del lago: lido, pontile e passeggiata</figcaption></figure>
+      <figure class="slide"><img src="../assets/img/slide-wald.svg" alt="Sentiero nel bosco autunnale con pannello informativo" width="1200" height="500"><figcaption>Sentiero didattico dell’Aarenwald – 4,5 km, ideale per famiglie</figcaption></figure>
+      <figure class="slide"><img src="../assets/img/slide-dorfplatz.svg" alt="Piazza del paese con fontana e bancarelle" width="1200" height="500"><figcaption>Musterwiler Märit in piazza – prossima data: 24 ottobre</figcaption></figure>
+      <figure class="slide"><img src="../assets/img/slide-schiff.svg" alt="Battello di linea sul lago davanti a colline boscose" width="1200" height="500"><figcaption>Giro del lago in battello: ogni giorno da aprile a ottobre</figcaption></figure>
+    </div>
+    <span class="carousel-ctrl carousel-prev" data-carousel-prev data-testid="carousel-prev"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></span>
+    <span class="carousel-ctrl carousel-next" data-carousel-next data-testid="carousel-next"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+    <div class="carousel-dots" aria-hidden="true"><span class="carousel-dot is-active"></span><span class="carousel-dot"></span><span class="carousel-dot"></span><span class="carousel-dot"></span></div>
+  </div>
+  <section class="section" aria-labelledby="offers-title">
+    <h2 id="offers-title">Offerte a Musterwil</h2>
+    <div class="filter-bar">
+      <label for="offer-filter">Filtrare le offerte</label>
+      <select id="offer-filter" data-filter-target="offer-list" data-filter-status="offer-count" data-testid="activity-filter">
+        <option value="all">Tutte le offerte</option><option value="sport">Sport e bagni</option><option value="kultur">Cultura</option><option value="natur">Natura</option><option value="gastro">Gastronomia</option>
+      </select>
+      <p id="offer-count" class="filter-count" role="status" data-template="{n} offerte visualizzate"></p>
+    </div>
+    <ul class="offer-grid" id="offer-list">
+      <li data-category="sport"><p class="offer-tag">Sport e bagni</p><h3>Lido sulla riva del lago</h3><p>Prato, trampolino e vasca per bambini. Aperto da metà maggio a metà settembre, con il bel tempo dalle 9 alle 20.</p></li>
+      <li data-category="kultur"><p class="offer-tag">Cultura</p><h3>Cinema all’aperto sul lago</h3><p>Ogni venerdì di luglio e agosto l’associazione culturale proietta un film sotto le stelle. Entrata libera, colletta.</p></li>
+      <li data-category="natur"><p class="offer-tag">Natura</p><h3>Sentiero didattico</h3><p>4,5 km con 20 pannelli su alberi, animali e funghi. Percorribile con passeggini.</p></li>
+      <li data-category="gastro" data-testid="activity-sushi"><p class="offer-tag">Gastronomia</p><h3>Serata sushi al Café du Lac</h3><p>Ogni primo venerdì del mese il Café du Lac propone sushi e piatti del lago. Prenotazione consigliata.</p></li>
+    </ul>
+  </section>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <h2 class="footer-title">Amministrazione comunale di Musterwil</h2>
+      <address>Dorfstrasse 1<br>9999 Musterwil<br>Telefono <a href="tel:+41320001234">032 000 12 34</a><br><a href="mailto:gemeinde@musterwil.example">gemeinde@musterwil.example</a></address>
+    </div>
+    <div>
+      <h2 class="footer-title">Orari degli sportelli</h2>
+      <p>Lu–ve 08.00–11.30<br>Lu, ma 14.00–17.00<br>Gio 14.00–18.30<br>Ve 14.00–16.00</p>
+      <p><a href="orari.html">Tutti gli orari</a></p>
+    </div>
+    <div>
+      <h2 class="footer-title">Servizi</h2>
+      <ul><li><a href="sportello-online.html">Sportello online</a></li><li><a href="mappa-del-sito.html">Mappa del sito</a></li><li><a href="ricerca.html">Ricerca</a></li><li><a href="accessibilita.html">Accessibilità</a></li></ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <p>© 2026 Comune di Musterwil</p>
+    <p>Musterwil è un comune fittizio. Nomi, indirizzi e cifre di questo sito dimostrativo sono inventati.</p>
+  </div>
+</footer>
+</body>
+</html>

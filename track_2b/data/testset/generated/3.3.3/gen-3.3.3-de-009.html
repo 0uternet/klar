@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gruppenraum reservieren – Bibliothek Mustersee</title>
+<style>body{margin:0;font-family:Arial, Helvetica, sans-serif;color:#16181d;background:#ffffff;line-height:1.5}a{color:#1f4fd8}.site-header{background:#2b2f3a;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #d4d7de;color:#50555e;padding:16px 24px;font-size:.9rem}.box{background:#f1f2f5;padding:16px;border-radius:8px}.muted{color:#50555e}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #2b2f3a;background:#2b2f3a;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #d4d7de;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #d4d7de;border-radius:10px;padding:12px;background:#ffffff}.fld{margin:0 0 14px}.fld label{margin-top:0}.hint{margin:2px 0 4px;font-size:.92rem;color:#4b5563}.err{margin:4px 0 0;color:#a3001b;font-weight:600;min-height:0}.is-invalid{border:2px solid #c8102e;background:#fff1f2}.msgbox{border:2px solid #a3001b;background:#fff6f6;padding:10px 14px;border-radius:6px;margin:0 0 16px}.okbox{border:2px solid #2f6b3a;background:#eef7ef;padding:10px 14px;border-radius:6px;margin:16px 0}.row{display:flex;flex-wrap:wrap;gap:0 18px}.row .fld{flex:1 1 180px}fieldset{border:1px solid #c5ccd3;border-radius:8px;padding:8px 16px 4px;margin:0 0 16px}legend{font-weight:700;padding:0 4px}.req{color:#a3001b}.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.icon-slot svg{vertical-align:middle;margin-left:6px}.actions{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}.btn-sec{background:#ffffff;color:#1d2327;border:1px solid #6b7280}aside.box{margin-top:24px}.dialog{position:fixed;left:50%;top:20%;transform:translateX(-50%);max-width:440px;background:#ffffff;border:2px solid #1d2327;border-radius:10px;padding:16px 20px;box-shadow:0 8px 30px rgba(0,0,0,.25)}.crumbs{font-size:.9rem;margin:0 0 8px}</style>
+</head>
+<body>
+<main>
+<h1>Gruppenraum reservieren</h1>
+<p>Der Gruppenraum im 1. Stock bietet Platz für 8 Personen und kann für maximal drei Stunden reserviert werden.</p>
+<form id="gruppenraum" novalidate><div class="fld"><label for="person">Name</label><input id="person" name="person" type="text" aria-describedby="err-person"><p class="err" id="err-person"></p></div><div class="row"><div class="fld"><label for="tag">Datum der Reservation</label><input id="tag" name="tag" type="text" aria-describedby="hint-tag err-tag"><p class="hint" id="hint-tag">TT.MM.JJJJ</p><p class="err" id="err-tag"></p></div><div class="fld"><label for="zeit">Zeitfenster</label><select id="zeit" name="zeit"><option>9.00–12.00 Uhr</option><option>13.00–16.00 Uhr</option><option>16.00–19.00 Uhr</option></select></div></div><div class="actions"><button type="submit">Absenden</button></div></form><div class="okbox" id="danke" tabindex="-1" hidden><p>Vielen Dank! Ihre Angaben wurden übermittelt.</p></div>
+</main>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var form = document.getElementById("gruppenraum");
+  var done = document.getElementById("danke");
+  var rules = [
+    {f:"person",t:function(v){return v !== "";},m:"Bitte geben Sie Ihren Namen ein.",o:"text",x:"err-person",mk:1,ln:0},
+    {f:"tag",t:function(v){return (function(){var m=/^(\d{2})\.(\d{2})\.(\d{4})$/.exec(v);if(!m){return false;}var d=new Date(+m[3],+m[2]-1,+m[1]);return d.getDate()===+m[1]&&d.getMonth()===+m[2]-1;})();},m:"Datum ungültig.",o:"text",x:"err-tag",mk:1,ln:0}
+  ];
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var first = null, items = [];
+    done.hidden = true;
+    rules.forEach(function (r) {
+      var f = document.getElementById(r.f);
+      var v = f.value.trim(), ok = r.t(v);
+      r.cur = (!ok && r.mf) ? r.mf(v) : r.m;
+      var x = r.x ? document.getElementById(r.x) : null;
+      if (r.mk) { if (ok) { f.removeAttribute("aria-invalid"); f.classList.remove("is-invalid"); }
+                  else { f.setAttribute("aria-invalid", "true"); f.classList.add("is-invalid"); } }
+      if (r.o === "text") { x.textContent = ok ? "" : r.cur; if (x.hasAttribute("hidden") || ok) { x.hidden = ok; } }
+      if (r.o === "show") { x.hidden = ok; }
+      if (!ok) { items.push(r); if (!first) { first = f; } }
+    });
+    if (first) { first.focus(); return; }
+    done.hidden = false; done.focus();
+  });
+});
+</script>
+</body>
+</html>

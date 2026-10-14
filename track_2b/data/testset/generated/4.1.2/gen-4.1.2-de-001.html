@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Umfrage Ortsbus – Beispielwiler Verkehrsbetriebe</title>
+<style>body{margin:0;font-family:Verdana, Geneva, sans-serif;color:#102a43;background:#f7fafc;line-height:1.5}a{color:#0a558c}.site-header{background:#1f6f8b;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #c5d5e4;color:#486581;padding:16px 24px;font-size:.9rem}.box{background:#e3eef6;padding:16px;border-radius:8px}.muted{color:#486581}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #1f6f8b;background:#1f6f8b;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #c5d5e4;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #c5d5e4;border-radius:10px;padding:12px;background:#ffffff}.btn{display:inline-block;padding:8px 16px;border-radius:6px;text-decoration:none;font-weight:600;background:#0b4f6c;color:#ffffff}.panel{border:1px solid #c9d3d8;border-radius:8px;padding:10px 14px;margin-top:8px}.chev svg{transition:transform .2s}.aperto .chev svg{transform:rotate(90deg)}.knopf{display:inline-block;background:#2f5d34;color:#ffffff;padding:8px 18px;border-radius:6px;cursor:pointer;font-weight:600;margin-top:12px}</style>
+</head>
+<body>
+<main>
+<h1>Online-Umfrage zum Ortsbus</h1>
+<p>Wie zufrieden sind Sie mit dem Ortsbus? Die Umfrage dauert etwa fünf Minuten und ist anonym.</p>
+<div class="knopf" id="umfrage-start" onclick="document.getElementById('frage-1').hidden = false; this.hidden = true;">Umfrage starten</div>
+<div id="frage-1" hidden>
+<p>Wie oft benutzen Sie den Ortsbus?</p>
+<p><label><input type="radio" name="haeufigkeit" value="taeglich"> täglich</label>
+<label><input type="radio" name="haeufigkeit" value="woechentlich"> wöchentlich</label>
+<label><input type="radio" name="haeufigkeit" value="selten"> selten</label></p>
+</div>
+<aside class="box news-aside"><h2>Sperrung Seeweg</h2><p>Wegen Belagsarbeiten ist der Seeweg vom 3. bis 7.11.2026 für den Verkehr gesperrt. Der Bus fährt in dieser Zeit über die Dorfstrasse.</p><p><a href="umleitung-seeweg.html">Umleitungsplan Seeweg</a></p></aside>
+</main>
+</body>
+</html>

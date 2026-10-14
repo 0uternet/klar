@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Book a bed – Lake Fictal Hostel</title>
+<style>body{margin:0;font-family:system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;color:#1d2327;background:#ffffff;line-height:1.5}a{color:#0b5394}.site-header{background:#0b4f6c;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #c9d3d8;color:#4f5b62;padding:16px 24px;font-size:.9rem}.box{background:#e8f1f5;padding:16px;border-radius:8px}.muted{color:#4f5b62}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #0b4f6c;background:#0b4f6c;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #c9d3d8;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #c9d3d8;border-radius:10px;padding:12px;background:#ffffff}</style>
+</head>
+<body>
+<main>
+<h1>Book a dormitory bed</h1>
+<form action="availability.html" method="get">
+<label for="arrival">Arrival date</label>
+<input id="arrival" name="arrival" type="date">
+<label for="nights">Nights</label>
+<input id="nights" name="nights" type="number" min="1" max="14" value="1">
+<p id="booking-hint">Select your arrival date, then press Check availability.</p>
+<p><button type="submit">Check availability</button></p>
+</form>
+<aside class="box news-aside"><h2>Winter opening hours</h2><p>From December the visitor centre is open daily from 10 am to 4 pm.</p><p><a href="hours.html">All opening hours</a></p></aside>
+</main>
+</body>
+</html>

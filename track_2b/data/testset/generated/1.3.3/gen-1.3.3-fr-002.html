@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Signaler un problème – Commune d&#x27;Exempleval</title>
+<style>body{margin:0;font-family:system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;color:#1d2327;background:#ffffff;line-height:1.5}a{color:#0b5394}.site-header{background:#0b4f6c;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #c9d3d8;color:#4f5b62;padding:16px 24px;font-size:.9rem}.box{background:#e8f1f5;padding:16px;border-radius:8px}.muted{color:#4f5b62}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #0b4f6c;background:#0b4f6c;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #c9d3d8;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #c9d3d8;border-radius:10px;padding:12px;background:#ffffff}.boutons{display:flex;align-items:center;gap:20px;margin-top:16px}.boutons .grand{width:72px;height:72px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center}.boutons .petit{width:34px;height:34px;padding:0;background:#ffffff;color:#1d2327;border:1px solid #6b7280}</style>
+</head>
+<body>
+<header class="site-header"><a class="site-name" href="index.html">Commune d&#x27;Exempleval</a><nav class="site-nav" aria-label="Navigation principale"><ul><li><a href="accueil.html">Accueil</a></li><li><a href="actualites.html">Actualités</a></li><li><a href="administration.html">Administration</a></li><li><a href="vie-pratique.html">Vie pratique</a></li><li><a href="loisirs.html">Loisirs</a></li></ul></nav></header>
+<main>
+<h1>Signaler un problème sur la voie publique</h1>
+<p>Lampadaire en panne, nid-de-poule, banc cassé ? Décrivez le problème et indiquez l'endroit le plus précisément possible.</p>
+<form action="signalement-recu.html" method="post">
+<label for="lieu">Lieu</label>
+<input id="lieu" name="lieu" type="text">
+<label for="description">Description du problème</label>
+<textarea id="description" name="description" rows="4"></textarea>
+<p id="consigne-envoi">Une fois la description rédigée, utilisez le grand bouton pour transmettre votre message.</p>
+<div class="boutons">
+<button type="submit" class="grand" aria-label="Envoyer le signalement"><svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></g></svg></button>
+<button type="reset" class="petit" aria-label="Effacer le formulaire"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l14 14M19 5L5 19"/></g></svg></button>
+</div>
+</form>
+</main>
+<footer class="site-footer"><p>Commune d&#x27;Exempleval · Rue des Tilleuls 6 · <a href="kontakt.html">Contact</a></p></footer>
+</body>
+</html>

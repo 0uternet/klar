@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="fr-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instructions eDéménagement – Commune de Musterwil</title>
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/css/site.css">
+<script>document.documentElement.classList.add('js');</script>
+<script src="../assets/js/site.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Aller au contenu</a>
+<div class="topbar">
+  <div class="container topbar-inner">
+    <p class="topbar-note">Commune de Musterwil · Région Aarenwald</p>
+    <nav class="lang-switch" aria-label="Langue" data-testid="lang-switch"><ul><li><a href="../anleitung.html" lang="de" hreflang="de">DE</a></li><li><a href="instructions.html" lang="fr" hreflang="fr" aria-current="true">FR</a></li><li><a href="../it/istruzioni.html" lang="it" hreflang="it">IT</a></li></ul></nav>
+  </div>
+</div>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="index.html"><img src="../assets/img/logo.svg" alt="Commune de Musterwil – Accueil" width="272" height="56" data-testid="site-logo"></a>
+    <form class="site-search" role="search" action="recherche.html" method="get">
+      <label class="sr-only" for="site-q">Terme de recherche</label>
+      <input id="site-q" name="q" type="search" placeholder="Saisir un terme de recherche">
+      <button type="submit" class="search-btn" data-testid="header-search-button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span>Recherche</span></button>
+    </form>
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="main-nav-list" data-nav-toggle><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Menu</button>
+  </div>
+  <nav class="main-nav" aria-label="Navigation principale" data-testid="main-nav">
+    <div class="container">
+      <ul id="main-nav-list">
+        <li><a href="index.html">Accueil</a></li><li><a href="guichet-en-ligne.html">Guichet en ligne</a></li><li><a href="instructions.html" aria-current="page">eDéménagement</a></li><li><a href="horaires.html">Horaires</a></li><li><a href="calendrier-dechets.html">Déchets</a></li><li><a href="loisirs.html">Loisirs</a></li><li><a href="bilingue.html">Avis officiels</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="main" tabindex="-1">
+<div class="container page-tools">
+  <nav class="breadcrumb" aria-label="Fil d'Ariane"><ol><li><a href="index.html">Accueil</a></li><li aria-current="page">Instructions eDéménagement</li></ol></nav>
+  <button type="button" class="tool-btn" data-print data-testid="print-button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>Imprimer</button>
+</div>
+<div class="container page-head">
+  <h1>Annoncer un déménagement en ligne</h1>
+  <p class="lead">Avec eDéménagement, vous annoncez votre déménagement en Suisse en ligne – à l’ancienne et à la nouvelle commune en même temps.</p>
+</div>
+<div class="container guide-layout">
+  <ol class="steps">
+    <li><h2>Ouvrir le formulaire</h2><p>Ouvrez le guichet en ligne et choisissez « Annoncer un déménagement ». Préparez votre nouvelle adresse et la date du déménagement.</p></li>
+    <li><h2>Saisir les données personnelles</h2><p data-testid="instruction-table-ref">Indiquez votre nom, votre date de naissance et votre adresse actuelle. Les documents nécessaires figurent dans le tableau ci-dessous.</p></li>
+    <li><h2>Passer à la nouvelle adresse</h2><p data-testid="instruction-next-button">Cliquez en bas à droite sur « Suivant ».</p></li>
+    <li><h2>Confirmer les données</h2><p data-testid="instruction-green-button">Vérifiez votre nouvelle adresse. Si tout est correct, cliquez sur le bouton vert à droite.</p></li>
+    <li><h2>Recevoir la confirmation</h2><p>Vous recevez immédiatement une confirmation par e-mail. La commune vous contacte s’il manque des documents.</p></li>
+  </ol>
+  <aside class="mock-wrap" aria-labelledby="mock-title">
+    <h2 id="mock-title" class="mock-heading">Vue d’exercice</h2>
+    <p class="mock-intro">Voici à quoi ressemble eDéménagement. Essayez les boutons : aucune donnée n’est transmise.</p>
+    <div class="mock-window">
+      <div class="mock-bar"><span></span><span></span><span></span><p>eDéménagement – étape 2 sur 4</p></div>
+      <div class="mock-body">
+        <p class="mock-label">Nom</p><p class="mock-value">Lukas Muster</p>
+        <p class="mock-label">Adresse actuelle</p><p class="mock-value">Lindenweg 3, 9998 Beispielhausen</p>
+        <div class="mock-actions"><button type="button" class="btn" data-practice="practice-status" data-practice-msg="Exercice : vous êtes maintenant à l’étape 3." data-testid="practice-next-button">Suivant</button></div>
+      </div>
+    </div>
+    <div class="mock-window">
+      <div class="mock-bar"><span></span><span></span><span></span><p>eDéménagement – étape 3 sur 4</p></div>
+      <div class="mock-body mock-confirm">
+        <div><p class="mock-label">Nouvelle adresse</p><p class="mock-value">Seeweg 7, 9999 Musterwil</p><p class="mock-label">Date d’arrivée</p><p class="mock-value">1<sup>er</sup> décembre 2026</p></div>
+        <button type="button" class="round-go" aria-label="Continuer" data-practice="practice-status" data-practice-msg="Exercice : vos données seraient maintenant confirmées." data-testid="practice-confirm-button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+    <p id="practice-status" class="practice-status" role="status"></p>
+  </aside>
+</div>
+<div class="container section">
+  <div class="table-wrap">
+    <table class="data-table" data-testid="documents-table">
+      <caption>Documents nécessaires</caption>
+      <thead><tr><th scope="col">Votre situation</th><th scope="col">Documents</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Ressortissants suisses</th><td>Acte d’origine (uniquement en cas d’arrivée d’une autre commune)</td></tr>
+        <tr><th scope="row">Ressortissants étrangers</th><td>Permis de séjour et passeport ou carte d’identité valable</td></tr>
+        <tr><th scope="row">Familles</th><td>Certificat de famille ou livret de famille</td></tr>
+        <tr><th scope="row">Locataires</th><td>Contrat de bail indiquant le numéro du logement</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <h2 class="footer-title">Administration communale de Musterwil</h2>
+      <address>Dorfstrasse 1<br>9999 Musterwil<br>Téléphone <a href="tel:+41320001234">032 000 12 34</a><br><a href="mailto:gemeinde@musterwil.example">gemeinde@musterwil.example</a></address>
+    </div>
+    <div>
+      <h2 class="footer-title">Heures d'ouverture des guichets</h2>
+      <p>Lu–ve 8 h 00–11 h 30<br>Lu, ma 14 h 00–17 h 00<br>Je 14 h 00–18 h 30<br>Ve 14 h 00–16 h 00</p>
+      <p><a href="horaires.html">Tous les horaires</a></p>
+    </div>
+    <div>
+      <h2 class="footer-title">Services</h2>
+      <ul><li><a href="guichet-en-ligne.html">Guichet en ligne</a></li><li><a href="plan-du-site.html">Plan du site</a></li><li><a href="recherche.html">Recherche</a></li><li><a href="accessibilite.html">Accessibilité</a></li></ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <p>© 2026 Commune de Musterwil</p>
+    <p>Musterwil est une commune fictive. Les noms, adresses et chiffres de ce site de démonstration sont inventés.</p>
+  </div>
+</footer>
+</body>
+</html>

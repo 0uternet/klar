@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="fr-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Déclaration d’accessibilité – Commune de Musterwil</title>
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/css/site.css">
+<script>document.documentElement.classList.add('js');</script>
+<script src="../assets/js/site.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Aller au contenu</a>
+<div class="topbar">
+  <div class="container topbar-inner">
+    <p class="topbar-note">Commune de Musterwil · Région Aarenwald</p>
+    <nav class="lang-switch" aria-label="Langue" data-testid="lang-switch"><ul><li><a href="../barrierefreiheit.html" lang="de" hreflang="de">DE</a></li><li><a href="accessibilite.html" lang="fr" hreflang="fr" aria-current="true">FR</a></li><li><a href="../it/accessibilita.html" lang="it" hreflang="it">IT</a></li></ul></nav>
+  </div>
+</div>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="index.html"><img src="../assets/img/logo.svg" alt="Commune de Musterwil – Accueil" width="272" height="56" data-testid="site-logo"></a>
+    <form class="site-search" role="search" action="recherche.html" method="get">
+      <label class="sr-only" for="site-q">Terme de recherche</label>
+      <input id="site-q" name="q" type="search" placeholder="Saisir un terme de recherche">
+      <button type="submit" class="search-btn" data-testid="header-search-button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span>Recherche</span></button>
+    </form>
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="main-nav-list" data-nav-toggle><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Menu</button>
+  </div>
+  <nav class="main-nav" aria-label="Navigation principale" data-testid="main-nav">
+    <div class="container">
+      <ul id="main-nav-list">
+        <li><a href="index.html">Accueil</a></li><li><a href="guichet-en-ligne.html">Guichet en ligne</a></li><li><a href="instructions.html">eDéménagement</a></li><li><a href="horaires.html">Horaires</a></li><li><a href="calendrier-dechets.html">Déchets</a></li><li><a href="loisirs.html">Loisirs</a></li><li><a href="bilingue.html">Avis officiels</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="main" tabindex="-1">
+<div class="container page-tools">
+  <nav class="breadcrumb" aria-label="Fil d'Ariane"><ol><li><a href="index.html">Accueil</a></li><li aria-current="page">Accessibilité</li></ol></nav>
+  <button type="button" class="tool-btn" data-print data-testid="print-button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>Imprimer</button>
+</div>
+<div class="container page-head"><h1>Déclaration d’accessibilité</h1></div>
+<div class="container with-sidebar">
+  <div class="content">
+    <p>La commune de Musterwil s’efforce de rendre son site musterwil.example accessible conformément aux Web Content Accessibility Guidelines (WCAG) 2.1, niveau AA, et à la norme eCH-0059.</p>
+    <h2>État de conformité</h2>
+    <p>Ce site est <strong>partiellement conforme</strong> aux WCAG 2.1, niveau AA. Les contenus énumérés ci-dessous ne sont pas encore accessibles.</p>
+    <h2>Contenus non accessibles</h2>
+    <ul><li>Certains anciens documents PDF des archives (avant 2022) ne sont pas entièrement accessibles.</li><li>Certaines images d’anciens articles n’ont pas de texte alternatif pertinent.</li><li>Les enregistrements de l’assemblée communale n’ont pas encore de sous-titres.</li></ul>
+    <h2>Établissement de cette déclaration</h2>
+    <p>Cette déclaration a été établie le 3 mars 2025 sur la base d’une auto-évaluation de l’administration communale.</p>
+    <h2>Retour d’information</h2>
+    <p>Vous avez constaté un problème d’accessibilité ? Merci de nous le signaler au moyen du formulaire suivant.</p>
+    <form class="form-card form-std" action="accessibilite.html" method="get" data-feedback-form>
+      <div class="form-grid">
+        <div class="field"><label for="fb-name">Votre nom</label><input id="fb-name" type="text" autocomplete="name"></div>
+        <div class="field"><label for="fb-email">Votre adresse e-mail</label><input id="fb-email" type="email" autocomplete="email"></div>
+        <div class="field field-full"><label for="fb-msg">Votre message</label><textarea id="fb-msg" rows="5"></textarea></div>
+      </div>
+      <div class="form-actions"><button type="submit" class="btn" data-testid="feedback-submit">Envoyer</button></div>
+      <p class="feedback-status" role="status" data-feedback-status data-msg="Merci pour votre message. Nous vous répondrons dans un délai de dix jours ouvrables." hidden></p>
+    </form>
+  </div>
+  <nav class="side" aria-labelledby="related-title" data-testid="related-sidebar">
+    <h2 id="related-title" class="side-title">Pages liées</h2>
+    <ul><li><a href="plan-du-site.html">Plan du site</a></li><li><a href="recherche.html">Recherche</a></li><li><a href="guichet-en-ligne.html">Guichet en ligne</a></li></ul>
+  </nav>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <h2 class="footer-title">Administration communale de Musterwil</h2>
+      <address>Dorfstrasse 1<br>9999 Musterwil<br>Téléphone <a href="tel:+41320001234">032 000 12 34</a><br><a href="mailto:gemeinde@musterwil.example">gemeinde@musterwil.example</a></address>
+    </div>
+    <div>
+      <h2 class="footer-title">Heures d'ouverture des guichets</h2>
+      <p>Lu–ve 8 h 00–11 h 30<br>Lu, ma 14 h 00–17 h 00<br>Je 14 h 00–18 h 30<br>Ve 14 h 00–16 h 00</p>
+      <p><a href="horaires.html">Tous les horaires</a></p>
+    </div>
+    <div>
+      <h2 class="footer-title">Services</h2>
+      <ul><li><a href="guichet-en-ligne.html">Guichet en ligne</a></li><li><a href="plan-du-site.html">Plan du site</a></li><li><a href="recherche.html">Recherche</a></li><li><a href="accessibilite.html">Accessibilité</a></li></ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <p>© 2026 Commune de Musterwil</p>
+    <p>Musterwil est une commune fictive. Les noms, adresses et chiffres de ce site de démonstration sont inventés.</p>
+  </div>
+</footer>
+</body>
+</html>

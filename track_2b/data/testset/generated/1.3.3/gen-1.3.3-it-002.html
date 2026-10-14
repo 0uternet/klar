@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="it-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sportello virtuale – Comune di Esempiano</title>
+<style>body{margin:0;font-family:Georgia, 'Times New Roman', serif;color:#241c1c;background:#fffdfb;line-height:1.5}a{color:#7a1f2b}.site-header{background:#7a1f2b;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #e0d2d2;color:#5d5050;padding:16px 24px;font-size:.9rem}.box{background:#f7eeee;padding:16px;border-radius:8px}.muted{color:#5d5050}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #7a1f2b;background:#7a1f2b;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #e0d2d2;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #e0d2d2;border-radius:10px;padding:12px;background:#ffffff}</style>
+</head>
+<body>
+<header class="site-header"><a class="site-name" href="index.html">Comune di Esempiano</a><nav class="site-nav" aria-label="Navigazione principale"><ul><li><a href="home.html">Home</a></li><li><a href="attualita.html">Attualità</a></li><li><a href="amministrazione.html">Amministrazione</a></li><li><a href="vita-quotidiana.html">Vita quotidiana</a></li><li><a href="tempo-libero.html">Tempo libero</a></li></ul></nav></header>
+<main>
+<h1>Sportello virtuale</h1>
+<p>Siete in coda per una consulenza video con l'Ufficio controllo abitanti. Il tempo di attesa medio è di 8 minuti.</p>
+<p id="istruzione-turno">Lasciate aperta questa pagina: quando sentite il segnale acustico è il vostro turno e potete entrare nella videochiamata.</p>
+<p><a href="videochiamata.html">Entrare nella videochiamata</a></p>
+<script>
+setTimeout(function () {
+  try {
+    var Ctx = window.AudioContext || window.webkitAudioContext;
+    var ctx = new Ctx();
+    var osc = ctx.createOscillator();
+    osc.frequency.value = 880;
+    osc.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.4);
+  } catch (e) {}
+}, 6000);
+</script>
+</main>
+<footer class="site-footer"><p>Comune di Esempiano · Via ai Ronchi 5 · <a href="kontakt.html">Contatto</a></p></footer>
+</body>
+</html>

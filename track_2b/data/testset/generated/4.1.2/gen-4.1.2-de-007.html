@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wasserzähler – Wasserversorgung Fiktal</title>
+<style>body{margin:0;font-family:system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;color:#1d2327;background:#ffffff;line-height:1.5}a{color:#0b5394}.site-header{background:#0b4f6c;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #c9d3d8;color:#4f5b62;padding:16px 24px;font-size:.9rem}.box{background:#e8f1f5;padding:16px;border-radius:8px}.muted{color:#4f5b62}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #0b4f6c;background:#0b4f6c;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #c9d3d8;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #c9d3d8;border-radius:10px;padding:12px;background:#ffffff}.btn{display:inline-block;padding:8px 16px;border-radius:6px;text-decoration:none;font-weight:600;background:#0b4f6c;color:#ffffff}.panel{border:1px solid #c9d3d8;border-radius:8px;padding:10px 14px;margin-top:8px}.chev svg{transition:transform .2s}.aperto .chev svg{transform:rotate(90deg)}.kachel{display:inline-block;background:#2f5d34;color:#ffffff;padding:10px 18px;border-radius:6px;cursor:pointer;font-weight:600}.kachel:focus{outline:3px solid #e07a2e;outline-offset:2px}</style>
+</head>
+<body>
+<main>
+<h1>Wasserzähler ablesen</h1>
+<p>Bitte melden Sie uns den Zählerstand bis 15. Januar 2027.</p>
+<div class="kachel" role="button" tabindex="0" id="ablesung-start">Zählerstand melden</div>
+<div id="ablesung-form" class="panel" hidden><p>Das Formular wird geladen …</p></div>
+<script>
+(function () {
+  var k = document.getElementById('ablesung-start');
+  function los() { document.getElementById('ablesung-form').hidden = false; }
+  k.addEventListener('click', los);
+  k.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); los(); }
+  });
+})();
+</script>
+</main>
+</body>
+</html>

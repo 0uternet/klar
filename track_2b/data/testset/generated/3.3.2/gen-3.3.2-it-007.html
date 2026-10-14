@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ordinazione di sacchi tassati – Comune di Esempiano</title>
+<style>body{margin:0;font-family:Verdana, Geneva, sans-serif;color:#102a43;background:#f7fafc;line-height:1.5}a{color:#0a558c}.site-header{background:#1f6f8b;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #c5d5e4;color:#486581;padding:16px 24px;font-size:.9rem}.box{background:#e3eef6;padding:16px;border-radius:8px}.muted{color:#486581}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #1f6f8b;background:#1f6f8b;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #c5d5e4;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #c5d5e4;border-radius:10px;padding:12px;background:#ffffff}.fld{margin:0 0 14px}.fld label{margin-top:0}.hint{margin:2px 0 4px;font-size:.92rem;color:#4b5563}.err{margin:4px 0 0;color:#a3001b;font-weight:600;min-height:0}.is-invalid{border:2px solid #c8102e;background:#fff1f2}.msgbox{border:2px solid #a3001b;background:#fff6f6;padding:10px 14px;border-radius:6px;margin:0 0 16px}.okbox{border:2px solid #2f6b3a;background:#eef7ef;padding:10px 14px;border-radius:6px;margin:16px 0}.row{display:flex;flex-wrap:wrap;gap:0 18px}.row .fld{flex:1 1 180px}fieldset{border:1px solid #c5ccd3;border-radius:8px;padding:8px 16px 4px;margin:0 0 16px}legend{font-weight:700;padding:0 4px}.req{color:#a3001b}.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.icon-slot svg{vertical-align:middle;margin-left:6px}.actions{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}.btn-sec{background:#ffffff;color:#1d2327;border:1px solid #6b7280}aside.box{margin-top:24px}.dialog{position:fixed;left:50%;top:20%;transform:translateX(-50%);max-width:440px;background:#ffffff;border:2px solid #1d2327;border-radius:10px;padding:16px 20px;box-shadow:0 8px 30px rgba(0,0,0,.25)}.crumbs{font-size:.9rem;margin:0 0 8px}</style>
+</head>
+<body>
+<main>
+<h1>Ordinazione di sacchi tassati</h1>
+<p>I sacchi vengono consegnati a domicilio con fattura. Ordinazione minima: un rotolo.</p>
+<form id="ordine-sacchi"><table><caption>Sacchi tassati (rotoli da 10 sacchi)</caption><tr><th id="col-formato">Formato</th><th id="col-prezzo">Prezzo per rotolo</th><th id="col-rotoli">Numero di rotoli</th></tr><tr><th id="riga-17">17 litri</th><td>CHF 10.–</td><td><input id="rotoli-17" name="rotoli-17" type="number" min="0" max="10" size="3" aria-labelledby="col-rotoli riga-17"></td></tr><tr><th id="riga-35">35 litri</th><td>CHF 20.–</td><td><input id="rotoli-35" name="rotoli-35" type="number" min="0" max="10" size="3" aria-labelledby="col-rotoli riga-35"></td></tr><tr><th id="riga-60">60 litri</th><td>CHF 34.–</td><td><input id="rotoli-60" name="rotoli-60" type="number" min="0" max="10" size="3" aria-labelledby="col-rotoli riga-60"></td></tr><tr><th id="riga-110">110 litri</th><td>CHF 60.–</td><td><input id="rotoli-110" name="rotoli-110" type="number" min="0" max="10" size="3" aria-labelledby="col-rotoli riga-110"></td></tr></table><div class="fld"><label for="cliente">Nome e indirizzo</label><input id="cliente" name="cliente" type="text"></div><div class="actions"><button type="submit">Invia</button></div></form><div class="okbox" id="grazie" tabindex="-1" hidden><p>Grazie! I suoi dati sono stati trasmessi.</p></div>
+</main>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var form = document.getElementById("ordine-sacchi");
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var d = document.getElementById("grazie"); d.hidden = false; d.focus();
+  });
+});
+</script>
+</body>
+</html>

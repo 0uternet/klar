@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demande de rappel – Commune d&#x27;Exempleval</title>
+<style>body{margin:0;font-family:Arial, Helvetica, sans-serif;color:#16181d;background:#ffffff;line-height:1.5}a{color:#1f4fd8}.site-header{background:#2b2f3a;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #d4d7de;color:#50555e;padding:16px 24px;font-size:.9rem}.box{background:#f1f2f5;padding:16px;border-radius:8px}.muted{color:#50555e}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #2b2f3a;background:#2b2f3a;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #d4d7de;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #d4d7de;border-radius:10px;padding:12px;background:#ffffff}form{max-width:560px}fieldset{border:1px solid #c9d3d8;border-radius:8px;margin:16px 0;padding:8px 14px 14px}legend{font-weight:700}.inline label{display:inline;font-weight:400;margin:0 14px 0 4px}.datum-teile{display:flex;gap:12px}.datum-teile div{flex:0 0 auto}.datum-teile input{width:5em}</style>
+</head>
+<body>
+<main>
+<h1>Demande de rappel</h1>
+<p>Laissez-nous votre numéro : un collaborateur de l'administration vous rappelle dans les deux jours ouvrables.</p>
+<form action="rappel-merci.html" method="post">
+<label for="rappel-nom">Nom et prénom</label>
+<input id="rappel-nom" name="rappel-nom" type="text" autocomplete="name">
+<label for="rappel-tel">Numéro de téléphone</label>
+<input id="rappel-tel" name="rappel-tel" type="tel" autocomplete="phone">
+<label for="sujet">Sujet</label>
+<select id="sujet" name="sujet"><option>Impôts</option><option>Contrôle des habitants</option><option>Constructions</option></select>
+<p><button type="submit">Demander un rappel</button></p>
+</form>
+<aside class="box news-aside"><h2>Budget 2027</h2><p>Le budget peut être consulté au greffe communal jusqu&#x27;au 20 novembre 2026.</p><p><a href="budget-2027.pdf">Budget 2027 (PDF, 380 Ko)</a></p></aside>
+</main>
+</body>
+</html>

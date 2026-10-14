@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subvention à l&#x27;abonnement de bus des apprentis – Commune de Valfictif</title>
+<style>body{margin:0;font-family:'Segoe UI', Tahoma, Verdana, sans-serif;color:#22241f;background:#fbfaf6;line-height:1.5}a{color:#1e5a8c}.site-header{background:#2f5d34;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #cfd6c6;color:#55594f;padding:16px 24px;font-size:.9rem}.box{background:#eef3e8;padding:16px;border-radius:8px}.muted{color:#55594f}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #2f5d34;background:#2f5d34;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #cfd6c6;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #cfd6c6;border-radius:10px;padding:12px;background:#ffffff}.fld{margin:0 0 14px}.fld label{margin-top:0}.hint{margin:2px 0 4px;font-size:.92rem;color:#4b5563}.err{margin:4px 0 0;color:#a3001b;font-weight:600;min-height:0}.is-invalid{border:2px solid #c8102e;background:#fff1f2}.msgbox{border:2px solid #a3001b;background:#fff6f6;padding:10px 14px;border-radius:6px;margin:0 0 16px}.okbox{border:2px solid #2f6b3a;background:#eef7ef;padding:10px 14px;border-radius:6px;margin:16px 0}.row{display:flex;flex-wrap:wrap;gap:0 18px}.row .fld{flex:1 1 180px}fieldset{border:1px solid #c5ccd3;border-radius:8px;padding:8px 16px 4px;margin:0 0 16px}legend{font-weight:700;padding:0 4px}.req{color:#a3001b}.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.icon-slot svg{vertical-align:middle;margin-left:6px}.actions{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}.btn-sec{background:#ffffff;color:#1d2327;border:1px solid #6b7280}aside.box{margin-top:24px}.dialog{position:fixed;left:50%;top:20%;transform:translateX(-50%);max-width:440px;background:#ffffff;border:2px solid #1d2327;border-radius:10px;padding:16px 20px;box-shadow:0 8px 30px rgba(0,0,0,.25)}.crumbs{font-size:.9rem;margin:0 0 8px}</style>
+</head>
+<body>
+<main>
+<h1>Subvention à l&#x27;abonnement de bus des apprentis</h1>
+<p>La commune prend en charge 30 % de l'abonnement annuel des apprentis domiciliés à Valfictif. Joignez une copie du contrat d'apprentissage.</p>
+<form id="subvention" novalidate><div class="row"><div class="fld"><label for="nom">Nom</label><input id="nom" name="nom" type="text" aria-describedby="err-nom" autocomplete="family-name"><p class="err" id="err-nom"></p></div><div class="fld"><label for="prenom">Prénom</label><input id="prenom" name="prenom" type="text" aria-describedby="err-prenom" autocomplete="given-name"><p class="err" id="err-prenom"></p></div></div><div class="fld"><label for="avs">Numéro AVS</label><input id="avs" name="avs" type="text" aria-describedby="err-avs"><p class="err" id="err-avs"></p></div><div class="fld"><label for="entreprise">Entreprise formatrice</label><input id="entreprise" name="entreprise" type="text" aria-describedby="err-entreprise"><p class="err" id="err-entreprise"></p></div><div class="actions"><button type="submit">Envoyer</button></div></form><div class="okbox" id="merci" tabindex="-1" hidden><p>Merci ! Vos données ont bien été transmises.</p></div>
+</main>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var form = document.getElementById("subvention");
+  var done = document.getElementById("merci");
+  var rules = [
+    {f:"nom",t:function(v){return v !== "";},m:"Veuillez indiquer votre nom.",o:"text",x:"err-nom",mk:1,ln:0},
+    {f:"prenom",t:function(v){return v !== "";},m:"Veuillez indiquer votre prénom.",o:"text",x:"err-prenom",mk:1,ln:0},
+    {f:"avs",t:function(v){return /^756\.\d{4}\.\d{4}\.\d{2}$/.test(v);},m:"Numéro AVS invalide.",o:"text",x:"err-avs",mk:1,ln:0},
+    {f:"entreprise",t:function(v){return v !== "";},m:"Veuillez indiquer le nom de l'entreprise formatrice.",o:"text",x:"err-entreprise",mk:1,ln:0}
+  ];
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var first = null, items = [];
+    done.hidden = true;
+    rules.forEach(function (r) {
+      var f = document.getElementById(r.f);
+      var v = f.value.trim(), ok = r.t(v);
+      r.cur = (!ok && r.mf) ? r.mf(v) : r.m;
+      var x = r.x ? document.getElementById(r.x) : null;
+      if (r.mk) { if (ok) { f.removeAttribute("aria-invalid"); f.classList.remove("is-invalid"); }
+                  else { f.setAttribute("aria-invalid", "true"); f.classList.add("is-invalid"); } }
+      if (r.o === "text") { x.textContent = ok ? "" : r.cur; if (x.hasAttribute("hidden") || ok) { x.hidden = ok; } }
+      if (r.o === "show") { x.hidden = ok; }
+      if (!ok) { items.push(r); if (!first) { first = f; } }
+    });
+    if (first) { first.focus(); return; }
+    done.hidden = false; done.focus();
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="it-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Esempiano – Comune di Esempiano</title>
+<style>body{margin:0;font-family:'Segoe UI', Tahoma, Verdana, sans-serif;color:#22241f;background:#fbfaf6;line-height:1.5}a{color:#1e5a8c}.site-header{background:#2f5d34;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #cfd6c6;color:#55594f;padding:16px 24px;font-size:.9rem}.box{background:#eef3e8;padding:16px;border-radius:8px}.muted{color:#55594f}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #2f5d34;background:#2f5d34;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #cfd6c6;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #cfd6c6;border-radius:10px;padding:12px;background:#ffffff}.btn{display:inline-block;padding:8px 16px;border-radius:6px;text-decoration:none;font-weight:600;background:#0b4f6c;color:#ffffff}.panel{border:1px solid #c9d3d8;border-radius:8px;padding:10px 14px;margin-top:8px}.chev svg{transition:transform .2s}.aperto .chev svg{transform:rotate(90deg)}.menu-top{list-style:none;display:flex;gap:18px;padding:0;margin:0 0 16px}.menu-top > li{position:relative}.menu-top .sotto{position:absolute;top:100%;left:0;background:#ffffff;border:1px solid #c9d3d8;list-style:none;padding:8px 12px;margin:0;min-width:200px}</style>
+</head>
+<body>
+<header class="site-header"><a class="site-name" href="index.html">Comune di Esempiano</a><nav class="site-nav" aria-label="Navigazione principale"><ul><li><a href="home.html">Home</a></li><li><a href="attualita.html">Attualità</a></li><li><a href="amministrazione.html">Amministrazione</a></li><li><a href="vita-quotidiana.html">Vita quotidiana</a></li><li><a href="tempo-libero.html">Tempo libero</a></li></ul></nav></header>
+<main>
+<nav aria-label="Servizi">
+<ul class="menu-top">
+<li id="voce-amm"><a href="amministrazione.html" id="link-amm" aria-haspopup="true" aria-expanded="false">Amministrazione</a>
+<ul class="sotto" id="sotto-amm" hidden><li><a href="cancelleria.html">Cancelleria</a></li><li><a href="ufficio-tecnico.html">Ufficio tecnico</a></li><li><a href="controllo-abitanti.html">Controllo abitanti</a></li></ul></li>
+<li><a href="tempo-libero.html">Tempo libero</a></li>
+</ul>
+</nav>
+<h1>Benvenuti a Esempiano</h1>
+<p>Il portale del Comune: servizi, notizie e appuntamenti.</p>
+<script>
+(function () {
+  var voce = document.getElementById('voce-amm');
+  var link = document.getElementById('link-amm');
+  var sotto = document.getElementById('sotto-amm');
+  function apri() { sotto.hidden = false; link.setAttribute('aria-expanded', 'true'); }
+  function chiudi() { sotto.hidden = true; link.setAttribute('aria-expanded', 'false'); }
+  voce.addEventListener('mouseenter', apri);
+  voce.addEventListener('mouseleave', chiudi);
+  link.addEventListener('focus', apri);
+  voce.addEventListener('focusout', function (e) { if (!voce.contains(e.relatedTarget)) { chiudi(); } });
+})();
+</script>
+</main>
+<footer class="site-footer"><p>Comune di Esempiano · Via ai Ronchi 5 · <a href="kontakt.html">Contatto</a></p></footer>
+</body>
+</html>

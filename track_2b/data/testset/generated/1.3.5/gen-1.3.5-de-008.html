@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gemeindechronik – Gemeinde Fiktal</title>
+<style>body{margin:0;font-family:Verdana, Geneva, sans-serif;color:#102a43;background:#f7fafc;line-height:1.5}a{color:#0a558c}.site-header{background:#1f6f8b;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #c5d5e4;color:#486581;padding:16px 24px;font-size:.9rem}.box{background:#e3eef6;padding:16px;border-radius:8px}.muted{color:#486581}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #1f6f8b;background:#1f6f8b;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #c5d5e4;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #c5d5e4;border-radius:10px;padding:12px;background:#ffffff}form{max-width:560px}fieldset{border:1px solid #c9d3d8;border-radius:8px;margin:16px 0;padding:8px 14px 14px}legend{font-weight:700}.inline label{display:inline;font-weight:400;margin:0 14px 0 4px}.datum-teile{display:flex;gap:12px}.datum-teile div{flex:0 0 auto}.datum-teile input{width:5em}</style>
+</head>
+<body>
+<main>
+<h1>Gemeindechronik «Fiktal im Wandel» bestellen</h1>
+<p>Die reich bebilderte Chronik (240 Seiten) kostet CHF 45.– inklusive Versand.</p>
+<form action="chronik-bestellt.html" method="post">
+<label for="anzahl">Anzahl Broschüren</label>
+<input id="anzahl" name="anzahl" type="number" min="1" max="10" value="1">
+<label for="be-name">Vor- und Nachname</label>
+<input id="be-name" name="be-name" type="text" autocomplete="name">
+<label for="be-strasse">Strasse und Nr.</label>
+<input id="be-strasse" name="be-strasse" type="text" autocomplete="street-address">
+<label for="be-plz">PLZ</label>
+<input id="be-plz" name="be-plz" type="text" autocomplete="postal-code">
+<label for="be-ort">Ort</label>
+<input id="be-ort" name="be-ort" type="text" autocomplete="address-level2">
+<p><button type="submit">Bestellen</button></p>
+</form>
+</main>
+</body>
+</html>

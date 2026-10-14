@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz du tri – Commune de Valfictif</title>
+<style>body{margin:0;font-family:Verdana, Geneva, sans-serif;color:#102a43;background:#f7fafc;line-height:1.5}a{color:#0a558c}.site-header{background:#1f6f8b;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #c5d5e4;color:#486581;padding:16px 24px;font-size:.9rem}.box{background:#e3eef6;padding:16px;border-radius:8px}.muted{color:#486581}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #1f6f8b;background:#1f6f8b;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #c5d5e4;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #c5d5e4;border-radius:10px;padding:12px;background:#ffffff}.question{display:flex;flex-direction:column;border:1px solid #c9d3d8;border-radius:8px;padding:12px;margin:12px 0}.question .enonce{order:-1;font-weight:700;margin:0 0 6px}.question ul{list-style:none;padding:0;margin:0}.question label{display:inline;font-weight:400;margin-left:6px}</style>
+</head>
+<body>
+<header class="site-header"><a class="site-name" href="index.html">Commune de Valfictif</a><nav class="site-nav" aria-label="Navigation principale"><ul><li><a href="accueil.html">Accueil</a></li><li><a href="actualites.html">Actualités</a></li><li><a href="administration.html">Administration</a></li><li><a href="vie-pratique.html">Vie pratique</a></li><li><a href="loisirs.html">Loisirs</a></li></ul></nav></header>
+<main>
+<h1>Quiz : êtes-vous champion du tri ?</h1>
+<p>Testez vos connaissances. Les solutions s'affichent après l'envoi.</p>
+<form action="quiz-resultat.html" method="get">
+<div class="question" id="question-1">
+<ul role="radiogroup" aria-labelledby="enonce-1">
+<li><input type="radio" name="q1" id="q1a" value="a"><label for="q1a">Dans le conteneur à verre</label></li>
+<li><input type="radio" name="q1" id="q1b" value="b"><label for="q1b">Dans le sac taxé</label></li>
+<li><input type="radio" name="q1" id="q1c" value="c"><label for="q1c">À la déchetterie, benne « verre plat »</label></li>
+</ul>
+<p class="enonce" id="enonce-1">Question 1 – Où faut-il jeter une vitre cassée ?</p>
+</div>
+<div class="question" id="question-2">
+<p class="enonce" id="enonce-2">Question 2 – Les capsules de café en aluminium vont…</p>
+<ul role="radiogroup" aria-labelledby="enonce-2">
+<li><input type="radio" name="q2" id="q2a" value="a"><label for="q2a">au point de collecte des capsules</label></li>
+<li><input type="radio" name="q2" id="q2b" value="b"><label for="q2b">dans le compost</label></li>
+</ul>
+</div>
+<p><button type="submit">Voir mes résultats</button></p>
+</form>
+</main>
+<footer class="site-footer"><p>Commune de Valfictif · Rue des Tilleuls 6 · <a href="kontakt.html">Contact</a></p></footer>
+</body>
+</html>

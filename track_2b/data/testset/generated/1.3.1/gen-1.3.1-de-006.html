@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seniorenturnen – Sportverein Beispielberg</title>
+<style>body{margin:0;font-family:Georgia, 'Times New Roman', serif;color:#241c1c;background:#fffdfb;line-height:1.5}a{color:#7a1f2b}.site-header{background:#7a1f2b;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #e0d2d2;color:#5d5050;padding:16px 24px;font-size:.9rem}.box{background:#f7eeee;padding:16px;border-radius:8px}.muted{color:#5d5050}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #7a1f2b;background:#7a1f2b;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #e0d2d2;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #e0d2d2;border-radius:10px;padding:12px;background:#ffffff}.tage label{display:inline;font-weight:400;margin:0 14px 0 4px}.frage{font-weight:700;margin-top:16px}</style>
+</head>
+<body>
+<main>
+<h1>Seniorenturnen – Anmeldung</h1>
+<p>Das Seniorenturnen findet in der Turnhalle Schulhausstrasse 8 statt. Die Leitung hat Beat Vorlage.</p>
+<form action="danke.html" method="post">
+<label for="tn-name">Name und Vorname</label>
+<input id="tn-name" name="tn-name" type="text" autocomplete="name">
+<p class="frage" id="frage-tage">An welchen Tagen möchten Sie teilnehmen?</p>
+<div role="group" aria-labelledby="frage-tage" class="tage" id="kurstage">
+<input type="checkbox" id="tag-mo" name="tage" value="mo"><label for="tag-mo">Montag 9.00</label>
+<input type="checkbox" id="tag-mi" name="tage" value="mi"><label for="tag-mi">Mittwoch 14.00</label>
+<input type="checkbox" id="tag-fr" name="tage" value="fr"><label for="tag-fr">Freitag 9.00</label>
+</div>
+<p><button type="submit">Anmelden</button></p>
+</form>
+<aside class="box news-aside"><h2>Sperrung Seeweg</h2><p>Wegen Belagsarbeiten ist der Seeweg vom 3. bis 7.11.2026 für den Verkehr gesperrt. Der Bus fährt in dieser Zeit über die Dorfstrasse.</p><p><a href="umleitung-seeweg.html">Umleitungsplan Seeweg</a></p></aside>
+</main>
+</body>
+</html>

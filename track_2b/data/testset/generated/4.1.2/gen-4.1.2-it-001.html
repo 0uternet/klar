@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="it-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Controllo abitanti – Comune di Esempiano</title>
+<style>body{margin:0;font-family:Georgia, 'Times New Roman', serif;color:#241c1c;background:#fffdfb;line-height:1.5}a{color:#7a1f2b}.site-header{background:#7a1f2b;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #e0d2d2;color:#5d5050;padding:16px 24px;font-size:.9rem}.box{background:#f7eeee;padding:16px;border-radius:8px}.muted{color:#5d5050}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #7a1f2b;background:#7a1f2b;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #e0d2d2;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #e0d2d2;border-radius:10px;padding:12px;background:#ffffff}.btn{display:inline-block;padding:8px 16px;border-radius:6px;text-decoration:none;font-weight:600;background:#0b4f6c;color:#ffffff}.panel{border:1px solid #c9d3d8;border-radius:8px;padding:10px 14px;margin-top:8px}.chev svg{transition:transform .2s}.aperto .chev svg{transform:rotate(90deg)}.fisarmonica{background:#ffffff;color:#1d2327;border:1px solid #c9d3d8;width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center}main h2{margin:.6em 0 0;font-size:1.1rem}</style>
+</head>
+<body>
+<main>
+<h1>Ufficio controllo abitanti</h1>
+<h2><button type="button" class="fisarmonica" id="acc-orari" aria-controls="pan-orari">Orari di apertura <span class="chev"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></g></svg></span></button></h2>
+<div class="panel" id="pan-orari" hidden><p>Da lunedì a venerdì, 8.30–11.30; giovedì anche 14.00–18.00.</p></div>
+<h2><button type="button" class="fisarmonica" id="acc-documenti" aria-controls="pan-documenti">Documenti necessari <span class="chev"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></g></svg></span></button></h2>
+<div class="panel" id="pan-documenti" hidden><p>Documento d'identità valido e contratto di locazione.</p></div>
+<script>
+document.querySelectorAll('.fisarmonica').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var pan = document.getElementById(btn.getAttribute('aria-controls'));
+    pan.hidden = !pan.hidden;
+    btn.classList.toggle('aperto');
+  });
+});
+</script>
+</main>
+</body>
+</html>

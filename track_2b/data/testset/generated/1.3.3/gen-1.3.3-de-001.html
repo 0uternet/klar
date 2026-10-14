@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Umzug melden – Gemeinde Beispielwil</title>
+<style>body{margin:0;font-family:'Segoe UI', Tahoma, Verdana, sans-serif;color:#22241f;background:#fbfaf6;line-height:1.5}a{color:#1e5a8c}.site-header{background:#2f5d34;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #cfd6c6;color:#55594f;padding:16px 24px;font-size:.9rem}.box{background:#eef3e8;padding:16px;border-radius:8px}.muted{color:#55594f}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #2f5d34;background:#2f5d34;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #cfd6c6;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #cfd6c6;border-radius:10px;padding:12px;background:#ffffff}.navi{display:flex;justify-content:space-between;margin-top:20px}.navi .vor{background:#2f7d3a;border-color:#2f7d3a;padding:8px 14px}.navi .zurueck{background:#6b7280;border-color:#6b7280;padding:8px 14px}</style>
+</head>
+<body>
+<main>
+<h1>Umzug innerhalb der Gemeinde melden</h1>
+<p class="muted">Schritt 1 von 3: Neue Adresse</p>
+<form action="umzug-schritt-2.html" method="get">
+<label for="neue-strasse">Strasse und Hausnummer</label>
+<input id="neue-strasse" name="neue-strasse" type="text" autocomplete="street-address">
+<label for="umzugsdatum">Umzugsdatum</label>
+<input id="umzugsdatum" name="umzugsdatum" type="text" placeholder="TT.MM.JJJJ">
+<p id="hinweis-weiter">Wenn alle Angaben stimmen, wählen Sie die grüne Schaltfläche unten links.</p>
+<div class="navi">
+<button type="button" class="zurueck" aria-label="Zurück" onclick="history.back()"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H4M10 6l-6 6 6 6"/></g></svg></button>
+<button type="submit" class="vor" aria-label="Weiter"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></g></svg></button>
+</div>
+</form>
+</main>
+</body>
+</html>

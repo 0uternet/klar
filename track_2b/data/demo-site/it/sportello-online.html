@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="it-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sportello online – Comune di Musterwil</title>
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/css/site.css">
+<script>document.documentElement.classList.add('js');</script>
+<script src="../assets/js/site.js" defer></script>
+<script src="../assets/js/forms.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Vai al contenuto</a>
+<div class="topbar">
+  <div class="container topbar-inner">
+    <p class="topbar-note">Comune di Musterwil · Regione Aarenwald</p>
+    <nav class="lang-switch" aria-label="Lingua" data-testid="lang-switch"><ul><li><a href="../online-schalter.html" lang="de" hreflang="de">DE</a></li><li><a href="../fr/guichet-en-ligne.html" lang="fr" hreflang="fr">FR</a></li><li><a href="sportello-online.html" lang="it" hreflang="it" aria-current="true">IT</a></li></ul></nav>
+  </div>
+</div>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="index.html"><img src="../assets/img/logo.svg" alt="Comune di Musterwil – Pagina iniziale" width="272" height="56" data-testid="site-logo"></a>
+    <form class="site-search" role="search" action="ricerca.html" method="get">
+      <label class="sr-only" for="site-q">Termine di ricerca</label>
+      <input id="site-q" name="q" type="search" placeholder="Inserire un termine di ricerca">
+      <button type="submit" class="search-btn" data-testid="header-search-button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span>Cerca</span></button>
+    </form>
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="main-nav-list" data-nav-toggle><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Menu</button>
+  </div>
+  <nav class="main-nav" aria-label="Navigazione principale" data-testid="main-nav">
+    <div class="container">
+      <ul id="main-nav-list">
+        <li><a href="index.html">Pagina iniziale</a></li><li><a href="sportello-online.html" aria-current="page">Sportello online</a></li><li><a href="istruzioni.html">eTrasloco</a></li><li><a href="orari.html">Orari</a></li><li><a href="calendario-rifiuti.html">Rifiuti</a></li><li><a href="tempo-libero.html">Tempo libero</a></li><li><a href="bilingue.html">Avvisi</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="main" tabindex="-1">
+<div class="container page-tools">
+  <nav class="breadcrumb" aria-label="Percorso di navigazione"><ol><li><a href="index.html">Pagina iniziale</a></li><li aria-current="page">Sportello online</li></ol></nav>
+  <button type="button" class="tool-btn" data-print data-testid="print-button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>Stampa</button>
+</div>
+<div class="container page-head">
+  <h1>Sportello online</h1>
+  <p class="lead">Molti servizi dell’amministrazione comunale si possono ordinare comodamente online. I documenti vi vengono spediti per posta.</p>
+</div>
+<div class="container layout-main-aside">
+  <div class="main-col">
+    <form class="form-card form-classic" id="residence-form" action="grazie.html" method="get" data-form-mode="simple" data-success="grazie.html" data-msg-error="Errore" data-testid="residence-form">
+      <h2>Ordinare un attestato di domicilio</h2>
+      <p class="fee">Tassa: CHF 20.– per esemplare. Ricevete l’attestato con la fattura entro tre giorni lavorativi per posta.</p>
+      <div class="form-alert" role="alert" data-error-summary data-testid="form-error-summary" hidden></div>
+      <p class="hint">I campi contrassegnati con <span class="req">*</span> sono obbligatori.</p>
+      <fieldset>
+        <legend>Dati personali</legend>
+        <div class="form-grid">
+          <div class="field"><label for="f-given">Nome <span class="req">*</span></label><input id="f-given" name="nome" type="text" autocomplete="given-name" data-required data-testid="form-given-name"></div>
+          <div class="field"><label for="f-family" data-testid="form-family-name-label">Cognome <span class="req">*</span></label><input id="f-family" name="cognome" type="text" autocomplete="family-name" data-required data-testid="form-family-name"></div>
+          <div class="field"><label for="f-birth" data-testid="form-birthdate-label">Dati</label><input id="f-birth" name="nascita" type="text" inputmode="numeric" placeholder="GG.MM.AAAA" autocomplete="bday" data-testid="form-birthdate"></div>
+          <div class="field"><label for="f-email">E-mail <span class="req">*</span></label><input id="f-email" name="email" type="email" autocomplete="email" data-required data-kind="email" data-testid="form-email"></div>
+          <div class="field"><label for="f-tel">Telefono</label><input id="f-tel" name="telefono" type="tel" autocomplete="tel" data-testid="form-tel"></div>
+          <div class="field"><label for="f-copies">Numero di esemplari</label><input id="f-copies" name="esemplari" type="number" min="1" max="5" value="1" data-testid="form-copies"></div>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Indirizzo di domicilio</legend>
+        <div class="form-grid-3">
+          <div class="field"><label for="f-street">Via e numero <span class="req">*</span></label><input id="f-street" name="via" type="text" data-required data-testid="form-street"></div>
+          <div class="field"><label for="f-plz">NPA <span class="req">*</span></label><input id="f-plz" name="npa" type="text" inputmode="numeric" autocomplete="postal-code" data-required data-pattern="^[0-9]{4}$" data-error-id="f-plz-error" data-testid="form-plz"><span class="field-error" id="f-plz-error" data-msg="Inserimento non valido" data-testid="form-plz-error" hidden></span></div>
+          <div class="field"><label for="f-city">Località <span class="req">*</span></label><input id="f-city" name="localita" type="text" autocomplete="address-level2" data-required data-testid="form-city"></div>
+        </div>
+      </fieldset>
+      <div class="form-actions">
+        <button type="submit" class="btn" aria-label="Invia il modulo" data-testid="form-submit">Invia</button>
+      </div>
+    </form>
+  </div>
+  <div class="aside-col">
+    <section class="box" aria-labelledby="more-services">
+      <h2 id="more-services">Altri servizi</h2>
+      <ul class="link-list"><li><a href="istruzioni.html">Notificare un trasloco con eTrasloco</a></li><li><a href="calendario-rifiuti.html">Calendario dei rifiuti e punti di raccolta</a></li><li><a href="orari.html">Orari dell’amministrazione</a></li></ul>
+    </section>
+    <section class="box" aria-labelledby="questions"><h2 id="questions">Domande?</h2><p>Il controllo abitanti vi aiuta volentieri: telefono <a href="tel:+41320001210">032 000 12 10</a>.</p></section>
+  </div>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <h2 class="footer-title">Amministrazione comunale di Musterwil</h2>
+      <address>Dorfstrasse 1<br>9999 Musterwil<br>Telefono <a href="tel:+41320001234">032 000 12 34</a><br><a href="mailto:gemeinde@musterwil.example">gemeinde@musterwil.example</a></address>
+    </div>
+    <div>
+      <h2 class="footer-title">Orari degli sportelli</h2>
+      <p>Lu–ve 08.00–11.30<br>Lu, ma 14.00–17.00<br>Gio 14.00–18.30<br>Ve 14.00–16.00</p>
+      <p><a href="orari.html">Tutti gli orari</a></p>
+    </div>
+    <div>
+      <h2 class="footer-title">Servizi</h2>
+      <ul><li><a href="sportello-online.html">Sportello online</a></li><li><a href="mappa-del-sito.html">Mappa del sito</a></li><li><a href="ricerca.html">Ricerca</a></li><li><a href="accessibilita.html">Accessibilità</a></li></ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <p>© 2026 Comune di Musterwil</p>
+    <p>Musterwil è un comune fittizio. Nomi, indirizzi e cifre di questo sito dimostrativo sono inventati.</p>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bestattungen – Gemeinde Fiktal</title>
+<style>body{margin:0;font-family:system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;color:#1d2327;background:#ffffff;line-height:1.5}a{color:#0b5394}.site-header{background:#0b4f6c;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #c9d3d8;color:#4f5b62;padding:16px 24px;font-size:.9rem}.box{background:#e8f1f5;padding:16px;border-radius:8px}.muted{color:#4f5b62}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #0b4f6c;background:#0b4f6c;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #c9d3d8;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #c9d3d8;border-radius:10px;padding:12px;background:#ffffff}.btn{display:inline-block;padding:8px 16px;border-radius:6px;text-decoration:none;font-weight:600;background:#0b4f6c;color:#ffffff}.panel{border:1px solid #c9d3d8;border-radius:8px;padding:10px 14px;margin-top:8px}.chev svg{transition:transform .2s}.aperto .chev svg{transform:rotate(90deg)}</style>
+</head>
+<body>
+<header class="site-header"><a class="site-name" href="index.html">Gemeinde Fiktal</a><nav class="site-nav" aria-label="Hauptnavigation"><ul><li><a href="startseite.html">Startseite</a></li><li><a href="aktuelles.html">Aktuelles</a></li><li><a href="verwaltung.html">Verwaltung</a></li><li><a href="leben-wohnen.html">Leben &amp; Wohnen</a></li><li><a href="freizeit.html">Freizeit</a></li></ul></nav></header>
+<main>
+<h1>Bestattungen</h1>
+<p>Bei einem Todesfall unterstützt Sie das Bestattungsamt bei allen Formalitäten.</p>
+<p><button type="button" id="toggle-gebuehren" aria-expanded="false" aria-controls="gebuehren-panel">Gebühren anzeigen</button></p>
+<div class="panel" id="gebuehren-panel" hidden>
+<p>Erdbestattung CHF 900.–, Urnenbeisetzung CHF 450.–, Gemeinschaftsgrab CHF 300.–. Für Einwohnerinnen und Einwohner gelten reduzierte Tarife.</p>
+</div>
+<script>
+document.getElementById('toggle-gebuehren').addEventListener('click', function () {
+  var p = document.getElementById('gebuehren-panel');
+  p.hidden = !p.hidden;
+});
+</script>
+</main>
+<footer class="site-footer"><p>Gemeinde Fiktal · Lindenweg 14 · <a href="kontakt.html">Kontakt</a></p></footer>
+</body>
+</html>

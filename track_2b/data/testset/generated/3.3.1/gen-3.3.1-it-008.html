@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Iscrizione al servizio mensa – Città di Modellina</title>
+<style>body{margin:0;font-family:Arial, Helvetica, sans-serif;color:#16181d;background:#ffffff;line-height:1.5}a{color:#1f4fd8}.site-header{background:#2b2f3a;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #d4d7de;color:#50555e;padding:16px 24px;font-size:.9rem}.box{background:#f1f2f5;padding:16px;border-radius:8px}.muted{color:#50555e}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #2b2f3a;background:#2b2f3a;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #d4d7de;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #d4d7de;border-radius:10px;padding:12px;background:#ffffff}.fld{margin:0 0 14px}.fld label{margin-top:0}.hint{margin:2px 0 4px;font-size:.92rem;color:#4b5563}.err{margin:4px 0 0;color:#a3001b;font-weight:600;min-height:0}.is-invalid{border:2px solid #c8102e;background:#fff1f2}.msgbox{border:2px solid #a3001b;background:#fff6f6;padding:10px 14px;border-radius:6px;margin:0 0 16px}.okbox{border:2px solid #2f6b3a;background:#eef7ef;padding:10px 14px;border-radius:6px;margin:16px 0}.row{display:flex;flex-wrap:wrap;gap:0 18px}.row .fld{flex:1 1 180px}fieldset{border:1px solid #c5ccd3;border-radius:8px;padding:8px 16px 4px;margin:0 0 16px}legend{font-weight:700;padding:0 4px}.req{color:#a3001b}.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.icon-slot svg{vertical-align:middle;margin-left:6px}.actions{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}.btn-sec{background:#ffffff;color:#1d2327;border:1px solid #6b7280}aside.box{margin-top:24px}.dialog{position:fixed;left:50%;top:20%;transform:translateX(-50%);max-width:440px;background:#ffffff;border:2px solid #1d2327;border-radius:10px;padding:16px 20px;box-shadow:0 8px 30px rgba(0,0,0,.25)}.crumbs{font-size:.9rem;margin:0 0 8px}</style>
+</head>
+<body>
+<header class="site-header"><a class="site-name" href="index.html">Città di Modellina</a><nav class="site-nav" aria-label="Navigazione principale"><ul><li><a href="home.html">Home</a></li><li><a href="attualita.html">Attualità</a></li><li><a href="amministrazione.html">Amministrazione</a></li><li><a href="vita-quotidiana.html">Vita quotidiana</a></li><li><a href="tempo-libero.html">Tempo libero</a></li></ul></nav></header>
+<main>
+<h1>Iscrizione al servizio mensa</h1>
+<p>La mensa scolastica è aperta il lunedì, martedì, giovedì e venerdì. Il pasto costa CHF 9.– ed è fatturato ogni mese.</p>
+<form id="mensa" novalidate><div class="row"><div class="fld"><label for="bnome">Nome del bambino</label><input id="bnome" name="bnome" type="text"></div><div class="fld"><label for="classe">Classe</label><input id="classe" name="classe" type="text"></div></div><div class="fld"><label for="bavs">Numero AVS del bambino</label><input id="bavs" name="bavs" type="text" aria-describedby="hint-bavs"><p class="hint" id="hint-bavs">13 cifre, sulla tessera d'assicurazione malattia.</p></div><div class="fld"><label for="allergie">Allergie o diete</label><textarea id="allergie" name="allergie" rows="2" cols="40"></textarea></div><div class="msgbox" id="avvisi" tabindex="-1" role="alert" hidden><ul id="avvisi-lista"></ul></div><div class="actions"><button type="submit">Invia</button></div></form><div class="okbox" id="grazie" tabindex="-1" hidden><p>Grazie! I suoi dati sono stati trasmessi.</p></div>
+</main>
+<footer class="site-footer"><p>Città di Modellina · Via ai Ronchi 5 · <a href="kontakt.html">Contatto</a></p></footer>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var form = document.getElementById("mensa");
+  var done = document.getElementById("grazie");
+  var rules = [
+    {f:"bnome",t:function(v){return v !== "";},m:"Il campo «Nome del bambino» è obbligatorio.",o:"list",x:"",mk:1,ln:0},
+    {f:"classe",t:function(v){return v !== "";},m:"Il campo «Classe» è obbligatorio.",o:"list",x:"",mk:1,ln:0},
+    {f:"bavs",t:function(v){return /^756\.\d{4}\.\d{4}\.\d{2}$/.test(v);},m:"Il campo «Numero AVS del bambino» deve contenere 13 cifre nel formato 756.0000.0000.00.",o:"list",x:"",mk:1,ln:0}
+  ];
+  var sbox = document.getElementById("avvisi"), slist = document.getElementById("avvisi-lista");
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var first = null, items = [];
+    done.hidden = true;
+    rules.forEach(function (r) {
+      var f = document.getElementById(r.f);
+      var v = f.value.trim(), ok = r.t(v);
+      r.cur = (!ok && r.mf) ? r.mf(v) : r.m;
+      var x = r.x ? document.getElementById(r.x) : null;
+      if (r.mk) { if (ok) { f.removeAttribute("aria-invalid"); f.classList.remove("is-invalid"); }
+                  else { f.setAttribute("aria-invalid", "true"); f.classList.add("is-invalid"); } }
+      if (r.o === "text") { x.textContent = ok ? "" : r.cur; if (x.hasAttribute("hidden") || ok) { x.hidden = ok; } }
+      if (r.o === "show") { x.hidden = ok; }
+      if (!ok) { items.push(r); if (!first) { first = f; } }
+    });
+    function fill(list, kind) {
+      while (list.firstChild) { list.removeChild(list.firstChild); }
+      items.forEach(function (r) {
+        if (r.o !== kind) { return; }
+        var li = document.createElement("li");
+        if (r.ln) { var a = document.createElement("a"); a.href = "#" + r.f; a.textContent = r.cur; li.appendChild(a); }
+        else { li.textContent = r.cur; }
+        list.appendChild(li);
+      });
+      return list.children.length;
+    }
+    var ns = fill(slist, "list"); sbox.hidden = ns === 0; if (ns) { sbox.focus(); return; }
+    if (first) { first.focus(); return; }
+    done.hidden = false; done.focus();
+  });
+});
+</script>
+</body>
+</html>

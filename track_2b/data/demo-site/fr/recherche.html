@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="fr-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recherche – Commune de Musterwil</title>
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/css/site.css">
+<script>document.documentElement.classList.add('js');</script>
+<script src="../assets/js/site.js" defer></script>
+<script src="../assets/js/search.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Aller au contenu</a>
+<div class="topbar">
+  <div class="container topbar-inner">
+    <p class="topbar-note">Commune de Musterwil · Région Aarenwald</p>
+    <nav class="lang-switch" aria-label="Langue" data-testid="lang-switch"><ul><li><a href="../suche.html" lang="de" hreflang="de">DE</a></li><li><a href="recherche.html" lang="fr" hreflang="fr" aria-current="true">FR</a></li><li><a href="../it/ricerca.html" lang="it" hreflang="it">IT</a></li></ul></nav>
+  </div>
+</div>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="index.html"><img src="../assets/img/logo.svg" alt="Commune de Musterwil – Accueil" width="272" height="56" data-testid="site-logo"></a>
+    <form class="site-search" role="search" action="recherche.html" method="get">
+      <label class="sr-only" for="site-q">Terme de recherche</label>
+      <input id="site-q" name="q" type="search" placeholder="Saisir un terme de recherche">
+      <button type="submit" class="search-btn" data-testid="header-search-button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span>Recherche</span></button>
+    </form>
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="main-nav-list" data-nav-toggle><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Menu</button>
+  </div>
+  <nav class="main-nav" aria-label="Navigation principale" data-testid="main-nav">
+    <div class="container">
+      <ul id="main-nav-list">
+        <li><a href="index.html">Accueil</a></li><li><a href="guichet-en-ligne.html">Guichet en ligne</a></li><li><a href="instructions.html">eDéménagement</a></li><li><a href="horaires.html">Horaires</a></li><li><a href="calendrier-dechets.html">Déchets</a></li><li><a href="loisirs.html">Loisirs</a></li><li><a href="bilingue.html">Avis officiels</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<main id="main" tabindex="-1">
+<div class="container page-tools">
+  <nav class="breadcrumb" aria-label="Fil d'Ariane"><ol><li><a href="index.html">Accueil</a></li><li aria-current="page">Recherche</li></ol></nav>
+  <button type="button" class="tool-btn" data-print data-testid="print-button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>Imprimer</button>
+</div>
+<div class="container page-head"><h1>Recherche</h1></div>
+<div class="container narrow">
+  <form class="search-page" role="search" action="recherche.html" method="get" data-search-form>
+    <label for="search-q">Terme de recherche</label>
+    <div class="search-field"><input id="search-q" name="q" type="search" autocomplete="off"><button type="submit" class="search-go search-go-strong" aria-label="Recherche" data-testid="search-page-button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button></div>
+  </form>
+  <p class="search-status" role="status" data-search-status data-msg-empty="Saisissez un terme de recherche, par exemple « déchets » ou « déménagement »." data-msg-count="{n} résultat(s) pour « {q} »" data-msg-none="Aucun résultat pour « {q} ». Essayez un autre terme ou consultez le plan du site."></p>
+  <ol class="search-results" data-search-results></ol>
+</div>
+<script>
+window.SEARCH_INDEX = [
+ {
+  "title": "Accueil",
+  "url": "index.html",
+  "text": "Actualités, manifestations et avis de la commune de Musterwil.",
+  "keywords": "actualites nouvelles"
+ },
+ {
+  "title": "Guichet en ligne",
+  "url": "guichet-en-ligne.html",
+  "text": "Commander une attestation de domicile et annoncer un changement d’adresse.",
+  "keywords": "formulaire commande attestation domicile adresse"
+ },
+ {
+  "title": "Instructions eDéménagement",
+  "url": "instructions.html",
+  "text": "Annoncer un déménagement en ligne : instructions pas à pas et documents nécessaires.",
+  "keywords": "demenagement arrivee depart adresse"
+ },
+ {
+  "title": "Horaires d’ouverture",
+  "url": "horaires.html",
+  "text": "Horaires de l’administration, de la voirie et de la bibliothèque ; situation et accès.",
+  "keywords": "guichet bibliotheque voirie telephone"
+ },
+ {
+  "title": "Calendrier des déchets 2026",
+  "url": "calendrier-dechets.html",
+  "text": "Dates de ramassage des ordures, déchets verts, papier et carton ; points de collecte et taxes.",
+  "keywords": "dechets ordures dechets verts papier carton"
+ },
+ {
+  "title": "Loisirs et tourisme",
+  "url": "loisirs.html",
+  "text": "Plage, sentier didactique, culture et cours à Musterwil.",
+  "keywords": "tourisme excursion baignade culture"
+ },
+ {
+  "title": "Avis officiels",
+  "url": "bilingue.html",
+  "text": "Avis bilingues du Conseil communal : assemblée communale, budget 2027.",
+  "keywords": "conseil communal budget assemblee"
+ },
+ {
+  "title": "Plan du site",
+  "url": "plan-du-site.html",
+  "text": "Toutes les pages du site en un coup d’œil.",
+  "keywords": "apercu pages"
+ },
+ {
+  "title": "Déclaration d’accessibilité",
+  "url": "accessibilite.html",
+  "text": "État de l’accessibilité de ce site et formulaire de contact.",
+  "keywords": "accessibilite feedback"
+ }
+];
+</script>
+</main>
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <h2 class="footer-title">Administration communale de Musterwil</h2>
+      <address>Dorfstrasse 1<br>9999 Musterwil<br>Téléphone <a href="tel:+41320001234">032 000 12 34</a><br><a href="mailto:gemeinde@musterwil.example">gemeinde@musterwil.example</a></address>
+    </div>
+    <div>
+      <h2 class="footer-title">Heures d'ouverture des guichets</h2>
+      <p>Lu–ve 8 h 00–11 h 30<br>Lu, ma 14 h 00–17 h 00<br>Je 14 h 00–18 h 30<br>Ve 14 h 00–16 h 00</p>
+      <p><a href="horaires.html">Tous les horaires</a></p>
+    </div>
+    <div>
+      <h2 class="footer-title">Services</h2>
+      <ul><li><a href="guichet-en-ligne.html">Guichet en ligne</a></li><li><a href="plan-du-site.html">Plan du site</a></li><li><a href="recherche.html">Recherche</a></li><li><a href="accessibilite.html">Accessibilité</a></li></ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <p>© 2026 Commune de Musterwil</p>
+    <p>Musterwil est une commune fictive. Les noms, adresses et chiffres de ce site de démonstration sont inventés.</p>
+  </div>
+</footer>
+</body>
+</html>

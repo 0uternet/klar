@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="it-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carta giornaliera – Comune di Valfittizia</title>
+<style>body{margin:0;font-family:Verdana, Geneva, sans-serif;color:#102a43;background:#f7fafc;line-height:1.5}a{color:#0a558c}.site-header{background:#1f6f8b;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #c5d5e4;color:#486581;padding:16px 24px;font-size:.9rem}.box{background:#e3eef6;padding:16px;border-radius:8px}.muted{color:#486581}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #1f6f8b;background:#1f6f8b;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #c5d5e4;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #c5d5e4;border-radius:10px;padding:12px;background:#ffffff}.cols{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:28px}@media (max-width:720px){.cols{grid-template-columns:1fr}}.crumbs{list-style:none;padding:0;margin:0 0 8px;display:flex;flex-wrap:wrap;gap:8px;font-size:.9rem}.crumbs li+li::before{content:'/';margin-right:8px}#richiesta input{border-width:2px}.campo-errore{border-color:#c62828}.msg-errore{color:#b3261e;font-weight:600;margin-top:4px}</style>
+</head>
+<body>
+<main>
+<div class="cols"><div><h1>Richiesta di carta giornaliera</h1><p>Le carte giornaliere del Comune costano CHF 45.– e sono valide su tutta la rete.</p><form id="richiesta" action="richiesta-inviata.html" method="post"><label for="nome">Nome e cognome</label><input type="text" id="nome" name="nome" value="Lucia Esempio"><label for="data">Data del viaggio</label><input type="text" id="data" name="data" value="31.11.2026" class="campo-errore" aria-describedby="msg-data" aria-invalid="true"><p id="msg-data" class="msg-errore">⚠ Data non valida: novembre ha 30 giorni. Usate il formato gg.mm.aaaa.</p><p><button type="submit">Invia richiesta</button></p></form></div><aside><section><h2>Newsletter</h2><p>Una volta al mese vi informiamo sulle novità della regione. <a href="newsletter.html">Iscriversi alla newsletter</a></p></section></aside></div>
+</main>
+</body>
+</html>

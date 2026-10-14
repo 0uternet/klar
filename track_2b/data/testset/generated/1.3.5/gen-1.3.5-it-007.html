@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="it-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Legna da ardere – Comune di Valfittizia</title>
+<style>body{margin:0;font-family:'Segoe UI', Tahoma, Verdana, sans-serif;color:#22241f;background:#fbfaf6;line-height:1.5}a{color:#1e5a8c}.site-header{background:#2f5d34;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #cfd6c6;color:#55594f;padding:16px 24px;font-size:.9rem}.box{background:#eef3e8;padding:16px;border-radius:8px}.muted{color:#55594f}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #2f5d34;background:#2f5d34;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #cfd6c6;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #cfd6c6;border-radius:10px;padding:12px;background:#ffffff}form{max-width:560px}fieldset{border:1px solid #c9d3d8;border-radius:8px;margin:16px 0;padding:8px 14px 14px}legend{font-weight:700}.inline label{display:inline;font-weight:400;margin:0 14px 0 4px}.datum-teile{display:flex;gap:12px}.datum-teile div{flex:0 0 auto}.datum-teile input{width:5em}</style>
+</head>
+<body>
+<main>
+<h1>Ordinazione di legna da ardere</h1>
+<p>Il patriziato vende legna di faggio stagionata, tagliata a 33 cm: CHF 140.– per stero, consegna compresa.</p>
+<form action="legna-ordinata.html" method="post">
+<fieldset><legend>Fatturazione</legend>
+<label for="fa-nome">Nome e cognome</label>
+<input id="fa-nome" name="fa-nome" type="text" autocomplete="name">
+<label for="fa-via">Via e numero</label>
+<input id="fa-via" name="fa-via" type="text" autocomplete="street-address">
+<label for="fa-nap">NAP</label>
+<input id="fa-nap" name="fa-nap" type="text" autocomplete="postal-code">
+<label for="fa-localita">Località</label>
+<input id="fa-localita" name="fa-localita" type="text" autocomplete="address-level2">
+</fieldset>
+<fieldset><legend>Consegna</legend>
+<label for="consegna-via">Indirizzo di consegna (se diverso)</label>
+<input id="consegna-via" name="consegna-via" type="text">
+<label for="steri">Quantità</label>
+<select id="steri" name="steri"><option>1 stero</option><option>2 steri</option><option>4 steri</option></select>
+</fieldset>
+<p><button type="submit">Ordinare</button></p>
+</form>
+<aside class="box news-aside"><h2>Nuova collaboratrice all&#x27;Ufficio controllo abitanti</h2><p>Dal 1° ottobre Giulia Fittizi rafforza il team dello sportello.</p><p><a href="controllo-abitanti.html">Team dell&#x27;Ufficio controllo abitanti</a></p></aside>
+</main>
+</body>
+</html>
