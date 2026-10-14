@@ -1,4 +1,5 @@
 import importlib
+import json
 import pkgutil
 import re
 from collections import Counter
@@ -8,10 +9,10 @@ from klar.checks import registry
 from klar.checks.base import BaseCheck
 
 EXPECTED = {
-    "apertus_text": "1.3.1 1.3.2 2.2.2 2.4.3 1.3.3 1.3.5 2.4.2 2.4.4 2.4.5 2.4.6 2.5.3 3.1.1 3.1.2 3.2.2 3.2.3 3.2.4 3.3.1 3.3.2 3.3.3 3.3.4 4.1.2",
+    "apertus_text": "1.3.1 1.3.2 2.2.2 2.4.3 1.3.3 1.3.5 2.4.2 2.4.4 2.4.6 2.5.3 3.1.1 3.1.2 3.2.2 3.2.4 3.3.1 3.3.2 3.3.3 3.3.4 4.1.2",
     "apertus_vision": "1.1.1 1.4.1 1.4.3 1.4.5 1.4.11 1.4.4 1.4.10 1.4.12",
     "experimental": "1.2.1 1.2.2",
-    "rule": "1.3.4 1.4.2 2.1.1 2.1.2 2.4.1 2.4.7 3.2.1 4.1.1",
+    "rule": "1.3.4 1.4.2 2.1.1 2.1.2 2.4.1 2.4.5 2.4.7 3.2.1 3.2.3 4.1.1",
     "human": "1.2.3 1.2.4 1.2.5 2.3.1 2.1.4 2.5.1 2.5.2 2.5.4 2.2.1 1.4.13 4.1.3",
 }
 
@@ -54,3 +55,25 @@ def test_every_check_module_imports_and_matches_the_registry():
         assert cls.prompt_version.startswith(cls.criterion + "/")
         assert cls.needs_vision == (meta.method == "apertus_vision")
     assert set(registry.implemented()) >= {"1.1.1", "2.4.4", "3.1.2"}
+
+
+def test_a_check_that_never_asks_the_model_is_not_claimed_as_apertus():
+    import inspect
+
+    for number, cls in registry.implemented().items():
+        never_asks = "raise NotImplementedError" in inspect.getsource(cls.question)
+        assert not (never_asks and registry.get(number).method.startswith("apertus")), number
+    assert registry.get("2.4.5").method == registry.get("3.2.3").method == "rule"
+
+
+def test_evaluated_reads_source_prefixed_criterion_keys(tmp_path):
+    block = {"ours": {"n": 12}, "baseline": {"n": 12}}
+    results = {"run": {"split": "test"}, "by_criterion": {
+        "generated:2.4.4": block, "act:3.1.2": block, "generated:1.4.10": block,  # 1.4.10: no check module
+        "generated:2.4.6": {"ours": {"n": 0}}, "other:1.1.1": block}}
+    path = tmp_path / "results.json"
+    path.write_text(json.dumps(results), encoding="utf-8")
+    assert registry.evaluated(path) == {"2.4.4", "3.1.2"}
+    path.write_text(json.dumps({**results, "run": {"split": "dev"}}), encoding="utf-8")
+    assert registry.evaluated(path) == set()  # dev numbers are not evaluation results
+    assert registry.evaluated(tmp_path / "missing.json") == set()

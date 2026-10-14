@@ -177,3 +177,25 @@ def test_eval_writes_the_model_response_dataset(make_settings, tmp_path, chromiu
     assert all(r["from_cache"] and r["match"] == "exact" for r in again)
     strip = lambda rows: [{k: v for k, v in r.items() if k not in ("from_cache", "match")} for r in rows]  # noqa: E731
     assert strip(again) == strip(first)
+
+
+def test_act_cases_follow_the_implemented_checks_and_exclusions_are_explicit(tmp_path, monkeypatch):
+    import klar.eval.runner as runner
+
+    testset = tmp_path / "testset"
+    testset.mkdir()
+    rows = [{"case_id": f"a{i}", "criterion": crit, "source": "act", "act_rule": rule, "split": "test",
+             "expected": "failed", "path": f"act/{rule}/{i}.html"}
+            for i, (crit, rule) in enumerate([("2.4.4", "5effbb"), ("2.4.4", "5effbb"), ("2.4.4", "fd3a94"),
+                                              ("3.1.2", "off6ek"), ("1.4.10", "b4f0c3")])]
+    rows.append({"case_id": "g1", "criterion": "2.4.4", "source": "generated", "split": "test", "expected": "passed",
+                 "path": "generated/g1.html"})
+    (testset / "manifest.jsonl").write_text("\n".join(json.dumps(r) for r in rows), encoding="utf-8")
+    monkeypatch.setitem(runner.ACT_EXCLUDED, "off6ek", "our 3.1.2 check does not target this element type")
+    cases, rules = runner.load_manifest(testset, split="test", criteria={"2.4.4", "3.1.2"}, source="all", limit=None)
+    assert sorted(c["case_id"] for c in cases) == ["a0", "a1", "a2", "g1"]
+    assert rules["5effbb"] == {"criterion": "2.4.4", "n": 2, "status": "evaluated", "reason": None}
+    assert rules["fd3a94"]["n"] == 1 and rules["fd3a94"]["status"] == "evaluated"
+    assert rules["off6ek"]["status"] == "excluded" and "does not target" in rules["off6ek"]["reason"]
+    assert rules["b4f0c3"] == {"criterion": "1.4.10", "n": 1, "status": "excluded",
+                               "reason": "no implemented check for 1.4.10"}

@@ -15,8 +15,10 @@ tuning only. `surface_forms` and `tags` are not used for scoring, except the
 
 Scoring (metric definitions in klar/eval/metrics.py): unit = (case, criterion);
 the target element is resolved in the live DOM; generated cases and W3C ACT
-cases are reported separately and never pooled; ACT is scored on the judgement
-rules only (5effbb, cc0f0a, b49b2e, off6ek, qt1vmo).
+cases are reported separately and never pooled. The test set keeps only ACT judgement
+rules; an ACT case is scored when its criterion has an implemented check. A rule our
+check cannot score is listed in ACT_EXCLUDED with its reason; results.json reports n
+per rule and every exclusion (`run.act_rules`), never silently.
 
 Integrity: `--split test` is refused unless data/testset/manifest.jsonl is
 byte-identical to the one at git tag `labels-v1`. Every test-split run is
@@ -59,7 +61,9 @@ log = logging.getLogger(__name__)
 
 SYSTEMS = ("axe", "baseline", "ours", "ours_no_guard", "ours_no_context")
 DEFAULT_SYSTEMS = ("axe", "baseline", "ours", "ours_no_guard")
-ACT_JUDGEMENT_RULES = {"5effbb", "cc0f0a", "b49b2e", "off6ek", "qt1vmo"}
+# ACT rule id → why our check cannot score it (none today: every rule in the test set
+# judges what its criterion's check targets).
+ACT_EXCLUDED: dict[str, str] = {}
 LABELS_TAG = "labels-v1"
 
 _RELATED_JS = """([target, selectors]) => {
@@ -149,24 +153,37 @@ def tagged_manifest_sha(root: Path) -> tuple[str | None, str]:
 # --- cases ------------------------------------------------------------------------------------
 
 def load_manifest(testset: Path, *, split: str, criteria: set[str] | None, source: str,
-                  limit: int | None) -> tuple[list[dict], int]:
+                  limit: int | None) -> tuple[list[dict], dict[str, dict]]:
+    """Cases to scan, and per ACT rule: criterion, n, status (evaluated / excluded) and
+    the reason of an exclusion."""
     rows = [json.loads(line) for line in (testset / "manifest.jsonl").read_text(encoding="utf-8").splitlines()
             if line.strip()]
-    out, act_excluded = [], 0
+    implemented = set(registry.implemented())
+    out: list[dict] = []
+    act_rules: dict[str, dict] = {}
     for r in rows:
         if split != "all" and r.get("split") != split:
-            continue
-        if criteria is not None and r["criterion"] not in criteria:
             continue
         if source != "all" and r.get("source") != source:
             continue
         if r["criterion"] not in registry.BY_NUMBER:
             continue
-        if r.get("source") == "act" and r.get("act_rule") not in ACT_JUDGEMENT_RULES:
-            act_excluded += 1  # presence rules are axe territory: never pooled into "Ours"
+        is_act = r.get("source") == "act"
+        # a criterion left out on purpose (--criteria) is not an exclusion; one without a
+        # check is, for ACT rows (reported with its reason)
+        if criteria is not None and r["criterion"] not in criteria and not (is_act and r["criterion"] not in implemented):
             continue
+        if is_act:
+            rule = r.get("act_rule") or "?"
+            reason = ACT_EXCLUDED.get(rule) or (None if r["criterion"] in implemented
+                                                 else f"no implemented check for {r['criterion']}")
+            entry = act_rules.setdefault(rule, {"criterion": r["criterion"], "n": 0,
+                                                "status": "excluded" if reason else "evaluated", "reason": reason})
+            entry["n"] += 1
+            if reason:
+                continue
         out.append(r)
-    return (out[:limit] if limit else out), act_excluded
+    return (out[:limit] if limit else out), dict(sorted(act_rules.items()))
 
 
 def _case_url(case: dict, servers: dict[str, StaticServer]) -> str:
@@ -242,7 +259,7 @@ def run_eval(settings: Settings, *, split: str = "test", criteria: list[str] | N
     # One request at a time, exact keys only: comparable, reproducible numbers.
     settings = settings.with_(llm_concurrency=1, replay_exact=True)
     wanted = set(criteria) if criteria else (None if all_criteria else set(registry.implemented()))
-    cases, act_excluded = load_manifest(testset, split=split, criteria=wanted, source=source, limit=limit)
+    cases, act_rules = load_manifest(testset, split=split, criteria=wanted, source=source, limit=limit)
     counter = RequestCounter()
     caps = CapabilityCache(settings, counter)
     llm = make_backend(settings, counter, capabilities=caps.get)
@@ -307,7 +324,7 @@ def run_eval(settings: Settings, *, split: str = "test", criteria: list[str] | N
 
     report = build_report(results, systems=systems, settings=settings, llm=llm, caps=caps.get(), split=split,
                           source=source, manifest_sha=manifest_sha, tag_sha=tag_sha, tag_source=tag_source,
-                          act_excluded=act_excluded,
+                          act_rules=act_rules,
                           totals=totals, seconds=time.monotonic() - started, counter=counter)
     out = out_dir or (root / "eval" / "results")
     out.mkdir(parents=True, exist_ok=True)
@@ -348,7 +365,7 @@ def _group_block(rows: list[dict], systems: tuple[str, ...]) -> dict:
 
 
 def build_report(results: list[dict], *, systems, settings: Settings, llm, caps, split: str, source: str,
-                 manifest_sha: str, tag_sha: str | None, tag_source: str, act_excluded: int, totals: dict,
+                 manifest_sha: str, tag_sha: str | None, tag_source: str, act_rules: dict, totals: dict,
                  seconds: float,
                  counter: RequestCounter) -> dict:
     from urllib.parse import urlparse
@@ -373,7 +390,8 @@ def build_report(results: list[dict], *, systems, settings: Settings, llm, caps,
         "id": datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"), "klar_version": __version__,
         "commit": commit_of(settings.project_root), "labels_tag": LABELS_TAG if tag_sha == manifest_sha else None,
         "manifest_sha256": manifest_sha, "labels_sha256": tag_sha, "labels_source": tag_source, "split": split, "source": source, "cases": len(results),
-        "act_cases_excluded_presence_rules": act_excluded,
+        "act_rules": act_rules,  # per ACT rule: criterion, n, evaluated / excluded (+ reason)
+        "act_cases_excluded": sum(v["n"] for v in act_rules.values() if v["status"] != "evaluated"),
         "templates": len({r.get("template_id") for r in results if r.get("template_id")}),
         "mode": settings.mode, "model": llm.model,
         "endpoint_host": urlparse(settings.llm_base_url or "").hostname if settings.mode != "replay" else None,
@@ -421,7 +439,7 @@ def to_markdown(report: dict) -> str:
         "",
         f"Run {run['id']} · commit `{run['commit']}` · labels `{run['labels_tag']}` · manifest sha256 "
         f"`{run['manifest_sha256'][:12]}…` · mode `{run['mode']}` · model `{run['model']}` · {run['cases']} cases "
-        f"({run['act_cases_excluded_presence_rules']} ACT presence-rule cases excluded) · "
+        f"({run['act_cases_excluded']} ACT cases excluded) · "
         f"tokens/page {report['cost']['tokens_per_page']} · s/page {report['cost']['seconds_per_page']} · "
         f"not recorded {report['cost']['not_recorded']} · model errors {report['cost']['llm_errors']}",
         "",
@@ -429,6 +447,12 @@ def to_markdown(report: dict) -> str:
         "decision correctness (failed / review / no failure). Generated and W3C ACT cases are never pooled.",
         "",
     ]
+    if run.get("act_rules"):
+        lines += ["## W3C ACT rules", "", "| Rule | Criterion | n | Status |", "|---|---|---|---|"]
+        for rule, v in run["act_rules"].items():
+            status = v["status"] if not v.get("reason") else f"{v['status']}: {v['reason']}"
+            lines.append(f"| {rule} | {v['criterion']} | {v['n']} | {status} |")
+        lines.append("")
     for scope_name, groups in (("Source", report["by_source"]), ("Criterion", report["by_criterion"])):
         lines += [f"## By {scope_name.lower()}", "",
                   f"| {scope_name} | System | n | Precision | Recall | F1 | False pass (explicit + silent) "

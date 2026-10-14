@@ -117,7 +117,7 @@ CRITERIA: tuple[Criterion, ...] = (
     Criterion("2.4.2", "Page Titled", "A", T, "c4a8a4", "page-titled"),
     Criterion("2.4.3", "Focus Order", "A", T, None, "focus-order"),
     Criterion("2.4.4", "Link Purpose (In Context)", "A", T, "5effbb", "link-purpose-in-context"),
-    Criterion("2.4.5", "Multiple Ways", "AA", T, None, "multiple-ways"),
+    Criterion("2.4.5", "Multiple Ways", "AA", R, None, "multiple-ways"),  # decided in code only
     Criterion("2.4.6", "Headings and Labels", "AA", T, "b49b2e", "headings-and-labels"),
     Criterion("2.4.7", "Focus Visible", "AA", R, "oj04fd", "focus-visible"),
     Criterion("2.5.1", "Pointer Gestures", "A", H, None, "pointer-gestures"),
@@ -129,7 +129,7 @@ CRITERIA: tuple[Criterion, ...] = (
     Criterion("3.1.2", "Language of Parts", "AA", T, "off6ek", "language-of-parts"),
     Criterion("3.2.1", "On Focus", "A", R, None, "on-focus"),
     Criterion("3.2.2", "On Input", "A", T, None, "on-input"),
-    Criterion("3.2.3", "Consistent Navigation", "AA", T, None, "consistent-navigation"),
+    Criterion("3.2.3", "Consistent Navigation", "AA", R, None, "consistent-navigation"),  # decided in code only
     Criterion("3.2.4", "Consistent Identification", "AA", T, None, "consistent-identification"),
     Criterion("3.3.1", "Error Identification", "A", T, "36b590", "error-identification"),
     Criterion("3.3.2", "Labels or Instructions", "A", T, None, "labels-or-instructions"),
@@ -178,7 +178,13 @@ def evaluated(results: Path | None = None) -> set[str]:
         return set()
     if (data.get("run") or {}).get("split") != "test":
         return set()
-    return {c for c, block in (data.get("by_criterion") or {}).items() if block} & set(implemented())
+    # by_criterion keys are "<source>:<criterion>" (generated and W3C ACT are never pooled)
+    out = set()
+    for key, block in (data.get("by_criterion") or {}).items():
+        source, _, number = key.rpartition(":")
+        if source in ("generated", "act") and any((m or {}).get("n") for m in (block or {}).values()):
+            out.add(number)
+    return out & set(implemented())
 
 
 def sort_key(number: str) -> tuple[int, ...]:
