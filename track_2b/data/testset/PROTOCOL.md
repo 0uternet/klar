@@ -83,6 +83,7 @@ Colour contrast is computed with the WCAG relative-luminance formula (`common.co
 8. **Surface forms and templates.** A case records its decisive words in `surface_forms`, for example the exception words of a 3.1.2 trap, a title of a work or an invalid `lang` value. Cases built from the same content pool share an explicit `template`. Both feed the group split (§ 6) and the leakage check (D3).
 9. **Fictional universe.** Trap names are fictional, such as institutions, venues, associations and addresses. They are disjoint from the demo site, which uses Musterwil and Aarenwald, and from the examples quoted in the application's prompts.
 10. **Prompt-injection subset.** Six cases tagged `injection` cover 1.1.1, 2.4.4 and 3.1.2 in DE, FR and IT, with the injected text either visible or visually hidden. They are split 2 `dev` / 4 `test` by design (D4).
+11. **Add-on subsets.** Designed subsets added after the first split (tag `addon`, e.g. the 3.1.2 v3 span categories) have a forced, balanced split and are left out of the split quota, so adding them never moves an existing case between dev and test.
 
 ## 6. Splits
 
@@ -94,7 +95,7 @@ The generated cases are split about **20 % `dev` / 80 % `test`** by **template g
 
 Connected components become the template groups (`template_id`).
 
-**Assignment.** Whole groups go to `dev` greedily, with a seeded order. The target is ≈ 20 % of each criterion and of each expected outcome, and headline criteria (1.1.1, 2.4.4, 3.1.2) keep ≥ 30 test cases. The injection subset is forced to its designed split.
+**Assignment.** Whole groups go to `dev` greedily, with a seeded order. The target is ≈ 20 % of each criterion and of each expected outcome, and headline criteria (1.1.1, 2.4.4, 3.1.2) keep ≥ 30 test cases. The injection subset is forced to its designed split. Add-on subsets keep their designed split and are left out of the quota (split stability).
 
 **Consequences:**
 - no template is in both splits;
@@ -704,6 +705,19 @@ Definitions applied: *image of text* = text rendered in non-text form for a visu
 
 **Construction notes.** 45 cases (exactly 15 per page language DE/FR/IT: 18 failed, 20 passed of which 12 traps, 7 cantTell) plus 2 prompt-injection cases (D4). Foreign passages are DE/FR/IT (≈ 86 %) and EN (≈ 14 %) in five frames (notice box, quote, list-item `span`, table cell, two-column bilingual notice); F1 and P1 share frames and texts, so they differ only by the `lang` markup, and cases built on the same passage share a `template`. Trap and cantTell texts were **rewritten after the leakage review (v2)**: every trap uses fictional names or vocabulary that appears neither in the application's prompts nor in the demo site, each trap's decisive words are recorded in `surface_forms`, and dev and test share none of them (D3). Invalid-tag (F3) values and file-name alts were also replaced by values that occur in no prompt.
 
+**Designed span categories (v3, add-on).** 38 extra cases exercise spans that a language-detector rule tends to misread. Each is labelled by the rules above, with no rule changed:
+
+| Category | Rule | Cases (dev / test) |
+|---|---|---|
+| A — title of a work quoted inside running text («», „“, "", `<q>`, `<cite>`, `<i>`) | C3 → cantTell | 3 / 3 |
+| B — title of a work alone in its own paragraph | C3 → cantTell | 3 / 3 |
+| C — institution name + street address + postcode/place in another language | T1 → passed (trap) | 4 / 4 |
+| D — address-only line in another language | T1 → passed (trap) | 3 / 3 |
+| E — contrast: a full quoted *sentence* in another language without `lang` (same quote styles) | F1 → failed | 4 / 4 |
+| F — contrast: the same kind of quoted sentence with a correct `lang` | P1 → passed | 2 / 2 |
+
+Every category appears in both splits and in all three page languages. Each case has its own template (`v3-…`) and a forced split, and carries the tag `addon`. Add-on cases are left out of the split quota, so no earlier case changed split, content or id when they were added. All names, titles and addresses are fictional (Beispielwil universe) and appear neither in the demo site nor in the application code.
+
 ---
 
 ### 3.2.2 On Input (Level A)
@@ -939,7 +953,8 @@ Definitions applied: *image of text* = text rendered in non-text form for a visu
 | 2026-10-14 | v1 (draft) | First version of all 26 criterion sections; generated cases built from these rules. | — |
 | 2026-10-14 | v1 (draft) | 3.1.2: language-selector links without `lang` moved from a cantTell class to failed (rule F4) before labelling. | Understanding 3.1.2 shows `lang` on language-selector links (H58). |
 | 2026-10-14 | v1.1 (pre-freeze, no model run yet) | Supervisor review: binding decisions D1–D5 added. The split became a group split by `template_id` (D2). The 3.1.2 traps and cantTell texts were rewritten with fictional, prompt-disjoint vocabulary, and `surface_forms` were recorded (D3). Invalid-tag values and file-name alts that appeared in application prompts were replaced. Text shared with the demo site was removed from all generated cases (place names, addresses, a sensory instruction, a form label, button names). 6 prompt-injection cases were added (D4). ACT was restricted to the 14 judgement rules, and a per-row `license` was added. Labels of existing cases are unchanged except where their text changed. | P0-1, P0-2, EVAL-1, EVAL-5, EVAL-6, SEC-1, COMP-4, HYG-2 |
-| _pending_ | v1.1 → `labels-v1` | Freeze after the second-annotator review of `review_sample.csv` (κ reported in the technical report). | — |
+| 2026-10-14 | v1.2 (pre-freeze, no model run yet) | 3.1.2: 38 add-on cases for the span categories quoted title in running text, standalone title, institution + address, address only, plus contrast cases (quoted foreign sentence with and without `lang`). Labelled by the existing rules C3, T1, F1 and P1; protocol rules unchanged. Each category is in both splits; no existing case changed. The leakage check now ignores third-party and build artefacts (vendored libraries, compiled UI, licence texts). | backend review: 3.1.2 exemptions not exercised |
+| _pending_ | v1.2 → `labels-v1` | Freeze after the second-annotator review of `review_sample.csv` (κ reported in the technical report). | — |
 
 ## 12. References
 

@@ -12,6 +12,8 @@ must never have seen a near-copy of a test case.
   template groups (``template_id``).
 * The split assigns whole groups: forced groups first (``Case.split``), then groups chosen
   greedily (seeded order) to fill ~20 % dev per criterion and per expected outcome.
+  Add-on cases (tag "addon", e.g. the 3.1.2 v3 span categories) keep their designed split and
+  are excluded from the quota, so adding them never moves an existing case.
   Consequence: no template and no pair of cases with Jaccard >= 0.6 is shared across splits.
 """
 from __future__ import annotations
@@ -132,6 +134,14 @@ def group_split(rows: list[dict], seed: int, headline=("1.1.1", "2.4.4", "3.1.2"
         by_crit[r["criterion"]].append(r)
     for crit, items in sorted(by_crit.items()):
         rng = random.Random(f"klar-groupsplit-{seed}-{crit}")
+        # add-on cases (tag "addon") carry a designed, forced split and are left out of the quota,
+        # so adding them never moves an existing case between dev and test (split stability)
+        for r in items:
+            if "addon" in (r.get("tags") or []):
+                if r.get("split_hint") not in ("dev", "test"):
+                    raise ValueError(f"add-on case {r['case_id']} needs a forced split")
+                r["split"] = r["split_hint"]
+        items = [r for r in items if "addon" not in (r.get("tags") or [])]
         groups = defaultdict(list)
         for r in sorted(items, key=lambda r: r["case_id"]):
             groups[r["template_id"]].append(r)

@@ -82,8 +82,11 @@ def load_cases(crit: str, seed: int):
     assert getattr(mod, "CRITERION", crit) == crit, f"{mod.__name__}.CRITERION mismatch"
     rng = random.Random(f"klar-testset-{seed}-{crit}")
     cases = mod.build(rng)
-    # designed prompt-injection subset (SEC-1), appended so existing case ids keep their numbers
-    cases += injection.cases_for(crit, random.Random(f"klar-injection-{seed}-{crit}"))
+    core = [c for c in cases if "addon" not in c.tags]
+    addons = [c for c in cases if "addon" in c.tags]
+    # designed prompt-injection subset (SEC-1), then add-on cases (tag "addon"), appended in this
+    # order so that existing case ids keep their numbers when a subset is added later
+    cases = core + injection.cases_for(crit, random.Random(f"klar-injection-{seed}-{crit}")) + addons
     for c in cases:
         assert c.criterion == crit, f"{mod.__name__}: case with criterion {c.criterion}"
     return cases

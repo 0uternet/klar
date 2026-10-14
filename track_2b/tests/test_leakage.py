@@ -49,12 +49,13 @@ def _row(case_id, split, path, template, *, surface=(), trap=True, expected="pas
 
 
 def build_tree(root: Path, *, dev_main=DEV_MAIN, dev_template="3.1.2/b", demo_html=DEMO_HTML,
-               src_files=None, truth_rationale="Understanding 3.1.2: \"Gratis-Service für Schulvelos\" is a heading.") -> Path:
+               src_files=None, truth_rationale="Understanding 3.1.2: \"Gratis-Service für Schulvelos\" is a heading.",
+               test_surface=("Brasserie des Trois Sapins",)) -> Path:
     ts = root / "data" / "testset"
     (ts / "generated" / "3.1.2").mkdir(parents=True)
     (ts / "generated" / "3.1.2" / "gen-test-001.html").write_text(PAGE.format(title="Chorprobe", main=TEST_MAIN), encoding="utf-8")
     (ts / "generated" / "3.1.2" / "gen-dev-001.html").write_text(PAGE.format(title="Markt", main=dev_main), encoding="utf-8")
-    rows = [_row("gen-test-001", "test", "generated/3.1.2/gen-test-001.html", "3.1.2/a", surface=["Brasserie des Trois Sapins"]),
+    rows = [_row("gen-test-001", "test", "generated/3.1.2/gen-test-001.html", "3.1.2/a", surface=list(test_surface)),
             _row("gen-dev-001", "dev", "generated/3.1.2/gen-dev-001.html", dev_template, surface=["place de l'église"])]
     (ts / "manifest.jsonl").write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8")
     demo = root / "data" / "demo-site"
@@ -65,12 +66,14 @@ def build_tree(root: Path, *, dev_main=DEV_MAIN, dev_template="3.1.2/b", demo_ht
     (truth / "issues.jsonl").write_text(json.dumps({"page": "index.html", "selector": None, "criterion": "3.1.2",
                                                     "kind": "trap", "expected": "passed",
                                                     "rationale": truth_rationale}, ensure_ascii=False) + "\n", encoding="utf-8")
-    checks = root / "src" / "klar" / "checks"
-    checks.mkdir(parents=True)
-    files = {"c_clean.py": 'SYSTEM = "Classify the flagged part, e.g. \\"Gasthof zur Linde am Bach\\"."\n'}
-    files.update(src_files or {})
+    klar = root / "src" / "klar"
+    (klar / "checks").mkdir(parents=True)
+    files = {"checks/c_clean.py": 'SYSTEM = "Classify the flagged part, e.g. \\"Gasthof zur Linde am Bach\\"."\n'}
+    # keys without a folder go to checks/; keys with a folder are relative to src/klar
+    files.update({(k if "/" in k else f"checks/{k}"): v for k, v in (src_files or {}).items()})
     for name, text in files.items():
-        (checks / name).write_text(text, encoding="utf-8")
+        (klar / name).parent.mkdir(parents=True, exist_ok=True)
+        (klar / name).write_text(text, encoding="utf-8")
     return root
 
 
@@ -144,6 +147,25 @@ def test_verdict_marker_in_demo_page(tmp_path):
     demo = DEMO_HTML.replace("</main>", '<p data-note="cantTell">x</p></main>')
     res = findings(build_tree(tmp_path, demo_html=demo))
     assert any("contains answer-key text" in f for f in res["answer-keys"]), res
+
+
+def test_licence_and_vendor_files_are_ignored(tmp_path):
+    boiler = ("WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or "
+              "FITNESS FOR A PARTICULAR PURPOSE.\n")
+    src = {"capture/vendor/LICENSE-3RD-PARTY.txt": boiler,
+           "api/static/licenses/inter-OFL.txt": boiler,
+           "api/static/assets/app.js": "const t = 'fitness';\n",
+           "LICENSE": boiler}
+    root = build_tree(tmp_path, src_files=src, test_surface=("fitness",))
+    assert not cl.run(root)["code->test"], "licence/vendor/build files must be ignored"
+
+
+def test_same_word_in_python_string_is_caught(tmp_path):
+    src = {"capture/vendor/LICENSE-3RD-PARTY.txt": "FITNESS FOR A PARTICULAR PURPOSE\n",
+           "checks/c_seed.py": 'LOANWORDS = ["fitness", "coaching", "brunch"]\n'}
+    root = build_tree(tmp_path, src_files=src, test_surface=("fitness",))
+    hits = cl.run(root)["code->test"]
+    assert any("surface form 'fitness'" in f for f in hits), hits
 
 
 def test_ws_text_inserts_boundaries():

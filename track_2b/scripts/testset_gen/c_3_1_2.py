@@ -1,4 +1,4 @@
-"""3.1.2 Language of Parts — 45 cases, 15 per page language (de / fr / it).
+"""3.1.2 Language of Parts — 45 core cases (15 per page language de / fr / it) + 38 designed span cases (v3).
 
 Decision rules: PROTOCOL.md §3.1.2. The element under test is the passage (paragraph,
 quote, list item, cell, column) that contains the other-language text or the look-alike.
@@ -36,7 +36,7 @@ PASSAGES = {
         "La cancelleria comunale resterà eccezionalmente chiusa lunedì 26 dicembre. Grazie per la comprensione.",
     ],
     "en": [
-        "Please register before 30 November at the municipal office. Places are limited.",
+        "Kindly sign up at the town hall counter by the end of November. Places are limited.",
         "Guided tours in English are available every Saturday at 10 a.m. from the tourist office.",
         "Visitors are kindly asked to use public transport, as parking near the lake is very limited.",
     ],
@@ -373,4 +373,168 @@ def build(rng):
         cases.append(Case(CRITERION, lang, expected, html=html, target=target, rule=f"{CRITERION}/{rule}",
                           notes=notes, trap=trap, alt_expected=alt, difficulty=diff,
                           template=template, surface=surface))
+    cases += extra_cases(rng)      # v3 designed span categories (appended: earlier case ids unchanged)
     return cases
+
+
+# ---------------------------------------------------------------------------
+# v3 (backend review, 14 Oct): designed span categories that a language-detector rule tends to
+# misclassify, each present in BOTH splits (forced split, one template per case, fresh fictional
+# vocabulary from the Beispielwil universe, nothing shared with the demo site).
+#   A  quoted title of a work inside running text  («», „“, "", <q>, <cite>, <i>)  -> C3 cantTell
+#   B  title of a work standing alone in its own paragraph                          -> C3 cantTell
+#   C  institution name + street address + postcode/place in another language       -> T1 passed (trap)
+#   D  address-only line in another language                                         -> T1 passed (trap)
+#   E  contrast: a quoted SENTENCE in another language without lang                  -> F1 failed
+#   F  contrast: the same kind of quoted sentence correctly marked with lang         -> P1 passed
+# Each entry: (category, lang, split, h2, body_html, target, surface forms, note)
+EXTRA = [
+    # A: quoted titles in running text (C3)
+    ("A", "de", "dev", "Kino im Kornhaus",
+     '<p id="kino-text">Am Freitag zeigt der Filmclub den Dokumentarfilm «La mémoire des glaciers» in der Originalfassung mit deutschen Untertiteln. Der Eintritt kostet CHF 12.–.</p>',
+     "#kino-text", ("La mémoire des glaciers",), "French film title in «» inside a German sentence"),
+    ("A", "de", "test", "Neu in der Bibliothek",
+     '<p id="neu-text">Ab sofort ausleihbar: der Roman „Il silenzio del bosco“ einer Autorin aus Valfittizia, dazu zwei neue Hörbücher für Kinder.</p>',
+     "#neu-text", ("Il silenzio del bosco",), "Italian novel title in „“ inside a German sentence"),
+    ("A", "fr", "dev", "Théâtre au collège",
+     '<p id="theatre-texte">La troupe des Vergers joue samedi la comédie "Der falsche Gemeindeschreiber" dans une adaptation française.</p>',
+     "#theatre-texte", ("Der falsche Gemeindeschreiber",), "German play title in straight quotes inside a French sentence"),
+    ("A", "fr", "test", "Concert d'automne",
+     '<p>Le chœur mixte interprète en ouverture le cycle <q id="concert-titre">Lieder vom alten Brunnen</q> d\'un compositeur de la région.</p>',
+     "#concert-titre", ("Lieder vom alten Brunnen",), "German song-cycle title marked up with <q> inside a French sentence"),
+    ("A", "it", "dev", "Serata letteraria",
+     '<p>La biblioteca dedica una serata al racconto <cite id="serata-titolo">Le phare des oubliés</cite>, appena tradotto in italiano.</p>',
+     "#serata-titolo", ("Le phare des oubliés",), "French story title marked up with <cite> inside an Italian sentence"),
+    ("A", "it", "test", "Cineforum",
+     '<p>Giovedì il cineforum propone il film <i id="cine-titolo">Die Fähre im Nebel</i>, in versione originale con sottotitoli.</p>',
+     "#cine-titolo", ("Die Fähre im Nebel",), "German film title in <i> inside an Italian sentence"),
+    # B: standalone title paragraph (C3)
+    ("B", "de", "dev", "Ausstellung im Gemeindehaus",
+     '<p class="kicker">Fotografie</p><p id="ausst-titel" class="title-line">«L\'heure bleue sur le lac»</p><p>Bis 30. November, jeweils Mittwoch bis Sonntag von 14 bis 18 Uhr.</p>',
+     "#ausst-titel", ("L'heure bleue sur le lac",), "French exhibition title alone in its own paragraph of a German page"),
+    ("B", "de", "test", "Gastspiel im Saal",
+     '<p class="title-line" id="stueck-titel">„Sotto il cielo d\'inverno“</p><p>Eine Theatergruppe aus Esempiano spielt auf Italienisch, mit deutschen Übertiteln.</p>',
+     "#stueck-titel", ("Sotto il cielo d'inverno",), "Italian play title alone in its own paragraph of a German page"),
+    ("B", "fr", "dev", "Exposition à la Grange",
+     '<p id="expo-titre" class="title-line">«Stille Wasser im Fiktal»</p><p>Aquarelles et dessins, du 4 au 26 novembre, entrée libre.</p>',
+     "#expo-titre", ("Stille Wasser im Fiktal",), "German exhibition title alone in its own paragraph of a French page"),
+    ("B", "fr", "test", "Lecture publique",
+     '<p class="title-line" id="lecture-titre"><cite>Le voci del mercato</cite></p><p>Lecture bilingue par l\'autrice, suivie d\'une discussion et d\'une collation.</p>',
+     "#lecture-titre", ("Le voci del mercato",), "Italian book title (<cite>) alone in its own paragraph of a French page"),
+    ("B", "it", "dev", "Mostra in biblioteca",
+     '<p class="title-line" id="mostra-titolo">«Schnee über den Dächern»</p><p>Fotografie d\'epoca del nucleo, visibili fino al 15 gennaio.</p>',
+     "#mostra-titolo", ("Schnee über den Dächern",), "German exhibition title alone in its own paragraph of an Italian page"),
+    ("B", "it", "test", "Concerto di Natale",
+     '<p class="title-line" id="concerto-titolo">«Le chemin des crêtes»</p><p>Suite per coro e fiati, prima esecuzione nella chiesa parrocchiale.</p>',
+     "#concerto-titolo", ("Le chemin des crêtes",), "French suite title alone in its own paragraph of an Italian page"),
+    # C: institution + address (T1)
+    ("C", "de", "dev", "Elternberatung",
+     '<p>Die Elternberatung findet neu in den Räumen des Partnervereins statt:</p><p id="adresse-1">Association des parents d\'élèves de Valfictif, Rue des Mésanges 7, 2998 Valfictif</p>',
+     "#adresse-1", ("Association des parents d'élèves de Valfictif", "Rue des Mésanges 7"), "French association name with its street address and place"),
+    ("C", "de", "test", "Kontakt Sommerkurse",
+     '<p>Anmeldungen für die Sommerkurse nimmt die Partnerstiftung entgegen:</p><address id="adresse-2">Fondazione Casa degli Artisti<br>Via dei Mulini 4<br>6998 Esempiano</address>',
+     "#adresse-2", ("Fondazione Casa degli Artisti", "Via dei Mulini 4"), "Italian foundation name with street address and postcode/place in an <address>"),
+    ("C", "de", "dev", "Musikschule",
+     '<p>Den Instrumentalunterricht für Blasinstrumente übernimmt ab Februar:</p><address id="adresse-7">Scuola di musica Valfittizia<br>Piazzetta del Ponte 1<br>6997 Valfittizia</address>',
+     "#adresse-7", ("Scuola di musica Valfittizia", "Piazzetta del Ponte 1"), "Italian music-school name with street address and postcode/place"),
+    ("C", "fr", "dev", "Cours de musique",
+     '<p id="adresse-3">Inscriptions auprès de la Musikschule Beispielwil, Lindenhofweg 2, 3998 Beispielwil, jusqu\'au 15 décembre.</p>',
+     "#adresse-3", ("Musikschule Beispielwil", "Lindenhofweg 2"), "German school name and address inside a French sentence"),
+    ("C", "fr", "test", "Visites de la vieille ville",
+     '<p>Les visites guidées sont organisées par l\'association partenaire :</p><address id="adresse-4">Verein Altstadtfreunde Mustersee<br>Ankengasse 9<br>3997 Mustersee</address>',
+     "#adresse-4", ("Verein Altstadtfreunde Mustersee", "Ankengasse 9"), "German association name with street address and postcode/place"),
+    ("C", "it", "dev", "Biblioteca per ragazzi",
+     '<p id="adresse-5">Prestiti interbibliotecari: Bibliothèque des Jeunes de Valfictif, Rue du Four-Banal 3, 2998 Valfictif.</p>',
+     "#adresse-5", ("Bibliothèque des Jeunes de Valfictif", "Rue du Four-Banal 3"), "French library name and address after an Italian lead-in"),
+    ("C", "it", "test", "Banda giovanile",
+     '<p>Per le prove congiunte ci si ritrova presso la banda ospite:</p><address id="adresse-6">Jugendmusik Fiktal<br>Schützenmattstrasse 21<br>3996 Fiktal</address>',
+     "#adresse-6", ("Jugendmusik Fiktal", "Schützenmattstrasse 21"), "German band name with street address and postcode/place"),
+    ("C", "it", "test", "Scambio culturale",
+     '<p id="adresse-8">Partner del progetto: Centre culturel de Bourg-Modèle, Place des Halles 5, 2997 Bourg-Modèle.</p>',
+     "#adresse-8", ("Centre culturel de Bourg-Modèle", "Place des Halles 5"), "French cultural-centre name and address after an Italian lead-in"),
+    # D: address only (T1)
+    ("D", "de", "dev", "Treffpunkt Wanderung",
+     '<p id="treff-1">Treffpunkt: Rue des Cerisiers 14, 2998 Valfictif, um 8.15 Uhr.</p>',
+     "#treff-1", ("Rue des Cerisiers 14",), "French street address and place in a German line"),
+    ("D", "de", "test", "Abholstelle",
+     '<p id="treff-2">Abholung der Bestellungen: Vicolo delle Rose 6, 6998 Esempiano.</p>',
+     "#treff-2", ("Vicolo delle Rose 6",), "Italian street address and place in a German line"),
+    ("D", "fr", "dev", "Nouvelle adresse",
+     '<p id="treff-3">Le bureau de l\'association a déménagé : Brunnmattweg 18, 3998 Beispielwil.</p>',
+     "#treff-3", ("Brunnmattweg 18",), "German street address and place in a French line"),
+    ("D", "fr", "test", "Point de rencontre",
+     '<p id="treff-4">Rendez-vous devant l\'entrée : Via del Castagneto 11, 6997 Valfittizia.</p>',
+     "#treff-4", ("Via del Castagneto 11",), "Italian street address and place in a French line"),
+    ("D", "it", "dev", "Punto d'incontro",
+     '<p id="treff-5">Ritrovo alle 9 in Eichholzstrasse 33, 3997 Mustersee.</p>',
+     "#treff-5", ("Eichholzstrasse 33",), "German street address and place in an Italian line"),
+    ("D", "it", "test", "Nuova sede",
+     '<p id="treff-6">La sede del club si trova ora in Chemin des Lavandières 2, 2997 Bourg-Modèle.</p>',
+     "#treff-6", ("Chemin des Lavandières 2",), "French street address and place in an Italian line"),
+    # E: contrast — quoted foreign sentence without lang (F1)
+    ("E", "de", "dev", "Einweihung der Passerelle",
+     '<p id="zitat-1">Die Syndique von Valfictif freute sich: «Nous sommes très heureux de pouvoir enfin traverser la rivière à pied.»</p>',
+     "#zitat-1", (), "a full French sentence quoted in a German paragraph without lang"),
+    ("E", "de", "test", "Gemeinsames Projekt",
+     '<p>Der Sindaco von Esempiano betonte bei der Feier: <q id="zitat-2">Questo ponte unisce davvero le due rive del fiume.</q></p>',
+     "#zitat-2", (), "a full Italian sentence in <q> without lang in a German paragraph"),
+    ("E", "de", "dev", "Grussbotschaft",
+     '<p>Zum Schluss las die Präsidentin den Gruss der Partnergemeinde vor: <i id="zitat-7">Grazie di cuore per l\'accoglienza e arrivederci in primavera.</i></p>',
+     "#zitat-7", (), "a full Italian sentence in <i> without lang in a German paragraph"),
+    ("E", "fr", "dev", "Saison commune",
+     '<p id="zitat-3">Le président du club partenaire a déclaré : „Wir freuen uns sehr auf die gemeinsame Saison mit euch.“</p>',
+     "#zitat-3", (), "a full German sentence in „“ in a French paragraph without lang"),
+    ("E", "fr", "test", "Rénovation terminée",
+     '<p>L\'architecte a résumé le chantier en une phrase : <q id="zitat-4">Abbiamo lavorato due anni per questo risultato.</q></p>',
+     "#zitat-4", (), "a full Italian sentence in <q> without lang in a French paragraph"),
+    ("E", "fr", "test", "Le mot du partenaire",
+     '<p id="zitat-8">Le président de Beispielwil a conclu par ces mots : «Die neue Brücke verbindet endlich beide Ortsteile.»</p>',
+     "#zitat-8", (), "a full German sentence in «» in a French paragraph without lang"),
+    ("E", "it", "dev", "Ringraziamenti",
+     '<p id="zitat-5">Il presidente della società partner ha scritto: "Wir danken allen Helferinnen und Helfern für den grossen Einsatz am Wochenende."</p>',
+     "#zitat-5", (), "a full German sentence in straight quotes in an Italian paragraph without lang"),
+    ("E", "it", "test", "Visita della delegazione",
+     '<p id="zitat-6">La delegazione di Bourg-Modèle ha concluso: «C\'est une belle journée pour nos deux communes.»</p>',
+     "#zitat-6", (), "a full French sentence in «» in an Italian paragraph without lang"),
+    # F: contrast — quoted foreign sentence with a correct lang (P1)
+    ("F", "de", "dev", "Weihnachtsmarkt",
+     '<p>Die Organisatoren aus Valfictif laden ein: <q id="zitat-9" lang="fr">Le marché de Noël ouvre ses portes le premier samedi de décembre.</q></p>',
+     "#zitat-9", (), 'a French sentence in <q lang="fr">'),
+    ("F", "fr", "dev", "Merci à nos hôtes",
+     '<p>Le groupe de chant d\'Esempiano a laissé ce message : «<span id="zitat-11" lang="it">Grazie per la splendida accoglienza nel vostro villaggio.</span>»</p>',
+     "#zitat-11", (), 'an Italian sentence in a <span lang="it"> inside French quotation marks'),
+    ("F", "it", "test", "Iscrizioni aperte",
+     '<p>Il comitato di Beispielwil comunica: <q id="zitat-10" lang="de">Die Anmeldung für den Ferienpass ist ab sofort online möglich.</q></p>',
+     "#zitat-10", (), 'a German sentence in <q lang="de">'),
+    ("F", "de", "test", "Besuch aus Bourg-Modèle",
+     '<p>Zum Abschied schrieb die Delegation ins Gästebuch:</p><blockquote id="zitat-12" lang="fr-CH"><p>Nous reviendrons l\'an prochain avec beaucoup de plaisir.</p></blockquote>',
+     "#zitat-12", (), 'a French sentence in <blockquote lang="fr-CH">'),
+]
+EXTRA_RULE = {"A": ("C3", "cantTell", False, "hard"), "B": ("C3", "cantTell", False, "hard"),
+              "C": ("T1", "passed", True, "hard"), "D": ("T1", "passed", True, "hard"),
+              "E": ("F1", "failed", False, "medium"), "F": ("P1", "passed", False, "easy")}
+EXTRA_NOTE = {
+    "A": "Title of a work in another language made of ordinary words ({d}); name-like but pronounced as a foreign phrase, so whether the proper-name exception applies is debatable (C3).",
+    "B": "Title of a work in another language ({d}); a standalone title is still a title: name-like, pronounced as a foreign phrase, expert practice differs (C3).",
+    "C": "Proper names: {d}; institution names and postal addresses are exempt from 3.1.2 (T1).",
+    "D": "Proper names: {d}; a postal address is a proper name and is exempt from 3.1.2 (T1).",
+    "E": "Not a name or title but {d}, so it inherits the page language: failed (F1).",
+    "F": "Passage in another language correctly marked: {d} (P1).",
+}
+
+
+def extra_cases(rng):
+    out = []
+    for i, (cat, lang, split, h2, body, target, surface, desc) in enumerate(EXTRA):
+        rule, expected, trap, diff = EXTRA_RULE[cat]
+        F = FILL[lang]
+        main = (f'<h1>{esc(pick(rng, F["h1"]))}</h1><p>{esc(F["notice_intro"])}</p>'
+                f'<section class="box"><h2>{esc(h2)}</h2>{body}</section><p class="muted">{esc(F["after"])}</p>')
+        org = pick(rng, ORGS[lang][:4])
+        html = page(pick(rng, TAG[lang]), f"{h2} – {org}", wrap(lang, org, main, chrome=rng.random() < 0.75),
+                    rng=rng, css=".title-line{font-size:1.4rem;font-weight:700;margin:.2em 0}.kicker{text-transform:uppercase;letter-spacing:.06em;font-size:.8rem;margin:0}")
+        out.append(Case(CRITERION, lang, expected, html=html, target=target, rule=f"{CRITERION}/{rule}",
+                        notes=EXTRA_NOTE[cat].format(d=desc), trap=trap, difficulty=diff,
+                        template=f"v3-{cat}-{i:02d}", surface=surface, split=split,
+                        tags=("addon", "span-category-" + cat)))
+    return out

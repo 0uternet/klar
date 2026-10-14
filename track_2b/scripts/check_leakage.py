@@ -36,6 +36,12 @@ page-level cases. "Surface forms" = the decisive words of a case stored in the m
 4. answer keys: no ISSUES.md / issues.jsonl or other answer-key-like file, no rationale text and
    no verdict marker ("cantTell", "alt_expected", '"expected"') inside the served data/demo-site/.
 
+Excluded from the code side: third-party and build artefacts that are not Klar.'s prompts —
+src/klar/capture/vendor/** (unmodified vendored libraries such as axe-core),
+src/klar/api/static/** (the compiled web UI, git-ignored) and licence texts (LICENSE*, NOTICE*,
+COPYING*, *.txt). Licence boilerplate ("fitness for a particular purpose") would otherwise
+collide with ordinary words.
+
 Criterion vocabulary is not reported: generic link texts ("Mehr", "Lire la suite", "Di più",
 "Download" …, taken from testset_gen/c_2_4_4.py) are the phenomenon under test for 2.4.4 —
 whether they fail depends on their context, not on the words — so a lexicon of generic link
@@ -140,6 +146,19 @@ def page_text(path: Path) -> str:
 
 
 # ---------------------------------------------------------------------------- code strings
+EXCLUDED_DIRS = (("capture", "vendor"), ("api", "static"))   # third-party code, build output
+
+
+def excluded(f: Path, src: Path) -> bool:
+    """Third-party code, build artefacts and licence texts are not Klar.'s prompts or code."""
+    parts = f.relative_to(src).parts
+    for d in EXCLUDED_DIRS:
+        if any(parts[i:i + len(d)] == d for i in range(len(parts) - len(d) + 1)):
+            return True
+    name = f.name.upper()
+    return name.startswith(("LICENSE", "LICENCE", "COPYING", "NOTICE")) or f.suffix.lower() == ".txt"
+
+
 def code_strings(src: Path):
     """Return (examples, lexicon, code_text, code_shingles) for src/**.
 
@@ -147,7 +166,7 @@ def code_strings(src: Path):
     code_shingles cover string literals and comments of *.py and *.js files."""
     examples, lexicon, chunks, code_sh = set(), set(), [], set()
     for f in sorted(src.rglob("*")):
-        if not f.is_file() or "__pycache__" in f.parts or f.suffix in SKIP_SUFFIX:
+        if not f.is_file() or "__pycache__" in f.parts or f.suffix in SKIP_SUFFIX or excluded(f, src):
             continue
         try:
             text = f.read_text(encoding="utf-8")
