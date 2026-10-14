@@ -32,7 +32,7 @@ import random
 from dataclasses import dataclass, field
 
 OUTCOMES = ("failed", "passed", "cantTell", "inapplicable")
-LANGS = ("de", "fr", "it", "en")
+LANGS = ("de", "fr", "it", "en", "rm")   # rm = Romansh (Rumantsch Grischun), add-on cases only
 
 CRITERIA = {
     # code: (name, level)

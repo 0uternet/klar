@@ -104,7 +104,7 @@ def stats_md(rows: list[dict], sha256: str = "") -> str:
     out += ["## Criterion × expected outcome × source", "", table(hdr, trs), ""]
 
     # criterion x language (generated)
-    langs = ["de", "fr", "it", "en"]
+    langs = ["de", "fr", "it", "en", "rm"]
     by_l = defaultdict(Counter)
     for r in gen:
         by_l[r["criterion"]][r["page_lang"]] += 1

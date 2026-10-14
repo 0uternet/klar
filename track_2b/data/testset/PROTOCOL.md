@@ -108,7 +108,7 @@ Connected components become the template groups (`template_id`).
 
 ## 7. Documented deviations and contested readings (`alt_expected`)
 
-Where W3C sources (SC text, Understanding, techniques, ACT rules) or established audit practice point to different outcomes, the case is labelled with the reading this protocol adopts and the other reading is stored in `alt_expected`, so results can be reported under both. 36 generated cases carry an `alt_expected` (generated from `manifest.jsonl`):
+Where W3C sources (SC text, Understanding, techniques, ACT rules) or established audit practice point to different outcomes, the case is labelled with the reading this protocol adopts and the other reading is stored in `alt_expected`, so results can be reported under both. 38 generated cases carry an `alt_expected` (generated from `manifest.jsonl`):
 
 | Criterion | Rule | Cases | Our label | Other reading | Case class (from § 10) |
 |---|---|---:|---|---|---|
@@ -122,7 +122,7 @@ Where W3C sources (SC text, Understanding, techniques, ACT rules) or established
 | 1.4.3 | `1.4.3/C1` | 2 | `cantTell` | `passed` | Background under the glyphs varies (vertical gradient through the line box, or a photo-like illustration) so that some pixels of each character pass and others fail. ACT afw4f7 uses the *highest possible* contrast per character (→ passed, alt_expected … |
 | 1.4.3 | `1.4.3/C2` | 2 | `cantTell` | `passed` | Light text on a light background made readable only by a `text-shadow`. A narrow outline counts as part of the glyph, a wide halo counts as background (Understanding); which one a given blur radius produces cannot be decided from the CSS colours alone. ACT … |
 | 2.2.2 | `2.2.2/C1` | 1 | `cantTell` | `failed` | Motion stops only when the user agent reports `prefers-reduced-motion: reduce`; there is no on-page mechanism. Whether an OS/browser preference is "a mechanism" is disputed; ACT efbfc7 requires an instrument in the page (assumption: other means "may mean … |
-| 2.4.2 | `2.4.2/C1` | 2 | `cantTell` | `failed` | Single article / notice page titled only with its section name ("Aktuelles – Gemeinde X", "Actualités – …"): describes the section, not the specific content. Strict ACT c4a8a4 → failed; many evaluators accept section titles for news items. |
+| 2.4.2 | `2.4.2/C1` | 4 | `cantTell` | `failed` | Single article / notice page titled only with its section name ("Aktuelles – Gemeinde X", "Actualités – …"): describes the section, not the specific content. Strict ACT c4a8a4 → failed; many evaluators accept section titles for news items. |
 | 2.4.4 | `2.4.4/C1` | 4 | `cantTell` | `failed` | Generic name whose **only** disambiguating information is a preceding heading element (`h1`–`h6`/`role="heading"`) outside the link's block container, list item, cell and describedby targets (typical news cards: `h3` + teaser + `<p><a>Mehr</a></p>`). … |
 | 2.4.4 | `2.4.4/C2` | 1 | `cantTell` | `failed` | Generic name whose purpose is given only in the `title` attribute. H33 is still listed as sufficient in WCAG 2.1 (with an AT-support caveat) but `title` is not ACT link context and is not exposed to keyboard/touch users. |
 | 2.4.5 | `2.4.5/C2` | 1 | `cantTell` | `failed` | Hierarchical main navigation + breadcrumbs only (sub-pages reachable via their parent page). Breadcrumbs (G65, for 2.4.8) only repeat the same hierarchy upwards; whether they count as a second way is disputed. |
@@ -524,6 +524,14 @@ Definitions applied: *image of text* = text rendered in non-text form for a visu
 
 **Construction notes.** 28 pages taken from 18 hand-written fictional sites (municipality, school, library, water utility, transport, tourism; DE/FR/IT) with header navigation, side-navigation or bare layouts. Every failed title except F1–F3 is a plausible, well-formed string; passed titles include short titles without site name, org-first titles, home-page site names and synonym titles, so neither "contains the org name", "title = h1" nor "title length" predicts the label.
 
+**Add-on cases (review B, 6 multi-page cases, 3 dev / 3 test, tag `addon`).** Each case is a mini site of 3–4 pages. The criterion is judged on every page, and the case outcome is the worst page outcome. `notes` names the deciding page.
+
+| Mini site | Rule → label | dev / test |
+|---|---|---|
+| Web-application views sharing the application title, with `h1` naming the task | T5 → passed (trap) | 1 / 1 |
+| Single articles titled only with their section ("Aktuelles – …", "Actualités – …") | C1 → cantTell (`alt_expected` failed) | 1 / 1 |
+| An inner page whose title equals the home page's title (organisation name only) | F4 → failed | 1 / 1 |
+
 ---
 
 ### 2.4.3 Focus Order (Level A)
@@ -609,6 +617,13 @@ Definitions applied: *image of text* = text rendered in non-text form for a visu
 
 **Construction notes.** 14 mini sites (DE/FR/IT) from the hand-written site library (municipality, school, library, water utility, transport, tourism) with top, side or band navigation. Teaser boxes, footers and search boxes occur in failed and passed sites alike; what decides is coverage (which page is in which mechanism), so "site has a search box" or "has a site map link" is not a shortcut.
 
+**Add-on cases (review B, 4 mini sites, 2 dev / 2 test, tag `addon`).** Folder URLs: pages live at `folder/index.html` and are linked as `folder/` (a static HTTP server serves `folder/` as `folder/index.html`).
+
+| Mini site | Rule → label | dev / test |
+|---|---|---|
+| Every page is in the main navigation and in the site map | P1 → passed | 1 / 1 |
+| One page is reachable only through a single home-page teaser | F1 → failed | 1 / 1 |
+
 ---
 
 ### 2.4.6 Headings and Labels (Level AA)
@@ -682,6 +697,17 @@ Definitions applied: *image of text* = text rendered in non-text form for a visu
 **Not cantTell.** Annotator uncertainty is not a label; a page with one clearly dominant language is never C1, even if it contains several foreign words. Cases that do not fit a rule are discarded.
 
 **Construction notes.** 26 pages (11 failed, 11 passed incl. 6 traps, 4 cantTell; DE 10, FR 8, IT 7, EN 1). Failed pages use the same chrome, themes and topics as passed ones; F2/F3 pages contain a well-formed-looking `lang` (`de_CH`, `fra`, `ch`, `de-CH` on an Italian page) so that "attribute present / looks like a tag" is not a shortcut, while T3 uses an unusual but valid `de-CH-1996`. Traps contain dense foreign vocabulary (English event jargon, Italian dishes and place names, a French postal address, a foreign quotation, a language switcher) so that a naive language detector on short snippets would be misled. C1 pages are bilingual notices (DE/FR parallel water-cut notice, FR/DE school page, IT/DE valley commune, DE/IT sports club) built from language-tagged segments; the generator counts words per language (title, navigation, body), asserts the 0.8–1.25 ratio and asserts that the two readings DISAGREE (declared = first language but fewer words → `alt_expected = failed`; declared = second language with more words → `alt_expected = passed`).
+
+**Add-on cases (review B, 6 cases, 3 dev / 3 test, tag `addon`).**
+
+| Case | Rule → label | dev / test |
+|---|---|---|
+| Page in Romansh (Rumantsch Grischun) declared `lang="rm"` | P1 → passed | 1 / 0 |
+| Page in Romansh declared `lang="rm-CH"` | T3 → passed (trap) | 0 / 1 |
+| Page in Romansh declared `lang="de"` or `lang="de-CH"` | F3 → failed | 1 / 1 |
+| German page whose main content lists Italian-named places, institutions and addresses | T1 → passed (trap) | 1 / 1 |
+
+The Romansh texts are short, fictional municipal notices: office hours, the communal assembly, waste collection and the library of the "Vischnanca da Exemplun". For these cases `page_lang` is `rm`.
 
 ---
 
@@ -986,7 +1012,8 @@ The swipe surface and the card are not separate user-interface components, becau
 | 2026-10-14 | v1.1 (pre-freeze, no model run yet) | Supervisor review: binding decisions D1–D5 added. The split became a group split by `template_id` (D2). The 3.1.2 traps and cantTell texts were rewritten with fictional, prompt-disjoint vocabulary, and `surface_forms` were recorded (D3). Invalid-tag values and file-name alts that appeared in application prompts were replaced. Text shared with the demo site was removed from all generated cases (place names, addresses, a sensory instruction, a form label, button names). 6 prompt-injection cases were added (D4). ACT was restricted to the 14 judgement rules, and a per-row `license` was added. Labels of existing cases are unchanged except where their text changed. | P0-1, P0-2, EVAL-1, EVAL-5, EVAL-6, SEC-1, COMP-4, HYG-2 |
 | 2026-10-14 | v1.2 (pre-freeze, no model run yet) | 3.1.2: 38 add-on cases for the span categories quoted title in running text, standalone title, institution + address, address only, plus contrast cases (quoted foreign sentence with and without `lang`). Labelled by the existing rules C3, T1, F1 and P1; protocol rules unchanged. Each category is in both splits; no existing case changed. The leakage check now ignores third-party and build artefacts (vendored libraries, compiled UI, licence texts). | backend review: 3.1.2 exemptions not exercised |
 | 2026-10-14 | v1.3 (pre-freeze, no model run yet) | Added 40 review-A add-on cases. 4.1.2: swipe slider, map surface exposed and unexposed, clickable card, div button. 3.3.2: postcode and birth-year patterns without a hint, AHV pattern with and without a hint. 1.3.5: venue Wi-Fi code, login password. Every item has cases in both splits, labelled by the existing rules; no rule changed and no existing case moved. Renamed asset files whose names revealed a subset or a class (the prompt-injection charts and the 1.4.5 / 1.4.11 fixture names). The generator's leak scan now also rejects subset and split markers (inj, test, dev, addon …) in ids, classes, data attributes and URLs. | review A |
-| _pending_ | v1.3 → `labels-v1` | Freeze after the second-annotator review of `review_sample.csv` (κ reported in the technical report). | — |
+| 2026-10-14 | v1.4 (pre-freeze, no model run yet) | Added 16 review-B add-on cases. 3.1.1: Romansh pages declared rm / rm-CH (passed) and de / de-CH (failed), and German pages listing Italian place names (passed). 2.4.2: multi-page app views (T5), section-only article titles (C1), and an inner page carrying the home title (F4). 2.4.5: mini sites with folder URLs, one passed and one with a one-way page. Every item has cases in both splits. No rule changed and no existing case changed. `page_lang` may now be `rm` (Romansh). | review B |
+| _pending_ | v1.4 → `labels-v1` | Freeze after the second-annotator review of `review_sample.csv` (κ reported in the technical report). | — |
 
 ## 12. References
 

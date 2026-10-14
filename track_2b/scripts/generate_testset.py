@@ -41,6 +41,7 @@ import common  # noqa: E402
 import grouping  # noqa: E402
 import injection  # noqa: E402
 import addons_review_a  # noqa: E402
+import addons_review_b  # noqa: E402
 import htmlcheck  # noqa: E402
 
 ROOT = HERE.parent                      # track_2b/
@@ -92,6 +93,7 @@ def load_cases(crit: str, seed: int):
     cases = core + injection.cases_for(crit, random.Random(f"klar-injection-{seed}-{crit}")) + addons
     # later add-on batches go last, each with its own RNG, so earlier ids/contents never move
     cases += addons_review_a.cases_for(crit, random.Random(f"klar-addon-review-a-{seed}-{crit}"))
+    cases += addons_review_b.cases_for(crit, random.Random(f"klar-addon-review-b-{seed}-{crit}"))
     for c in cases:
         assert c.criterion == crit, f"{mod.__name__}: case with criterion {c.criterion}"
     return cases
