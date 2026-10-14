@@ -1,0 +1,47 @@
+# Docker build context hygiene: never send secrets, model weights, runtime data or
+# local build output to the daemon. The UI is always rebuilt inside the image.
+
+# secrets
+.env
+.env.*
+**/.env
+**/.env.*
+
+# model weights and downloads (mounted at runtime, never baked into the image)
+models/
+*.gguf
+*.safetensors
+*.bin
+*.ckpt
+*.pt
+
+# runtime and evaluation output
+var/
+eval/results/
+dist/
+
+# local builds and environments
+src/klar/api/static/
+src/web/dist/
+**/node_modules/
+.venv/
+**/.venv/
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/*.egg-info/
+build/
+
+# not needed in any image
+.git
+.github
+docs/
+*.pdf
+technical_report.md
+run.ps1
+run-native.sh
+.idea/
+.vscode/
+**/.DS_Store

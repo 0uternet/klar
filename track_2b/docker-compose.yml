@@ -1,0 +1,157 @@
+# Klar. - Docker Compose (needs Compose v2.24+ or v5). Normally driven by the Makefile:
+#
+#   make run       app only. LLM_* from the shell or .env; none set = replay mode (no key, no download)
+#   make run-gpu   + llm-gpu: official Apertus 1.5 vLLM image on a local NVIDIA GPU (profile gpu)
+#   make run-cpu   + llm-cpu: llama.cpp server, text-only Apertus 1.5 8B GGUF on CPU (profile cpu)
+#
+# Ports: only the app is published, on ${KLAR_BIND:-127.0.0.1}:${KLAR_PORT:-8080}.
+# The inference servers are reachable from the app container only (no host port).
+# Data: ./var (scans, SQLite, reports), ./eval/results, ./models (weights). See docs/DEPLOYMENT.md.
+
+name: klar
+
+services:
+  app:
+    build:
+      context: .
+      target: runtime
+    image: ${KLAR_IMAGE:-klar:local}
+    init: true
+    shm_size: "1gb"                       # Chromium needs more than Docker's default 64 MB /dev/shm
+    user: "${KLAR_UID:-10001}:${KLAR_GID:-10001}"   # the Makefile passes the host user (file ownership in ./var)
+    # No env_file: the app renders untrusted pages, so it receives ONLY this allow-list
+    # (values from the shell, else from .env). HF_TOKEN and anything else in .env stay out.
+    environment:
+      - LLM_BASE_URL=${LLM_BASE_URL:-}    # empty = replay mode (klar/config.py)
+      - LLM_NAME=${LLM_NAME:-swiss-ai/Apertus-v1.5-8B}
+      - LLM_API_KEY=${LLM_API_KEY:-local}
+      - KLAR_REPLAY=${KLAR_REPLAY:-0}
+      - KLAR_ALLOW_PRIVATE_NETWORKS=${KLAR_ALLOW_PRIVATE_NETWORKS:-0}   # 1 = allow scanning intranet (RFC 1918) hosts
+      # Optional knobs, passed only when set in the shell or .env:
+      - KLAR_ALLOWED_HOSTS
+      - KLAR_UI_LANG
+      - KLAR_RECORD
+      - KLAR_VISION
+      - KLAR_LLM_TIMEOUT
+      - KLAR_LLM_CONCURRENCY
+      - KLAR_MAX_LLM_CALLS
+      - KLAR_SCAN_TIMEOUT
+      - KLAR_QUEUE_MAX
+      - KLAR_MAX_HTML_BYTES
+      - KLAR_REPLAY_EXACT
+      - KLAR_REPLAY_MODELS
+      - KLAR_DETECT_LANGS
+      - KLAR_CORS_ORIGINS
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # an LLM server on the host, also on Linux
+    mem_limit: ${KLAR_MEM_LIMIT:-4g}      # Chromium + Python; a hostile page cannot exhaust the host
+    pids_limit: ${KLAR_PIDS_LIMIT:-1024}
+    ports:
+      - "${KLAR_BIND:-127.0.0.1}:${KLAR_PORT:-8080}:8080"
+    volumes:                              # ":z" = SELinux relabel (Fedora/RHEL hosts), a no-op elsewhere
+      - ./var:/app/var:z
+      - ./eval/results:/app/eval/results:z
+    depends_on:                           # only active when the matching profile is enabled
+      llm-gpu:
+        condition: service_healthy
+        required: false
+      llm-cpu:
+        condition: service_healthy
+        required: false
+    restart: unless-stopped
+
+  # -- profile gpu: Apertus 1.5 8B (text + images) with the official swiss-ai vLLM image ----
+  # Image: CUDA 13.0, needs NVIDIA driver >= 580 and the NVIDIA Container Toolkit.
+  # Memory (RTX 5090, 32 GB): BF16 weights ~18.4 GB + KV cache for --max-model-len 32768
+  # (~4 GiB) + activations/CUDA graphs fit in 0.85 x 32 GB. Lower VLLM_MAX_MODEL_LEN on 24 GB cards.
+  # HF_TOKEN is needed once, for the first download (gated repo); the weights are then
+  # cached in ./models/huggingface and HF_HUB_OFFLINE=1 makes the container fully offline.
+  llm-gpu:
+    profiles: ["gpu"]
+    image: ${VLLM_IMAGE:-ghcr.io/swiss-ai/vllm_apertus_1.5_release:latest@sha256:634973c5d8a2bd542ae9f7b95bf7a271858a842cdc873b2214671079dd9c1ea9}
+    command:                              # the image's entrypoint is NVIDIA's wrapper, it has no default command
+      - vllm
+      - serve
+      - swiss-ai/Apertus-v1.5-8B
+      - --served-model-name=swiss-ai/Apertus-v1.5-8B
+      - --host=0.0.0.0
+      - --port=8000
+      - --max-model-len=${VLLM_MAX_MODEL_LEN:-32768}
+      - --gpu-memory-utilization=${VLLM_GPU_MEMORY_UTILIZATION:-0.85}
+      - --chat-template-content-format=string     # as in the model card
+      - --seed=0
+      # No function-calling flags: Klar. never asks the model to call functions (least privilege).
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+      HF_HUB_OFFLINE: ${HF_HUB_OFFLINE:-0}
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      VLLM_NO_USAGE_STATS: "1"            # vLLM reports usage stats by default: switched off (no third-party calls)
+      DO_NOT_TRACK: "1"
+    volumes:
+      - ${HF_CACHE_DIR:-./models/huggingface}:/root/.cache/huggingface:z
+    expose: ["8000"]
+    shm_size: "8gb"
+    networks:
+      default:
+        aliases: [llm]                    # short name http://llm:8000/v1, also classified as local by klar/config.py
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/v1/models', timeout=5)"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60m                   # first start downloads ~18 GB of weights
+    restart: unless-stopped
+
+  # -- profile cpu: Apertus 1.5 8B text-only GGUF (Q4_K_M) with llama.cpp, no GPU, no vision --
+  # The model file is fetched and sha256-verified by `make run-cpu` (deploy/download_model.sh).
+  llm-cpu:
+    profiles: ["cpu"]
+    image: ${LLAMACPP_IMAGE:-ghcr.io/ggml-org/llama.cpp:server-b11243@sha256:f9115c95639e60abc09d4ea83b26fd4d56c66aa1174594393335a514da00c283}
+    command:
+      - -m
+      - /models/apertus-v1.5-8b-text-q4_k_m.gguf
+      - --alias
+      - swiss-ai/Apertus-v1.5-8B
+      - --jinja
+      - -c
+      - "8192"
+      - --parallel                        # one request at a time, each with the full 8192-token context
+      - "1"
+      - --threads                         # the Makefile sets about one per physical core
+      - "${LLAMA_THREADS:-4}"
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+    volumes:
+      - ./models:/models:ro,z
+    expose: ["8080"]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 5m
+    restart: unless-stopped
+
+  # -- one-shot: download + verify the GGUF without curl/sha256sum on the host ---------------
+  #   docker compose --profile download run --rm model-download
+  model-download:
+    profiles: ["download"]
+    image: ${LLAMACPP_IMAGE:-ghcr.io/ggml-org/llama.cpp:server-b11243@sha256:f9115c95639e60abc09d4ea83b26fd4d56c66aa1174594393335a514da00c283}
+    entrypoint: ["/bin/sh", "/deploy/download_model.sh"]
+    user: "${KLAR_UID:-10001}:${KLAR_GID:-10001}"
+    environment:
+      MODELS_DIR: /models
+      HF_TOKEN: ${HF_TOKEN:-}
+    volumes:
+      - ./models:/models:z
+      - ./deploy:/deploy:ro,z
+    restart: "no"

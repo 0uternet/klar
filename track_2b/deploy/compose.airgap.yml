@@ -1,0 +1,27 @@
+# Overlay used by `make airgap-check` (deploy/airgap_check.sh), and usable for a real
+# air-gapped deployment:
+#
+#   docker compose -p klar-airgap -f docker-compose.yml -f deploy/compose.airgap.yml [--profile cpu|gpu] up -d
+#
+# The project's default network becomes `internal`: Docker gives it no gateway and no NAT,
+# so the containers cannot reach the internet (or the LAN). They still reach each other
+# by service name (app -> llm-cpu / llm-gpu). Because an internal network cannot publish
+# ports, the app is used through `docker compose exec` here; for a real offline site put
+# a reverse proxy container on both this network and a host-facing one.
+
+networks:
+  default:
+    internal: true
+
+services:
+  app:
+    ports: !reset []
+    restart: "no"
+
+  llm-gpu:
+    environment:
+      HF_HUB_OFFLINE: "1"                 # weights must already be in ./models/huggingface
+    restart: "no"
+
+  llm-cpu:
+    restart: "no"
