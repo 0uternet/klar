@@ -1,0 +1,31 @@
+{
+  "ai_requests": {
+    "external": 0,
+    "local": 0,
+    "swiss_cloud": 0
+  },
+  "base_url_host": null,
+  "chat_template_kwargs": false,
+  "config_error": null,
+  "external_ai_requests": 0,
+  "json_schema": false,
+  "llm_error": null,
+  "llm_reachable": null,
+  "mode": "replay",
+  "model": "swiss-ai/Apertus-v1.5-8B",
+  "provider": null,
+  "replay_models": [
+    "swiss-ai/Apertus-v1.5-8B"
+  ],
+  "replay_recorded": {
+    "from": "2026-10-15T08:00:00+00:00",
+    "hosts": [
+      "llm-gpu"
+    ],
+    "records": 118,
+    "to": "2026-10-15T09:00:00+00:00"
+  },
+  "version": "0.1.0",
+  "vision": false,
+  "vision_source": "replay"
+}

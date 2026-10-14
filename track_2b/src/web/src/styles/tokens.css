@@ -1,0 +1,194 @@
+/*
+ * Klar. design tokens (Swiss Style, WCAG AA contrast).
+ * Light by default; dark via prefers-color-scheme unless the user forced light,
+ * or via [data-theme="dark"] (manual toggle). Every text pair is ≥ 4.5:1;
+ * borders of form controls and graphical fills are ≥ 3:1 (WCAG 1.4.11).
+ */
+
+:root {
+  color-scheme: light;
+
+  /* Brand + status */
+  --bg: #fafaf7;
+  --surface: #ffffff;
+  --ink: #0f1115;
+  --muted: #565b66;
+  --line: #e4e2dc;
+  --klar-red: #d0021b;
+  --red-text: #b00016;
+  --green: #13703a;
+  --amber: #8a4b00;
+  --blue: #1f4fd8;
+
+  /* Derived neutrals */
+  --surface-2: #f3f2ee;
+  --surface-3: #eae8e2;
+  --ink-hover: #2a2e36;
+  --on-ink: #fafaf7;
+  --control-border: #858a94;
+  --fill-rule: #858a94;
+  --grey-shape: #6b707a;
+
+  /* Tints (backgrounds only — text on them stays ≥ 4.5:1) */
+  --red-tint: #fcecee;
+  --green-tint: #e9f4ed;
+  --amber-tint: #faf0e3;
+  --blue-tint: #ebf0fc;
+  --mark-bg: #ffe7a0;
+  --mark-ink: #0f1115;
+  --diff-add: #e7f4eb;
+  --diff-add-strong: #bfe3cb;
+  --diff-del: #fcecee;
+  --diff-del-strong: #f6c6cc;
+  --scrim: rgba(15, 17, 21, 0.32);
+
+  /* Syntax (HTML excerpts) — all ≥ 4.5:1 on --surface-2 */
+  --syn-tag: #1f4fd8;
+  --syn-attr: #8a4b00;
+  --syn-value: #13703a;
+  --syn-punct: #565b66;
+
+  /* Elevation: a single soft shadow, overlays only */
+  --shadow-overlay: 0 1px 2px rgba(15, 17, 21, 0.06), 0 16px 48px rgba(15, 17, 21, 0.14);
+
+  /* Type */
+  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Menlo, Consolas, monospace;
+  --fs-12: 0.75rem;
+  --fs-14: 0.875rem;
+  --fs-16: 1rem;
+  --fs-20: 1.25rem;
+  --fs-24: 1.5rem;
+  --fs-32: 2rem;
+  --fs-48: 3rem;
+  --fs-64: 4rem;
+  --lh-body: 1.5;
+  --lh-display: 1.1;
+
+  /* Space */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+
+  /* Shape */
+  --r-card: 10px;
+  --r-control: 8px;
+  --r-pill: 999px;
+
+  /* Layout */
+  --max: 1200px;
+  --gutter: 24px;
+  --page-pad: 16px;
+  --bar-h: 64px;
+  --mock-h: 0px;
+  /* Total sticky header height (navigation bar + mock-up banner when shown). */
+  --header-h: calc(var(--bar-h) + var(--mock-h));
+  --drawer-w: 560px;
+
+  /* Motion */
+  --dur-1: 150ms;
+  --dur-2: 200ms;
+  --dur-3: 250ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+:root.is-mock {
+  --mock-h: 40px;
+}
+@media (max-width: 640px) {
+  /* Two lines on small screens: the message, then the button to leave. */
+  :root.is-mock {
+    --mock-h: 76px;
+  }
+}
+
+@media (min-width: 640px) {
+  :root { --page-pad: 24px; }
+}
+@media (min-width: 1024px) {
+  :root { --page-pad: 32px; }
+}
+
+/* ---- Dark ---------------------------------------------------------------- */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #0b0c0f;
+    --surface: #15171c;
+    --ink: #f2f1ec;
+    --muted: #a3a8b3;
+    --line: #2a2d35;
+    --klar-red: #ff4d4f;
+    --red-text: #ff4d4f;
+    --green: #3dd47a;
+    --amber: #f2a93b;
+    --blue: #7fa2ff;
+    --surface-2: #1c1f25;
+    --surface-3: #252931;
+    --ink-hover: #d9d8d2;
+    --on-ink: #0b0c0f;
+    --control-border: #6e7380;
+    --fill-rule: #6e7380;
+    --grey-shape: #8c919c;
+    --red-tint: #2a1416;
+    --green-tint: #11251a;
+    --amber-tint: #2a1f0f;
+    --blue-tint: #151d33;
+    --mark-bg: #5c4700;
+    --mark-ink: #fff4d1;
+    --diff-add: #11251a;
+    --diff-add-strong: #1d4a2f;
+    --diff-del: #2a1416;
+    --diff-del-strong: #5a2328;
+    --scrim: rgba(0, 0, 0, 0.55);
+    --syn-tag: #8fb0ff;
+    --syn-attr: #f2b45b;
+    --syn-value: #5fdc92;
+    --syn-punct: #a3a8b3;
+    --shadow-overlay: 0 1px 2px rgba(0, 0, 0, 0.4), 0 16px 48px rgba(0, 0, 0, 0.55);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0b0c0f;
+  --surface: #15171c;
+  --ink: #f2f1ec;
+  --muted: #a3a8b3;
+  --line: #2a2d35;
+  --klar-red: #ff4d4f;
+  --red-text: #ff4d4f;
+  --green: #3dd47a;
+  --amber: #f2a93b;
+  --blue: #7fa2ff;
+  --surface-2: #1c1f25;
+  --surface-3: #252931;
+  --ink-hover: #d9d8d2;
+  --on-ink: #0b0c0f;
+  --control-border: #6e7380;
+  --fill-rule: #6e7380;
+  --grey-shape: #8c919c;
+  --red-tint: #2a1416;
+  --green-tint: #11251a;
+  --amber-tint: #2a1f0f;
+  --blue-tint: #151d33;
+  --mark-bg: #5c4700;
+  --mark-ink: #fff4d1;
+  --diff-add: #11251a;
+  --diff-add-strong: #1d4a2f;
+  --diff-del: #2a1416;
+  --diff-del-strong: #5a2328;
+  --scrim: rgba(0, 0, 0, 0.55);
+  --syn-tag: #8fb0ff;
+  --syn-attr: #f2b45b;
+  --syn-value: #5fdc92;
+  --syn-punct: #a3a8b3;
+  --shadow-overlay: 0 1px 2px rgba(0, 0, 0, 0.4), 0 16px 48px rgba(0, 0, 0, 0.55);
+}

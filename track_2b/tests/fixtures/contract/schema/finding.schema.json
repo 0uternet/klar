@@ -1,0 +1,219 @@
+{
+  "properties": {
+    "act_rule": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Act Rule"
+    },
+    "axe_rule": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Axe Rule"
+    },
+    "confidence": {
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ],
+      "title": "Confidence",
+      "type": "string"
+    },
+    "content_lang": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Content Lang"
+    },
+    "context_shown": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Context Shown",
+      "type": "object"
+    },
+    "criterion": {
+      "title": "Criterion",
+      "type": "string"
+    },
+    "criterion_name": {
+      "title": "Criterion Name",
+      "type": "string"
+    },
+    "en301549": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "En301549"
+    },
+    "excerpt": {
+      "title": "Excerpt",
+      "type": "string"
+    },
+    "explanation": {
+      "title": "Explanation",
+      "type": "string"
+    },
+    "fix_diff": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Fix Diff"
+    },
+    "fix_hint": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Fix Hint"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "level": {
+      "enum": [
+        "A",
+        "AA"
+      ],
+      "title": "Level",
+      "type": "string"
+    },
+    "model": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Model"
+    },
+    "outcome": {
+      "enum": [
+        "failed",
+        "cantTell",
+        "passed",
+        "inapplicable"
+      ],
+      "title": "Outcome",
+      "type": "string"
+    },
+    "page_url": {
+      "title": "Page Url",
+      "type": "string"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reason"
+    },
+    "reason_code": {
+      "title": "Reason Code",
+      "type": "string"
+    },
+    "screenshot": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Screenshot"
+    },
+    "selector": {
+      "title": "Selector",
+      "type": "string"
+    },
+    "source": {
+      "enum": [
+        "rule",
+        "heuristic",
+        "apertus"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "status": {
+      "default": "to_review",
+      "enum": [
+        "to_review",
+        "accepted",
+        "rejected"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "user_impact": {
+      "title": "User Impact",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "criterion",
+    "criterion_name",
+    "level",
+    "act_rule",
+    "en301549",
+    "outcome",
+    "source",
+    "confidence",
+    "page_url",
+    "selector",
+    "excerpt",
+    "context_shown",
+    "explanation",
+    "user_impact",
+    "fix_diff",
+    "fix_hint",
+    "screenshot",
+    "model",
+    "reason_code"
+  ],
+  "title": "Finding",
+  "type": "object"
+}

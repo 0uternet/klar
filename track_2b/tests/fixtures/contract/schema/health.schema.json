@@ -1,0 +1,165 @@
+{
+  "properties": {
+    "ai_requests": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "description": "model requests by destination since the server started (in memory)",
+      "propertyNames": {
+        "enum": [
+          "local",
+          "swiss_cloud",
+          "external"
+        ]
+      },
+      "title": "Ai Requests",
+      "type": "object"
+    },
+    "base_url_host": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Base Url Host"
+    },
+    "chat_template_kwargs": {
+      "default": false,
+      "title": "Chat Template Kwargs",
+      "type": "boolean"
+    },
+    "config_error": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Config Error"
+    },
+    "external_ai_requests": {
+      "default": 0,
+      "description": "ai_requests.swiss_cloud + ai_requests.external, since the server started",
+      "title": "External Ai Requests",
+      "type": "integer"
+    },
+    "json_schema": {
+      "default": false,
+      "title": "Json Schema",
+      "type": "boolean"
+    },
+    "llm_error": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Llm Error"
+    },
+    "llm_reachable": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Llm Reachable"
+    },
+    "mode": {
+      "enum": [
+        "local",
+        "swiss_cloud",
+        "external",
+        "replay"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "model": {
+      "title": "Model",
+      "type": "string"
+    },
+    "provider": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Provider"
+    },
+    "replay_models": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Replay Models"
+    },
+    "replay_recorded": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Replay Recorded"
+    },
+    "version": {
+      "title": "Version",
+      "type": "string"
+    },
+    "vision": {
+      "title": "Vision",
+      "type": "boolean"
+    },
+    "vision_source": {
+      "default": "pending",
+      "enum": [
+        "pending",
+        "probe",
+        "override",
+        "replay",
+        "error"
+      ],
+      "title": "Vision Source",
+      "type": "string"
+    }
+  },
+  "required": [
+    "mode",
+    "model",
+    "base_url_host",
+    "vision",
+    "version"
+  ],
+  "title": "Health",
+  "type": "object"
+}

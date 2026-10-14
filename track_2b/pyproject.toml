@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "klar"
+version = "0.1.0"
+description = "Klar. - meaning checks for an accessible Swiss web (WCAG 2.1 AA / eCH-0059 pre-checks with Apertus)"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+authors = [{ name = "Klar. team" }]
+# Versions are pinned exactly: the Docker image, the replay recordings and the
+# evaluation numbers must be reproducible. Bump deliberately.
+# NOTE for the Docker engineer: the Playwright Python package version must match
+# the base image tag (mcr.microsoft.com/playwright/python:v1.63.0-noble).
+dependencies = [
+    "fastapi==0.143.0",
+    "uvicorn==0.54.0",
+    "pydantic==2.14.1",
+    "playwright==1.63.0",
+    "openai==3.29.0",
+    "httpx==0.28.1",
+    # Language detection for 3.1.2 (Apache-2.0). Chosen over lighter detectors
+    # for its accuracy on short text and its mixed-language span detection
+    # (detect_multiple_languages_of). Models ship inside the wheel: no download
+    # at runtime (air-gap friendly). ~290 MB on disk, ~30 MB RAM for the
+    # 11 languages we load.
+    "lingua-language-detector==2.2.0",
+    "python-multipart==0.0.32",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==9.1.1"]
+
+[project.scripts]
+klar = "klar.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["klar*"]
+
+[tool.setuptools.package-data]
+klar = [
+    "capture/js/*.js",
+    "capture/vendor/*",
+    "capture/vendor/axe-locales/*.json",
+    "api/static/**/*",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "browser: needs Playwright Chromium (python -m playwright install chromium)",
+]
+filterwarnings = ["ignore::DeprecationWarning:websockets.*"]

@@ -1,0 +1,214 @@
+{
+  "additionalProperties": true,
+  "description": "Shape of Scan.stats. FLAT. A few extra diagnostic keys are allowed\n(candidates, cache_hits, check_errors, blocked_requests, criteria lists…).",
+  "properties": {
+    "accepted": {
+      "default": 0,
+      "title": "Accepted",
+      "type": "integer"
+    },
+    "ai_requests": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "default": {},
+      "propertyNames": {
+        "enum": [
+          "local",
+          "swiss_cloud",
+          "external"
+        ]
+      },
+      "title": "Ai Requests",
+      "type": "object"
+    },
+    "budget_skipped": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "default": {},
+      "title": "Budget Skipped",
+      "type": "object"
+    },
+    "cantTell": {
+      "default": 0,
+      "title": "Canttell",
+      "type": "integer"
+    },
+    "criteria_apertus": {
+      "default": 0,
+      "title": "Criteria Apertus",
+      "type": "integer"
+    },
+    "criteria_checked": {
+      "default": 0,
+      "title": "Criteria Checked",
+      "type": "integer"
+    },
+    "criteria_rule": {
+      "default": 0,
+      "title": "Criteria Rule",
+      "type": "integer"
+    },
+    "error_code": {
+      "anyOf": [
+        {
+          "enum": [
+            "unreachable",
+            "tls",
+            "dns",
+            "timeout_page",
+            "blocked_redirect",
+            "too_many_redirects",
+            "not_html",
+            "scan_timeout",
+            "browser",
+            "internal",
+            "blocked_private",
+            "blocked_metadata",
+            "blocked_localhost"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Error Code"
+    },
+    "failed": {
+      "default": 0,
+      "title": "Failed",
+      "type": "integer"
+    },
+    "final_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Final Url"
+    },
+    "guard_rejected": {
+      "default": 0,
+      "title": "Guard Rejected",
+      "type": "integer"
+    },
+    "http_status": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Http Status"
+    },
+    "inapplicable": {
+      "default": 0,
+      "title": "Inapplicable",
+      "type": "integer"
+    },
+    "injection_flagged": {
+      "default": 0,
+      "title": "Injection Flagged",
+      "type": "integer"
+    },
+    "llm_calls": {
+      "default": 0,
+      "title": "Llm Calls",
+      "type": "integer"
+    },
+    "llm_errors": {
+      "default": 0,
+      "title": "Llm Errors",
+      "type": "integer"
+    },
+    "max_llm_calls": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Max Llm Calls"
+    },
+    "not_recorded": {
+      "default": 0,
+      "title": "Not Recorded",
+      "type": "integer"
+    },
+    "page_title": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Page Title"
+    },
+    "passed": {
+      "default": 0,
+      "title": "Passed",
+      "type": "integer"
+    },
+    "rejected": {
+      "default": 0,
+      "title": "Rejected",
+      "type": "integer"
+    },
+    "replay_loose_hits": {
+      "default": 0,
+      "title": "Replay Loose Hits",
+      "type": "integer"
+    },
+    "seconds": {
+      "default": 0.0,
+      "title": "Seconds",
+      "type": "number"
+    },
+    "timeout_notes": {
+      "default": 0,
+      "title": "Timeout Notes",
+      "type": "integer"
+    },
+    "timeout_skipped_checks": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Timeout Skipped Checks",
+      "type": "array"
+    },
+    "to_review": {
+      "default": 0,
+      "title": "To Review",
+      "type": "integer"
+    },
+    "tokens_in": {
+      "default": 0,
+      "title": "Tokens In",
+      "type": "integer"
+    },
+    "tokens_out": {
+      "default": 0,
+      "title": "Tokens Out",
+      "type": "integer"
+    }
+  },
+  "title": "ScanStats",
+  "type": "object"
+}

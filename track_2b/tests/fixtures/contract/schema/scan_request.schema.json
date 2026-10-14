@@ -1,0 +1,57 @@
+{
+  "properties": {
+    "criteria": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Criteria"
+    },
+    "html": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Html"
+    },
+    "ui_lang": {
+      "default": "en",
+      "enum": [
+        "en",
+        "de",
+        "fr",
+        "it"
+      ],
+      "title": "Ui Lang",
+      "type": "string"
+    },
+    "url": {
+      "anyOf": [
+        {
+          "maxLength": 4096,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Url"
+    }
+  },
+  "title": "ScanRequest",
+  "type": "object"
+}

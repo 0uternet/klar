@@ -1,0 +1,30 @@
+{
+  "act_rule": "5effbb",
+  "axe_rule": null,
+  "confidence": "high",
+  "content_lang": "de",
+  "context_shown": {
+    "block": "Mehr",
+    "html": "<a href=\"…\">Mehr</a>",
+    "link_text": "Mehr"
+  },
+  "criterion": "2.4.4",
+  "criterion_name": "Link Purpose (In Context)",
+  "en301549": "9.2.4.4",
+  "excerpt": "Mehr",
+  "explanation": "Apertus judged that neither “Mehr” nor its programmatic context says where the link goes.",
+  "fix_diff": "--- a/#main > p:nth-of-type(3) > a\n+++ b/#main > p:nth-of-type(3) > a\n@@ -1 +1 @@\n-<a href=\"news.html\">Mehr</a>\n+<a href=\"news.html\">Neue Öffnungszeiten</a>",
+  "fix_hint": "In your CMS, change the link text so that it names the destination, for example “Neue Öffnungszeiten”.",
+  "id": "0123456789-1a2b3c4d5e6f",
+  "level": "A",
+  "model": "swiss-ai/Apertus-v1.5-8B",
+  "outcome": "failed",
+  "page_url": "http://127.0.0.1:8080/demo/index.html",
+  "reason": "The link text and its block do not name the destination.",
+  "reason_code": "apertus_nowhere",
+  "screenshot": null,
+  "selector": "#main > p:nth-of-type(3) > a",
+  "source": "apertus",
+  "status": "to_review",
+  "user_impact": "Screen-reader users who list the links hear “Mehr” without knowing where it leads."
+}

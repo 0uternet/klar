@@ -1,0 +1,91 @@
+{
+  "description": "Item of GET /api/criteria and `klar criteria --json`.",
+  "properties": {
+    "act_rule": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Act Rule"
+    },
+    "criterion": {
+      "title": "Criterion",
+      "type": "string"
+    },
+    "en301549": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "En301549"
+    },
+    "evaluated": {
+      "title": "Evaluated",
+      "type": "boolean"
+    },
+    "implemented": {
+      "title": "Implemented",
+      "type": "boolean"
+    },
+    "level": {
+      "enum": [
+        "A",
+        "AA"
+      ],
+      "title": "Level",
+      "type": "string"
+    },
+    "method": {
+      "enum": [
+        "rule",
+        "apertus_text",
+        "apertus_vision",
+        "human",
+        "experimental",
+        "planned"
+      ],
+      "title": "Method",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "principle": {
+      "enum": [
+        "perceivable",
+        "operable",
+        "understandable",
+        "robust"
+      ],
+      "title": "Principle",
+      "type": "string"
+    },
+    "url": {
+      "title": "Url",
+      "type": "string"
+    }
+  },
+  "required": [
+    "criterion",
+    "name",
+    "level",
+    "principle",
+    "method",
+    "implemented",
+    "evaluated",
+    "act_rule",
+    "en301549",
+    "url"
+  ],
+  "title": "CriterionInfo",
+  "type": "object"
+}

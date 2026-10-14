@@ -1,0 +1,94 @@
+{
+  "properties": {
+    "current": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Current"
+    },
+    "detail": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Detail"
+    },
+    "duration_ms": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Duration Ms"
+    },
+    "started_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Started At"
+    },
+    "state": {
+      "enum": [
+        "pending",
+        "running",
+        "done",
+        "error",
+        "skipped"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "step": {
+      "enum": [
+        "render",
+        "axe",
+        "extract",
+        "apertus",
+        "verify",
+        "done"
+      ],
+      "title": "Step",
+      "type": "string"
+    },
+    "total": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Total"
+    }
+  },
+  "required": [
+    "step",
+    "state"
+  ],
+  "title": "ProgressStep",
+  "type": "object"
+}

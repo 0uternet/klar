@@ -1,0 +1,15 @@
+axe-core 4.13.0 (Deque Systems, Inc.), shipped UNMODIFIED.
+Licence: Mozilla Public License 2.0 (see LICENSE; bundled third-party notices in LICENSE-3RD-PARTY.txt).
+Source code: https://github.com/dequelabs/axe-core/tree/v4.13.0
+
+Files taken from the npm tarball https://registry.npmjs.org/axe-core/-/axe-core-4.13.0.tgz
+  npm shasum (sha1):  f868ecb1bd61d982321760e51d841ab497ab86d0
+  npm integrity:      sha512-UzGt8zg7Ny8djbYMhxl2zuEevVa7r2gJjYY5Lwr1xM7+XU2nd6CkIWFTVcCIbAP63vSz71NaVyyuSk9lHKcy0A==
+
+  axe.min.js                 -> axe.min.js
+  LICENSE                    -> LICENSE
+  LICENSE-3RD-PARTY.txt      -> LICENSE-3RD-PARTY.txt
+  locales/{de,fr,it}.json    -> axe-locales/{de,fr,it}.json   (axe messages in the UI language)
+
+To upgrade: download the new tarball, verify its integrity against `npm view axe-core@X dist.integrity`,
+replace the files above and update this file and docs/THIRD_PARTY_NOTICES.md.
