@@ -66,7 +66,8 @@ def test_heading_echoed_by_its_first_sentence_passes_in_code():
     ("Allgemeines", "Allgemeines zur Abholung: Sperrgut wird am Montag geholt. Allgemeines gilt für alle."),
     ("Informations", "Informations sur les tarifs : un canapé coûte 25 francs. Informations valables en 2027."),
     ("Abschnitt 2", "Abschnitt 2 regelt die Gebühren für Kühlschränke und Sofas."),
-    ("Öffnungszeiten", "Ausserhalb der Öffnungszeiten kostet die Abholung 40 Franken, ein Sofa 25 Franken."),
+    # PROTOCOL 2.4.6/F2: another topic whose word the opening text mentions only once
+    ("Parkplätze", "Neben den Parkplätzen gilt für Velos eine Gebühr von 2 Franken, für Motorräder 4 Franken."),
 ])
 def test_generic_numbered_or_once_mentioned_headings_are_never_passed_in_code(heading, section):
     html = f"<html lang='de'><body><main><h2>{heading}</h2><p>{section}</p></main></body></html>"
@@ -176,3 +177,71 @@ def test_end_to_end_scan_with_fake_apertus_keeps_grounded_findings(make_settings
     assert fs["Rubrik 3"].outcome == "failed" and fs["Rubrik 3"].source == "apertus"
     assert fs["Eingabe 2"].outcome == "failed" and fs["Eingabe 2"].selector.endswith("label:nth-of-type(2)")
     assert scan.stats["guard_rejected"] == 0
+
+
+def test_a_one_word_heading_must_be_the_recurring_subject_to_pass_in_code():
+    once = ("<html lang='de'><body><main><h2>Kontakt</h2><p>Kontaktieren Sie den Werkhof unter der Nummer "
+            "044 000 00 00.</p></main></body></html>")
+    check, cands = run(once)
+    assert check.decide(by_text(cands, "Kontakt")) is None  # one mention → the model
+    twice = once.replace("00.</p>", "00. Für den Kontakt per Post: Werkhof, Seestrasse 3.</p>")
+    check, cands = run(twice)
+    assert check.decide(by_text(cands, "Kontakt")).outcome == "passed"
+
+
+def test_headings_beyond_the_caps_get_a_cant_tell_note_never_silence():
+    content = "".join(f"<h2>Thema {chr(65 + i)} der Gemeinde Talwil</h2><p>Inhalt Nummer {i} ohne Bezug.</p>"
+                      for i in range(8))
+    aside = "".join(f"<h3>Kasten {w}</h3><p>Hinweis zu {w}.</p>" for w in ("Eins", "Zwei", "Drei"))
+    html = f"<html lang='de'><body><main>{content}</main><aside>{aside}</aside></body></html>"
+    check, cands = run(html)
+    headings = [c for c in cands if c.extra["target"] == "heading"]
+    assert len(headings) == 11  # every heading is a candidate: asked, or noted
+    capped = [c for c in headings if c.extra["kind"] == "cap"]
+    assert len([c for c in headings if c.extra["kind"] == "heading"]) == 6 + 2
+    assert len(capped) == 3
+    for c in capped:
+        f = check.decide(c)
+        assert f.outcome == "cantTell" and f.reason_code == "cap" and f.source == "heuristic"
+        assert f.explanation.startswith("Not checked: Klar. judges at most")
+    de = HeadingsAndLabels("de", Settings())
+    assert de.decide(capped[0]).explanation.startswith("Nicht geprüft: Klar. beurteilt höchstens")
+
+
+LANDMARK_PAGE = """<html lang="de"><body>
+<header><h2>Menü</h2><ul><li>Start</li><li>Werkhof</li></ul></header>
+<main><h1>{h1}</h1><p>{p}</p><h2>Sperrgut</h2><p>Grosse Gegenstände holen wir auf Anmeldung ab.</p></main>
+<aside><h2>Hinweis</h2><p>Der Hof bleibt an Feiertagen geschlossen.</p></aside>
+<footer><h2>Service</h2><p>Impressum und Datenschutz der Gemeinde.</p><h3>Folgen</h3><p>Social Media Kanäle.</p></footer>
+</body></html>"""
+
+
+def test_landmark_headings_are_capped_and_asked_identically_on_every_page():
+    check, a = run(LANDMARK_PAGE.format(h1="Abfall", p="Abfall wird am Montag abgeholt."))
+    landmark = [c for c in a if c.extra.get("landmark") in ("header", "nav", "footer", "aside")
+                and c.extra["kind"] == "heading"]
+    assert len(landmark) == 2  # at most MAX_LANDMARK_HEADINGS per page
+    assert all("other_headings_same_level" not in c.context for c in landmark)
+    _, b = run(LANDMARK_PAGE.format(h1="Steuern", p="Die Steuererklärung ist bis Ende März fällig."))
+    same = {c.text: check.question(c, "en").wire() for c in landmark}
+    other = {c.text: check.question(c, "en").wire() for c in b if c.text in same}
+    assert other and all(other[k] == same[k] for k in other)  # same prompt → one model call per site
+
+
+@pytest.mark.parametrize("label, token, kind", [
+    ("Vorname", "given-name", "label_autocomplete"), ("Nom", "family-name", "label_autocomplete"),
+    ("Codice postale", "postal-code", "label_autocomplete"), ("Ort", "address-level2", "label_autocomplete"),
+    ("Telefono", "email", "label"),  # the label names other data than declared → the model decides
+    ("Eingabe 7", "given-name", "label"),
+])
+def test_labels_naming_their_autocomplete_purpose_pass_in_code(label, token, kind):
+    html = (f"<html lang='de'><body><form><label for='f'>{label}</label>"
+            f"<input id='f' type='text' autocomplete='{token}'></form></body></html>")
+    check, cands = run(html)
+    c = by_text(cands, label)
+    assert c.extra["kind"] == kind
+    if kind == "label_autocomplete":
+        f = check.decide(c)
+        assert f.outcome == "passed" and f.source == "heuristic" and token in f.explanation
+    else:
+        assert check.decide(c) is None

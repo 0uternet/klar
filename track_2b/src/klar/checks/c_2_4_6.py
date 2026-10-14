@@ -14,18 +14,30 @@ Facts in code
     (sub-headings included), first ~250 characters.
   * Deterministic pass (no model), only when unambiguous:
       heading  every content word of the heading (1–4 words of ≥ 4 letters, compared on a
-               5-letter stem) occurs in the first two sentences of its section, and the
-               heading has no number and no generic or placeholder word (GENERIC_HEADING:
-               a generic heading that the text repeats is exactly PROTOCOL 2.4.6/F1)
+               5-letter stem) occurs in the first two sentences of its section (a one-word
+               heading at least twice in its section, PROTOCOL 2.4.6/F2), and the heading
+               has no number and no generic or placeholder word (GENERIC_HEADING: a generic
+               heading that the text repeats is exactly PROTOCOL 2.4.6/F1)
                                                                   → passed (heuristic, medium)
-      label    an e-mail field whose label contains "mail", or a telephone field whose
-               label names a telephone                            → passed (heuristic, medium)
+      label    an e-mail field whose label contains "mail", a telephone field whose label
+               names a telephone, the field of a search form whose label names a search,
+               or a field whose autocomplete token (given-name,
+               family-name, postal-code, address-level2, email, tel…) is named by its
+               label (AUTOCOMPLETE_WORDS, DE · FR · IT · EN)      → passed (heuristic, medium)
   * No candidate at all (no headings, no labels)                   → no finding (inapplicable)
 
-Asked to Apertus (one question per remaining heading or label; at most 10 headings, the
-shortest first, and 8 labels per page: CPU inference is slow)
-  Heading + the first lines of its section (+ up to 4 neighbouring headings of the same
-  level, to show whether topic headings are used). CATEGORICAL, mapped in code
+Asked to Apertus (one question per remaining heading or label; CPU inference is slow):
+  * content headings: at most 6 per page, the shortest first (placeholders, numbering and
+    generic words are short); every heading beyond a cap gets a cantTell note
+    (reason_code `cap`), never a silent "no finding";
+  * headings of header, navigation, footer and side blocks, and any heading outside <main>
+    on a page that has one (site furniture, the same on every page): at
+    most 2 per page, one per distinct text + landmark, and with a prompt that holds only
+    the heading and its block, so the question is identical on every page of the site and
+    the answer store asks the model once per site;
+  * labels: at most 8 per page.
+  Heading + the first lines of its section (+ for content headings, up to 4 neighbouring
+  headings of the same level, to show whether topic headings are used). CATEGORICAL, mapped in code
   (data/testset/PROTOCOL.md §2.4.6):
       describes         → passed
       generic           → cantTell  (a broad category word over content that partly fits,
@@ -54,15 +66,18 @@ import unicodedata
 
 from klar.capture.page import CapturedPage
 from klar.checks.base import BaseCheck, category_schema
-from klar.checks.c_2_4_5 import CONTROLS, NO_TEXT, Document, Node, norm_text, page_doc
+from klar.checks.c_2_4_5 import CONTROLS, NO_TEXT, Document, Node, norm_text, page_doc, region_of
 from klar.i18n import register, t
 from klar.langid import WORD_RE
 from klar.models import Candidate, Finding, LLMTask
 
-PROMPT_VERSION = "2.4.6/v1"
+PROMPT_VERSION = "2.4.6/v2"  # v2: landmark headings asked without page-specific context
 SECTION_CHARS = 250
-MAX_HEADINGS = 10  # model questions are expensive on CPU: short headings first (see heading_candidates)
+MAX_HEADINGS = 6  # content headings per page; CPU inference is slow: short headings first (see heading_candidates)
+MAX_LANDMARK_HEADINGS = 2  # header / nav / footer / aside headings: repeated on every page
 MAX_LABELS = 8
+LANDMARKS = ("header", "nav", "footer", "aside", "chrome")  # "chrome": outside <main> on a page that has one
+_SEARCH_LABEL = re.compile(r"such|recherch|ricerc|cerca|search", re.IGNORECASE)
 
 HEADING_CATEGORIES = ["describes", "generic", "placeholder", "different_topic", "unsure"]
 LABEL_CATEGORIES = ["describes", "vague", "non_descriptive", "wrong", "unsure"]
@@ -83,6 +98,23 @@ GENERIC_HEADING = re.compile(
     r"other|more\b|heading|detail|news\b|overview|various|additional|platzhalter|placeholder|"
     r"untitled|ohne\s+titel|sans\s+titre|senza\s+titolo)", re.IGNORECASE)
 _DIGIT = re.compile(r"\d")
+# Words that name what an autocomplete token asks for (DE · FR · IT · EN), checked against
+# the label text: a label that names the declared purpose of its field passes in code.
+AUTOCOMPLETE_WORDS = {
+    "given-name": r"vorname|prénom|prenom|first\s+name|given\s+name|nome(?!\s+(?:e|completo))",
+    "family-name": r"nachname|familienname|\bnom\b(?!\s+(?:et|complet))|cognome|last\s+name|surname|family\s+name",
+    "name": r"\bname\b|\bnom\b|\bnome\b|vollständiger\s+name|nom\s+complet|nome\s+completo|full\s+name",
+    "email": r"mail|courriel",
+    "tel": r"telefon|téléphone|telefono|phone|\btel\b|natel|handy|mobile|portable|cellulare",
+    "postal-code": r"\bplz\b|postleitzahl|\bnpa\b|code\s+postal|\bcap\b|codice\s+postale|postal\s+code|\bzip\b",
+    "address-level2": r"\bort\b|wohnort|ortschaft|localité|localite|\bville\b|località|localita|\bcity\b|\btown\b",
+    "street-address": r"strasse|adresse|\brue\b|\bvia\b|indirizzo|street|address",
+    "address-line1": r"strasse|adresse|\brue\b|\bvia\b|indirizzo|street|address",
+    "country": r"\bland\b|\bpays\b|\bpaese\b|nazione|country",
+    "country-name": r"\bland\b|\bpays\b|\bpaese\b|nazione|country",
+    "bday": r"geburtsdatum|date\s+de\s+naissance|data\s+di\s+nascita|date\s+of\s+birth|birthday",
+    "organization": r"firma|unternehmen|organisation|entreprise|société|azienda|ditta|company|organi[sz]ation",
+}
 
 register({
     "c246.heading_words": {
@@ -96,6 +128,24 @@ register({
         "de": "Die Beschriftung «{text}» nennt, was das Feld ({type}) verlangt.",
         "fr": "L'étiquette « {text} » nomme ce que le champ ({type}) demande.",
         "it": "L'etichetta «{text}» indica ciò che il campo ({type}) richiede.",
+    },
+    "c246.cap": {
+        "en": "Not checked: Klar. judges at most {n} headings of the main content per page. A person must check this one.",
+        "de": "Nicht geprüft: Klar. beurteilt höchstens {n} Überschriften des Hauptinhalts pro Seite. Eine Person muss diese prüfen.",
+        "fr": "Non vérifié : Klar. évalue au plus {n} titres du contenu principal par page. Une personne doit vérifier celui-ci.",
+        "it": "Non verificato: Klar. valuta al massimo {n} titoli del contenuto principale per pagina. Una persona deve verificare questo.",
+    },
+    "c246.cap_landmark": {
+        "en": "Not checked: Klar. judges at most {n} headings of the header, navigation, side and footer blocks per page. A person must check this one.",
+        "de": "Nicht geprüft: Klar. beurteilt höchstens {n} Überschriften in Kopf-, Navigations-, Seiten- und Fussbereich pro Seite. Eine Person muss diese prüfen.",
+        "fr": "Non vérifié : Klar. évalue au plus {n} titres de l'en-tête, de la navigation, des encadrés et du pied de page par page. Une personne doit vérifier celui-ci.",
+        "it": "Non verificato: Klar. valuta al massimo {n} titoli di intestazione, navigazione, riquadri laterali e piè di pagina per pagina. Una persona deve verificare questo.",
+    },
+    "c246.label_autocomplete": {
+        "en": "The label “{text}” names what its field is declared to ask for (autocomplete “{token}”).",
+        "de": "Die Beschriftung «{text}» nennt, was das Feld laut seiner Angabe verlangt (autocomplete «{token}»).",
+        "fr": "L'étiquette « {text} » nomme ce que le champ déclare demander (autocomplete « {token} »).",
+        "it": "L'etichetta «{text}» indica ciò che il campo dichiara di chiedere (autocomplete «{token}»).",
     },
     "c246.apertus_describes": {
         "en": "Apertus judged that “{text}” describes its {what}.",
@@ -241,6 +291,23 @@ def sections(doc: Document) -> dict[int, str]:
     return out
 
 
+def _in_search_form(field: Node) -> bool:
+    from klar.checks.c_2_4_5 import is_search_form
+
+    form = field.closest(lambda a: a.tag == "form")
+    return form is not None and is_search_form(form)
+
+
+def autocomplete_token(field: Node) -> str:
+    """The field's autocomplete purpose (last token, "section-…"/"shipping" prefixes dropped)
+    when it is one of AUTOCOMPLETE_WORDS, else ""."""
+    tokens = (field.attrs.get("autocomplete") or "").lower().split()
+    tokens = [x for x in tokens if x not in ("on", "off", "home", "work", "mobile", "fax", "pager", "webauthn")]
+    if tokens and tokens[-1].startswith("tel"):
+        return "tel"
+    return tokens[-1] if tokens and tokens[-1] in AUTOCOMPLETE_WORDS else ""
+
+
 class HeadingsAndLabels(BaseCheck):
     criterion = "2.4.6"
     prompt_version = PROMPT_VERSION
@@ -265,26 +332,43 @@ class HeadingsAndLabels(BaseCheck):
             if not section:
                 continue  # nothing to describe (a heading at the end, an empty block)
             level = heading_level(n)
-            siblings = [s.text() for s in nodes if s is not n and heading_level(s) == level and s.text()][:4]
+            landmark = region_of(n)
+            if landmark == "other" and doc.main is not None:
+                landmark = "chrome"  # site furniture around the main content (repeated on every page)
             context = {"section_start": section}
-            if siblings:
-                context["other_headings_same_level"] = " | ".join(siblings)
+            if landmark not in LANDMARKS:  # landmark headings: no page-specific context (same prompt site-wide)
+                siblings = [s.text() for s in nodes if s is not n and heading_level(s) == level and s.text()][:4]
+                if siblings:
+                    context["other_headings_same_level"] = " | ".join(siblings)
             words = _stem_words(text)
             first = {w for w in _stem_words(first_sentences(section))}
             generic = bool(GENERIC_HEADING.search(text) or _DIGIT.search(text))  # → always the model
             # A one-word heading must be the section's recurring subject (≥ 2 mentions), not a
-            # word the text merely mentions once (a fee list may mention opening hours).
+            # word the text merely mentions once (PROTOCOL 2.4.6/F2: a heading naming another
+            # topic whose word appears once in the opening text must reach the model).
             repeated = len(words) > 1 or (len(words) == 1 and _stem_words(section).count(words[0]) >= 2)
             kind = "heading_words" if (words and len(words) <= 4 and not generic and repeated
                                        and all(w in first for w in words)) else "heading"
             out.append(self.candidate(page, selector=sel, html=n.outer(400), text=text, lang=self._lang(n, page),
-                                      context=context, kind=kind, target="heading", level=level))
-        # Code-decided headings cost nothing; of the others, ask about the shortest first (placeholders,
-        # numbering and generic words are short), at most MAX_HEADINGS, then restore document order.
-        decided = [c for c in out if c.extra["kind"] != "heading"]
-        asked = sorted((c for c in out if c.extra["kind"] == "heading"), key=lambda c: len(c.text.split()))[:MAX_HEADINGS]
-        keep = {id(c) for c in decided + asked}
-        return [c for c in out if id(c) in keep]
+                                      context=context, kind=kind, target="heading", level=level, landmark=landmark))
+        # Code-decided headings cost nothing. Of the others, ask about the shortest first (placeholders,
+        # numbering and generic words are short): at most MAX_HEADINGS content headings and
+        # MAX_LANDMARK_HEADINGS distinct landmark headings; the rest get a cantTell note (kind "cap").
+        pending = sorted((c for c in out if c.extra["kind"] == "heading"), key=lambda c: len(c.text.split()))
+        content = [c for c in pending if c.extra["landmark"] not in LANDMARKS][:MAX_HEADINGS]
+        landmark: list[Candidate] = []
+        seen: set[tuple[str, str]] = set()
+        for c in pending:
+            key = (" ".join(c.text.casefold().split()), c.extra["landmark"])
+            if c.extra["landmark"] in LANDMARKS and key not in seen and len(landmark) < MAX_LANDMARK_HEADINGS:
+                seen.add(key)
+                landmark.append(c)
+        asked = {id(c) for c in content + landmark}
+        for c in pending:  # beyond the cap: a cantTell note, never a silent "no finding"
+            if id(c) not in asked:
+                c.extra["kind"] = "cap"
+                c.extra["cap"] = MAX_LANDMARK_HEADINGS if c.extra["landmark"] in LANDMARKS else MAX_HEADINGS
+        return out
 
     def label_candidates(self, page: CapturedPage, doc: Document) -> list[Candidate]:
         visible_fields = {f["selector"] for f in page.fields} if page.fields else None
@@ -317,11 +401,16 @@ class HeadingsAndLabels(BaseCheck):
             if others:
                 context["other_labels_in_form"] = " | ".join(o for o in others if o)
             kind = "label"
+            token = autocomplete_token(field)
             if (ftype == "email" and "mail" in text.lower()) or (ftype == "tel" and _TEL.search(text)):
                 kind = "label_type"
+            elif _SEARCH_LABEL.search(text) and (ftype == "search" or _in_search_form(field)):
+                kind = "label_type"  # the search field of a search form, labelled as a search
+            elif token and re.search(AUTOCOMPLETE_WORDS[token], text, re.IGNORECASE):
+                kind = "label_autocomplete"
             out.append(self.candidate(page, selector=lb.css_path(), html=lb.outer(300) + field.outer(300), text=text,
                                       lang=self._lang(lb, page), context=context, kind=kind, target="label",
-                                      field_type=ftype))
+                                      field_type=ftype, autocomplete=token))
             if len([c for c in out if c.extra["kind"] == "label"]) >= MAX_LABELS:
                 break
         return out
@@ -343,6 +432,16 @@ class HeadingsAndLabels(BaseCheck):
             return self.finding(c, outcome="passed", source="heuristic", confidence="medium", act_rule="cc0f0a",
                                 excerpt=c.text, explanation=t("c246.label_type", ui, text=c.text,
                                                               type=c.extra.get("field_type", "")),
+                                user_impact=t("c246.impact_ok", ui))
+        if kind == "cap":
+            return self.finding(c, outcome="cantTell", source="heuristic", confidence="low", reason_code="cap",
+                                excerpt=c.text, user_impact=t("impact.review", ui),
+                                explanation=t("c246.cap_landmark" if c.extra.get("landmark") in LANDMARKS
+                                              else "c246.cap", ui, n=c.extra.get("cap", MAX_HEADINGS)))
+        if kind == "label_autocomplete":
+            return self.finding(c, outcome="passed", source="heuristic", confidence="medium", act_rule="cc0f0a",
+                                excerpt=c.text, explanation=t("c246.label_autocomplete", ui, text=c.text,
+                                                              token=c.extra.get("autocomplete", "")),
                                 user_impact=t("c246.impact_ok", ui))
         return None
 
