@@ -338,7 +338,7 @@ def build(R):
     out['danke.html'] = page(L, 'thanks', 'Bestellung bestätigt – Gemeinde Musterwil', main,
                              crumbs=[('Online-Schalter', 'online-schalter.html'), 'Bestätigung'])
     P = 'danke.html'
-    R(P, None, '2.4.5', 'trap', 'passed', 'Understanding 2.4.5: the confirmation page is the result of a process (form submission), an explicit exception; it need not be in nav, sitemap or search.')
+    R(P, None, '2.4.5', 'set', 'failed', 'Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The German set FAILS 2.4.5, decided by velo-aktion.html, which is reachable only through one home-page teaser (designed failure). danke.html itself is exempt (result of a process, Understanding 2.4.5) and does not cause the failure.', scope='set', deciding_page='velo-aktion.html')
     R(P, 'order-status', '1.4.1', 'trap', 'passed', 'Understanding 1.4.1: success is shown by colour plus a check icon plus the text "Bestellung erfolgreich übermittelt".')
     R(P, 'thanks-para', '3.1.2', 'trap', 'passed', 'Understanding 3.1.2: "Merci vielmal" is an everyday Swiss German expression (helvetism), not a French passage.')
 
@@ -396,10 +396,10 @@ def build(R):
     R(P, 'pickup-time-emphasis', '1.3.1', 'trap', 'passed', 'Understanding 1.3.1: bold "bis 7 Uhr" is emphasis inside running text, not a heading.')
     R(P, 'collection-points-table', '1.3.1', 'trap', 'passed', 'Understanding 1.3.1 / H51, H63: data table with caption and th scope="col"/"row".')
     R(P, 'waste-calendar', '1.4.1', 'issue', 'failed', 'Understanding 1.4.1: in the calendar the collection type (Kehricht, Grüngut, Papier, Karton) is shown only by the colour of a dot; the legend maps colours to names.')
-    R(P, 'main-nav', '3.2.3', 'issue', 'failed', 'Understanding 3.2.3: the main navigation lists the same links in a different order on this page (Abfallkalender first) than on all other pages.')
+    R(P, 'main-nav', '3.2.3', 'issue', 'failed', 'Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). Designed set-level failure; this page decides it: the main navigation lists the same links in a different order (Abfallkalender first) than on all other German pages (Understanding 3.2.3).', scope='set', deciding_page='abfallkalender.html')
     R(P, 'regulation-pdf-link', '2.4.4', 'trap', 'passed', 'Understanding 2.4.4: link text "Abfallreglement (PDF, n KB)" states the target and its format.')
     R(P, None, '2.4.2', 'trap', 'passed', 'Understanding 2.4.2: title "Abfallkalender 2026 – Gemeinde Musterwil" describes topic and site.')
-    R(P, None, '2.4.5', 'trap', 'passed', 'Understanding 2.4.5: page is reachable via main navigation, sitemap and search.')
+    R(P, None, '2.4.5', 'set', 'failed', 'Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The German set FAILS 2.4.5, decided by velo-aktion.html, which is reachable only through one home-page teaser (designed failure). abfallkalender.html itself is reachable via main navigation, sitemap and search.', scope='set', deciding_page='velo-aktion.html')
 
     # ------------------------------------------------------------------ oeffnungszeiten.html
     lib = hours_grid([('Montag', 'geschlossen'), ('Dienstag', '15.00–18.00'), ('Mittwoch', '14.00–18.00'),
@@ -490,8 +490,8 @@ def build(R):
     for i in (1, 2, 3):
         R(P, f'faq-toggle-{i}', '4.1.2', 'issue', 'failed', 'Understanding 4.1.2: FAQ toggle is a <div> with a click handler: no button role, not focusable, no aria-expanded state.')
     R(P, 'location-map', '1.1.1', 'trap', 'passed', 'Understanding 1.1.1: the map image has an alt that gives the location information.')
-    R(P, 'print-button', '3.2.4', 'trap', 'passed', 'Understanding 3.2.4: the "Drucken" button has the same icon, label and position on every content page.')
-    R(P, 'main-nav', '3.2.3', 'trap', 'passed', 'Understanding 3.2.3: navigation order matches the other pages.')
+    R(P, 'print-button', '3.2.4', 'set', 'failed', 'Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The German set FAILS 3.2.4, decided by sitemap.html, where the search button is identified as „Finden“ with an arrow instead of „Suche“ with a magnifier (designed failure). The print button itself has the same icon, label and position on every content page.', scope='set', deciding_page='sitemap.html')
+    R(P, 'main-nav', '3.2.3', 'set', 'failed', 'Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The German set FAILS 3.2.3, decided by abfallkalender.html, whose main navigation is in a different order (designed failure). The navigation on this page itself has the common order.', scope='set', deciding_page='abfallkalender.html')
 
     # ------------------------------------------------------------------ zweisprachig.html
     main = '''<div class="container page-head">
@@ -643,7 +643,7 @@ def build(R):
     R(P, 'activity-workshop', '3.1.2', 'trap', 'passed', 'Understanding 3.1.2: "Workshop" and "Know-how" are loanwords that have become part of German.')
     R(P, 'boat-tour-para', '3.1.2', 'trap', 'passed', 'Understanding 3.1.2: "Billett" and "Glace" are helvetisms of Swiss Standard German.')
     R(P, 'guided-tours-para', '3.1.2', 'trap', 'passed', 'Understanding 3.1.2: Latin "ad hoc" is part of the German vernacular.')
-    R(P, None, '2.4.5', 'trap', 'passed', 'Understanding 2.4.5: page is reachable via main navigation, sitemap and search.')
+    R(P, None, '2.4.5', 'set', 'failed', 'Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The German set FAILS 2.4.5, decided by velo-aktion.html, which is reachable only through one home-page teaser (designed failure). freizeit.html itself is reachable via main navigation, sitemap and search.', scope='set', deciding_page='velo-aktion.html')
 
     # ------------------------------------------------------------------ anleitung.html
     main = f'''<div class="container page-head">
@@ -725,7 +725,7 @@ def build(R):
 </div>'''
     out['sitemap.html'] = page(L, 'sitemap', 'Sitemap – Gemeinde Musterwil', main, crumbs=['Sitemap'], search_variant='find')
     P = 'sitemap.html'
-    R(P, 'header-search-button', '3.2.4', 'issue', 'failed', 'Understanding 3.2.4: the site search button is labelled "Finden" with an arrow icon here, but "Suche" with a magnifier on every other page; same function, different identification.')
+    R(P, 'header-search-button', '3.2.4', 'issue', 'failed', 'Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). Designed set-level failure; this page decides it: the site search button is labelled „Finden“ with an arrow icon here, but „Suche“ with a magnifier on every other German page; same function, different identification (Understanding 3.2.4).', scope='set', deciding_page='sitemap.html')
 
     # ------------------------------------------------------------------ suche.html
     entries = [
@@ -759,7 +759,7 @@ def build(R):
     P = 'suche.html'
     R(P, 'search-page-button', '1.4.11', 'issue', 'failed', 'Understanding 1.4.11: the icon-only search button draws its magnifier in #c9cdd2 on white (about 1.6:1 < 3:1).')
     R(P, 'search-page-button', '2.5.3', 'trap', 'inapplicable', 'Understanding 2.5.3: icon-only button (aria-label "Suche") has no visible text label, so label-in-name does not apply.')
-    R(P, 'header-search-button', '3.2.4', 'trap', 'passed', 'Understanding 3.2.4: header search is labelled "Suche" with the magnifier icon, as on the other pages.')
+    R(P, 'header-search-button', '3.2.4', 'set', 'failed', 'Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The German set FAILS 3.2.4, decided by sitemap.html, where the search button is identified as „Finden“ with an arrow instead of „Suche“ with a magnifier (designed failure). On this page the header search is labelled „Suche“ with the magnifier, as on the other pages.', scope='set', deciding_page='sitemap.html')
 
     # ------------------------------------------------------------------ barrierefreiheit.html
     main = '''<div class="container page-head">
@@ -821,6 +821,6 @@ def build(R):
   </div>
 </div>'''
     out['velo-aktion.html'] = page(L, 'velo', 'Velo-Aktion – Gemeinde Musterwil', main, crumbs=['Velo-Aktion'])
-    R('velo-aktion.html', None, '2.4.5', 'issue', 'failed', 'Understanding 2.4.5: the page is reachable only through one teaser link on the home page; it is not in the navigation, the sitemap or the search index, and it is not a step in a process.')
+    R('velo-aktion.html', None, '2.4.5', 'issue', 'failed', 'Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). Designed set-level failure; this page decides it: it is reachable only through one teaser link on the home page; it is not in the navigation, the sitemap or the search index, and it is not a step in a process (Understanding 2.4.5).', scope='set', deciding_page='velo-aktion.html')
 
     return out

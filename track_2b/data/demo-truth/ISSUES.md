@@ -21,6 +21,7 @@ The HTML pages, SVG images, the PDF, this file and `issues.jsonl` (both in `data
 - 2.4.4 follows decision D1 of `data/testset/PROTOCOL.md`: programmatic context = the link's accessible name plus the enclosing sentence, the closest block container (ACT 5effbb), list item(s), table cell with its header cells and `aria-describedby` targets. **A preceding heading is not context** (H80 is advisory), so links disambiguated only by a card heading are labelled `cantTell` (strict ACT 5effbb reading: `failed`); links with no context at all (the "Kurz gemeldet" tiles) are `failed`.
 - Error containers (`form-error-summary`, `form-plz-error`) exist empty and `hidden` in the static DOM; their text is injected by `assets/js/forms.js` when the form is submitted.
 - `velo-aktion.html` is intentionally reachable only from the 4th news card on `index.html` (not in nav, sitemap or search index).
+- **Set-level criteria (2.4.5, 3.2.3, 3.2.4).** As in `data/testset/PROTOCOL.md`, the label applies to the *set of pages*; each language version (German root, `fr/`, `it/`) is one set. Rows for these criteria have `scope = set`, their `expected` is the outcome of the whole set on every page where the row applies, and `deciding_page` names the page that decides it. The German set is designed to fail all three, each because of one page: 2.4.5 → `velo-aktion.html`, 3.2.3 → `abfallkalender.html`, 3.2.4 → `sitemap.html`; the French and Italian sets pass. `kind = set` marks a row whose page itself is fine (or exempt) but which carries the set outcome; the deciding page keeps `kind = issue`.
 
 ## Highlights
 
@@ -97,7 +98,7 @@ The HTML pages, SVG images, the PDF, this file and `issues.jsonl` (both in `data
 | 58 | `online-schalter.html` | `[data-testid="residence-form"]` | 3.3.4 | issue | failed | Understanding 3.3.4: the form orders a billed certificate (CHF 20.–, financial commitment) and submits directly, with no review, confirmation or correction step. |
 | 59 | `online-schalter.html` | `[data-testid="form-language-select"]` | 3.2.2 | issue | failed | Understanding 3.2.2 / F37: choosing a language in the select runs location.href in onchange and leaves the page (losing input) without a submit button or prior warning. |
 | 60 | `online-schalter.html` | `[data-testid="print-button"]` | 4.1.2 | trap | passed | Understanding 4.1.2: native &lt;button&gt; with visible text "Drucken" exposes name and role. |
-| 61 | `danke.html` | — | 2.4.5 | trap | passed | Understanding 2.4.5: the confirmation page is the result of a process (form submission), an explicit exception; it need not be in nav, sitemap or search. |
+| 61 | `danke.html` | — | 2.4.5 | set | failed | Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The German set FAILS 2.4.5, decided by velo-aktion.html, which is reachable only through one home-page teaser (designed failure). danke.html itself is exempt (result of a process, Understanding 2.4.5) and does not cause the failure. |
 | 62 | `danke.html` | `[data-testid="order-status"]` | 1.4.1 | trap | passed | Understanding 1.4.1: success is shown by colour plus a check icon plus the text "Bestellung erfolgreich übermittelt". |
 | 63 | `danke.html` | `[data-testid="thanks-para"]` | 3.1.2 | trap | passed | Understanding 3.1.2: "Merci vielmal" is an everyday Swiss German expression (helvetism), not a French passage. |
 | 64 | `abfallkalender.html` | `[data-testid="waste-chart"]` | 1.1.1 | issue | failed | Understanding 1.1.1: the bar chart (monthly green-waste tonnes 2025) has alt="Bild"; no data or trend is conveyed. |
@@ -105,10 +106,10 @@ The HTML pages, SVG images, the PDF, this file and `issues.jsonl` (both in `data
 | 66 | `abfallkalender.html` | `[data-testid="pickup-time-emphasis"]` | 1.3.1 | trap | passed | Understanding 1.3.1: bold "bis 7 Uhr" is emphasis inside running text, not a heading. |
 | 67 | `abfallkalender.html` | `[data-testid="collection-points-table"]` | 1.3.1 | trap | passed | Understanding 1.3.1 / H51, H63: data table with caption and th scope="col"/"row". |
 | 68 | `abfallkalender.html` | `[data-testid="waste-calendar"]` | 1.4.1 | issue | failed | Understanding 1.4.1: in the calendar the collection type (Kehricht, Grüngut, Papier, Karton) is shown only by the colour of a dot; the legend maps colours to names. |
-| 69 | `abfallkalender.html` | `[data-testid="main-nav"]` | 3.2.3 | issue | failed | Understanding 3.2.3: the main navigation lists the same links in a different order on this page (Abfallkalender first) than on all other pages. |
+| 69 | `abfallkalender.html` | `[data-testid="main-nav"]` | 3.2.3 | issue | failed | Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). Designed set-level failure; this page decides it: the main navigation lists the same links in a different order (Abfallkalender first) than on all other German pages (Understanding 3.2.3). |
 | 70 | `abfallkalender.html` | `[data-testid="regulation-pdf-link"]` | 2.4.4 | trap | passed | Understanding 2.4.4: link text "Abfallreglement (PDF, 3 KB)" states the target and its format. |
 | 71 | `abfallkalender.html` | — | 2.4.2 | trap | passed | Understanding 2.4.2: title "Abfallkalender 2026 – Gemeinde Musterwil" describes topic and site. |
-| 72 | `abfallkalender.html` | — | 2.4.5 | trap | passed | Understanding 2.4.5: page is reachable via main navigation, sitemap and search. |
+| 72 | `abfallkalender.html` | — | 2.4.5 | set | failed | Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The German set FAILS 2.4.5, decided by velo-aktion.html, which is reachable only through one home-page teaser (designed failure). abfallkalender.html itself is reachable via main navigation, sitemap and search. |
 | 73 | `oeffnungszeiten.html` | — | 2.4.2 | issue | failed | Understanding 2.4.2 / F25: &lt;title&gt; is "Gemeinde Musterwil", identical to the home page, although the page is about opening hours. |
 | 74 | `oeffnungszeiten.html` | `[data-testid="hours-admin"]` | 1.3.1 | trap | passed | Understanding 1.3.1: opening-hours table with caption and th scope="col"/"row". |
 | 75 | `oeffnungszeiten.html` | `[data-testid="hours-werkhof"]` | 1.3.1 | issue | failed | Understanding 1.3.1 / F91: data table without &lt;th&gt;; the bold first row only looks like a header row. |
@@ -120,8 +121,8 @@ The HTML pages, SVG images, the PDF, this file and `issues.jsonl` (both in `data
 | 81 | `oeffnungszeiten.html` | `[data-testid="faq-toggle-2"]` | 4.1.2 | issue | failed | Understanding 4.1.2: FAQ toggle is a &lt;div&gt; with a click handler: no button role, not focusable, no aria-expanded state. |
 | 82 | `oeffnungszeiten.html` | `[data-testid="faq-toggle-3"]` | 4.1.2 | issue | failed | Understanding 4.1.2: FAQ toggle is a &lt;div&gt; with a click handler: no button role, not focusable, no aria-expanded state. |
 | 83 | `oeffnungszeiten.html` | `[data-testid="location-map"]` | 1.1.1 | trap | passed | Understanding 1.1.1: the map image has an alt that gives the location information. |
-| 84 | `oeffnungszeiten.html` | `[data-testid="print-button"]` | 3.2.4 | trap | passed | Understanding 3.2.4: the "Drucken" button has the same icon, label and position on every content page. |
-| 85 | `oeffnungszeiten.html` | `[data-testid="main-nav"]` | 3.2.3 | trap | passed | Understanding 3.2.3: navigation order matches the other pages. |
+| 84 | `oeffnungszeiten.html` | `[data-testid="print-button"]` | 3.2.4 | set | failed | Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The German set FAILS 3.2.4, decided by sitemap.html, where the search button is identified as „Finden“ with an arrow instead of „Suche“ with a magnifier (designed failure). The print button itself has the same icon, label and position on every content page. |
+| 85 | `oeffnungszeiten.html` | `[data-testid="main-nav"]` | 3.2.3 | set | failed | Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The German set FAILS 3.2.3, decided by abfallkalender.html, whose main navigation is in a different order (designed failure). The navigation on this page itself has the common order. |
 | 86 | `zweisprachig.html` | `[data-testid="notice-col-fr"]` | 3.1.2 | trap | passed | Understanding 3.1.2 / H58: the French column is marked lang="fr-CH". |
 | 87 | `zweisprachig.html` | `[data-testid="notice-col-de"]` | 3.1.2 | trap | passed | Understanding 3.1.2: the German column is marked lang="de-CH" (same as the page). |
 | 88 | `zweisprachig.html` | `[data-testid="budget-de-para"]` | 3.1.2 | issue | failed | Understanding 3.1.2: the French sentence "Le rapport détaillé peut être obtenu …" sits inside a German paragraph without lang="fr". |
@@ -137,20 +138,20 @@ The HTML pages, SVG images, the PDF, this file and `issues.jsonl` (both in `data
 | 98 | `freizeit.html` | `[data-testid="activity-workshop"]` | 3.1.2 | trap | passed | Understanding 3.1.2: "Workshop" and "Know-how" are loanwords that have become part of German. |
 | 99 | `freizeit.html` | `[data-testid="boat-tour-para"]` | 3.1.2 | trap | passed | Understanding 3.1.2: "Billett" and "Glace" are helvetisms of Swiss Standard German. |
 | 100 | `freizeit.html` | `[data-testid="guided-tours-para"]` | 3.1.2 | trap | passed | Understanding 3.1.2: Latin "ad hoc" is part of the German vernacular. |
-| 101 | `freizeit.html` | — | 2.4.5 | trap | passed | Understanding 2.4.5: page is reachable via main navigation, sitemap and search. |
+| 101 | `freizeit.html` | — | 2.4.5 | set | failed | Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The German set FAILS 2.4.5, decided by velo-aktion.html, which is reachable only through one home-page teaser (designed failure). freizeit.html itself is reachable via main navigation, sitemap and search. |
 | 102 | `anleitung.html` | `[data-testid="instruction-green-button"]` | 1.3.3 | issue | failed | Understanding 1.3.3 / F14, F26: "klicken Sie auf den grünen Knopf rechts" relies only on colour and position; the button shows only an arrow and its name ("Fortfahren") is not mentioned. |
 | 103 | `anleitung.html` | `[data-testid="instruction-next-button"]` | 1.3.3 | trap | passed | Understanding 1.3.3: position ("unten rechts") is combined with the visible button text «Weiter», so the instruction does not rely on sensory characteristics alone. |
 | 104 | `anleitung.html` | `[data-testid="instruction-table-ref"]` | 1.3.3 | trap | passed | Understanding 1.3.3: "in der Tabelle unten" refers to a table that also has the caption "Benötigte Unterlagen" and is the only table on the page. |
 | 105 | `anleitung.html` | `[data-testid="documents-table"]` | 1.3.1 | trap | passed | Understanding 1.3.1: data table with caption and th scope="col"/"row". |
 | 106 | `anleitung.html` | `[data-testid="practice-confirm-button"]` | 2.5.3 | trap | inapplicable | Understanding 2.5.3: icon-only button with aria-label and no visible text label; label-in-name does not apply. |
 | 107 | `anleitung.html` | `[data-testid="practice-next-button"]` | 4.1.2 | trap | passed | Understanding 4.1.2: native &lt;button&gt; "Weiter" exposes name and role. |
-| 108 | `sitemap.html` | `[data-testid="header-search-button"]` | 3.2.4 | issue | failed | Understanding 3.2.4: the site search button is labelled "Finden" with an arrow icon here, but "Suche" with a magnifier on every other page; same function, different identification. |
+| 108 | `sitemap.html` | `[data-testid="header-search-button"]` | 3.2.4 | issue | failed | Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). Designed set-level failure; this page decides it: the site search button is labelled „Finden“ with an arrow icon here, but „Suche“ with a magnifier on every other German page; same function, different identification (Understanding 3.2.4). |
 | 109 | `suche.html` | `[data-testid="search-page-button"]` | 1.4.11 | issue | failed | Understanding 1.4.11: the icon-only search button draws its magnifier in #c9cdd2 on white (about 1.6:1 &lt; 3:1). |
 | 110 | `suche.html` | `[data-testid="search-page-button"]` | 2.5.3 | trap | inapplicable | Understanding 2.5.3: icon-only button (aria-label "Suche") has no visible text label, so label-in-name does not apply. |
-| 111 | `suche.html` | `[data-testid="header-search-button"]` | 3.2.4 | trap | passed | Understanding 3.2.4: header search is labelled "Suche" with the magnifier icon, as on the other pages. |
+| 111 | `suche.html` | `[data-testid="header-search-button"]` | 3.2.4 | set | failed | Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The German set FAILS 3.2.4, decided by sitemap.html, where the search button is identified as „Finden“ with an arrow instead of „Suche“ with a magnifier (designed failure). On this page the header search is labelled „Suche“ with the magnifier, as on the other pages. |
 | 112 | `barrierefreiheit.html` | `[data-testid="feedback-submit"]` | 4.1.2 | issue | failed | Understanding 4.1.2: the feedback "Absenden" control is a &lt;div class="btn" onclick&gt;: no button role, not focusable, so keyboard and screen-reader users cannot send feedback. |
 | 113 | `barrierefreiheit.html` | `[data-testid="related-sidebar"]` | 1.3.2 | trap | passed | Understanding 1.3.2: the related-links sidebar is shown on the left but comes after the content in the DOM; its position does not affect meaning. |
-| 114 | `velo-aktion.html` | — | 2.4.5 | issue | failed | Understanding 2.4.5: the page is reachable only through one teaser link on the home page; it is not in the navigation, the sitemap or the search index, and it is not a step in a process. |
+| 114 | `velo-aktion.html` | — | 2.4.5 | issue | failed | Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). Designed set-level failure; this page decides it: it is reachable only through one teaser link on the home page; it is not in the navigation, the sitemap or the search index, and it is not a step in a process (Understanding 2.4.5). |
 | 115 | `fr/index.html` | `[data-testid="news-card-1-more"]` | 2.4.4 | issue | cantTell | Link text "En savoir plus" sits alone in &lt;p class="card-more"&gt;; only the card heading ("Nouveaux horaires des guichets") disambiguates it and a preceding heading is not programmatic context (Klar. rule, Understanding 2.4.4) → cantTell; strict ACT 5effbb reading: failed. |
 | 116 | `fr/index.html` | `[data-testid="news-card-2-more"]` | 2.4.4 | issue | cantTell | Link text "En savoir plus" sits alone in &lt;p class="card-more"&gt;; only the card heading ("Déchets verts : rythme d’hiver") disambiguates it and a preceding heading is not programmatic context (Klar. rule, Understanding 2.4.4) → cantTell; strict ACT 5effbb reading: failed. |
 | 117 | `fr/index.html` | `[data-testid="news-card-3-more"]` | 2.4.4 | issue | cantTell | Link text "En savoir plus" sits alone in &lt;p class="card-more"&gt;; only the card heading ("Marché d’automne") disambiguates it and a preceding heading is not programmatic context (Klar. rule, Understanding 2.4.4) → cantTell; strict ACT 5effbb reading: failed. |
@@ -186,12 +187,12 @@ The HTML pages, SVG images, the PDF, this file and `issues.jsonl` (both in `data
 | 147 | `fr/guichet-en-ligne.html` | `[data-testid="form-birthdate"]` | 3.3.2 | trap | passed | Understanding 3.3.2: a visible date-of-birth label with format hint "(JJ.MM.AAAA)" and required marker. |
 | 148 | `fr/guichet-en-ligne.html` | `[data-testid="form-submit"]` | 2.5.3 | trap | passed | Understanding 2.5.3: the accessible name equals the visible label "Vérifier la commande". |
 | 149 | `fr/guichet-en-ligne.html` | `[data-testid="form-submit"]` | 2.4.3 | trap | passed | Understanding 2.4.3: no positive tabindex; focus order follows the visual order. |
-| 150 | `fr/merci.html` | — | 2.4.5 | trap | passed | Understanding 2.4.5: confirmation page is the result of a process, an explicit exception. |
+| 150 | `fr/merci.html` | — | 2.4.5 | set | passed | Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The French set PASSES 2.4.5: every content page is reachable through the main navigation, the site map and the search; fr/merci.html is exempt as the result of a process (Understanding 2.4.5). |
 | 151 | `fr/merci.html` | `[data-testid="order-status"]` | 1.4.1 | trap | passed | Understanding 1.4.1: status uses colour, icon and text. |
 | 152 | `fr/calendrier-dechets.html` | `[data-testid="waste-chart"]` | 1.1.1 | trap | passed | Understanding 1.1.1: the chart alt gives the type, unit, all twelve values, the total and the peak. |
 | 153 | `fr/calendrier-dechets.html` | `[data-testid="waste-calendar"]` | 1.4.1 | trap | passed | Understanding 1.4.1: each collection day shows a letter (O, V, P, C) explained in the legend, plus hidden text, not colour alone. |
 | 154 | `fr/calendrier-dechets.html` | `[data-testid="waste-dates-title"]` | 1.3.1 | trap | passed | Understanding 1.3.1: the section title is a real &lt;h2&gt;. |
-| 155 | `fr/calendrier-dechets.html` | `[data-testid="main-nav"]` | 3.2.3 | trap | passed | Understanding 3.2.3: same navigation order as the other French pages. |
+| 155 | `fr/calendrier-dechets.html` | `[data-testid="main-nav"]` | 3.2.3 | set | passed | Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The French set PASSES 3.2.3: the main navigation has the same order on every French page, including this one. |
 | 156 | `fr/calendrier-dechets.html` | `[data-testid="regulation-pdf-link"]` | 2.4.4 | trap | passed | Understanding 2.4.4: link text names the document, its format, size and language. |
 | 157 | `fr/horaires.html` | — | 2.4.2 | trap | passed | Understanding 2.4.2: title "Horaires d’ouverture – Commune de Musterwil" describes topic and site. |
 | 158 | `fr/horaires.html` | `[data-testid="hours-library"]` | 1.3.2 | trap | passed | Understanding 1.3.2: each day is directly followed by its hours in the DOM; reading order matches the visual order. |
@@ -212,7 +213,7 @@ The HTML pages, SVG images, the PDF, this file and `issues.jsonl` (both in `data
 | 173 | `fr/instructions.html` | `[data-testid="instruction-next-button"]` | 1.3.3 | trap | passed | Understanding 1.3.3: position plus the visible button text « Suivant ». |
 | 174 | `fr/instructions.html` | `[data-testid="instruction-table-ref"]` | 1.3.3 | trap | passed | Understanding 1.3.3: "tableau ci-dessous" points to the only table, which has the caption "Documents nécessaires". |
 | 175 | `fr/instructions.html` | `[data-testid="practice-confirm-button"]` | 2.5.3 | trap | inapplicable | Understanding 2.5.3: icon-only button with aria-label, no visible text label. |
-| 176 | `fr/plan-du-site.html` | `[data-testid="header-search-button"]` | 3.2.4 | trap | passed | Understanding 3.2.4: search button "Recherche" with magnifier, identical on all French pages. |
+| 176 | `fr/plan-du-site.html` | `[data-testid="header-search-button"]` | 3.2.4 | set | passed | Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The French set PASSES 3.2.4: the search button reads «Recherche» with a magnifier on every French page, including the site map. |
 | 177 | `fr/recherche.html` | `[data-testid="search-page-button"]` | 1.4.11 | trap | passed | Understanding 1.4.11: white icon on a dark teal button (#0e5a63), well above 3:1. |
 | 178 | `fr/recherche.html` | `[data-testid="search-page-button"]` | 2.5.3 | trap | inapplicable | Understanding 2.5.3: icon-only button without visible text. |
 | 179 | `fr/accessibilite.html` | `[data-testid="feedback-submit"]` | 4.1.2 | trap | passed | Understanding 4.1.2: the feedback form uses a native submit &lt;button&gt;. |
@@ -250,11 +251,11 @@ The HTML pages, SVG images, the PDF, this file and `issues.jsonl` (both in `data
 | 211 | `it/sportello-online.html` | `[data-testid="form-family-name-label"]` | 1.4.1 | trap | passed | Understanding 1.4.1: required fields are marked with an asterisk explained in text. |
 | 212 | `it/sportello-online.html` | `[data-testid="form-submit"]` | 2.5.3 | trap | passed | Understanding 2.5.3: visible label "Invia" is contained at the start of the accessible name "Invia il modulo". |
 | 213 | `it/sportello-online.html` | `[data-testid="residence-form"]` | 3.3.4 | issue | failed | Understanding 3.3.4: billed order (CHF 20.–) is submitted directly, without review, confirmation or correction step. |
-| 214 | `it/grazie.html` | — | 2.4.5 | trap | passed | Understanding 2.4.5: confirmation page is the result of a process, an explicit exception. |
+| 214 | `it/grazie.html` | — | 2.4.5 | set | passed | Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The Italian set PASSES 2.4.5: every content page is reachable through the main navigation, the site map and the search; it/grazie.html is exempt as the result of a process (Understanding 2.4.5). |
 | 215 | `it/calendario-rifiuti.html` | `[data-testid="waste-chart"]` | 1.1.1 | issue | failed | Understanding 1.1.1 / F30: the bar chart has alt="grafico.svg", a file name; data are not conveyed. |
 | 216 | `it/calendario-rifiuti.html` | `[data-testid="waste-calendar"]` | 1.4.1 | issue | failed | Understanding 1.4.1: collection types in the calendar are distinguished by dot colour only. |
 | 217 | `it/calendario-rifiuti.html` | `[data-testid="collection-points-table"]` | 1.3.1 | trap | passed | Understanding 1.3.1: table with caption and th scope. |
-| 218 | `it/calendario-rifiuti.html` | `[data-testid="main-nav"]` | 3.2.3 | trap | passed | Understanding 3.2.3: same navigation order as the other Italian pages. |
+| 218 | `it/calendario-rifiuti.html` | `[data-testid="main-nav"]` | 3.2.3 | set | passed | Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The Italian set PASSES 3.2.3: the main navigation has the same order on every Italian page, including this one. |
 | 219 | `it/orari.html` | — | 3.1.1 | issue | failed | Understanding 3.1.1: &lt;html lang="de-CH"&gt; (copy-paste from the German page) although the whole page is in Italian. |
 | 220 | `it/orari.html` | — | 2.4.2 | trap | passed | Understanding 2.4.2: title "Orari d’apertura – Comune di Musterwil" describes topic and site. |
 | 221 | `it/orari.html` | `[data-testid="hours-library"]` | 1.3.2 | issue | failed | Understanding 1.3.2 / C27: CSS grid pairs days and hours visually, but the DOM lists all days first and then all times. |
@@ -278,34 +279,34 @@ The HTML pages, SVG images, the PDF, this file and `issues.jsonl` (both in `data
 
 ### Rows per criterion
 
-| criterion | rows | issue | trap |
-|---|---|---|---|
-| 1.1.1 | 20 | 8 | 12 |
-| 1.3.1 | 12 | 4 | 8 |
-| 1.3.2 | 4 | 2 | 2 |
-| 1.3.3 | 9 | 3 | 6 |
-| 1.3.5 | 16 | 3 | 13 |
-| 1.4.1 | 11 | 6 | 5 |
-| 1.4.3 | 6 | 3 | 3 |
-| 1.4.5 | 4 | 3 | 1 |
-| 1.4.11 | 7 | 4 | 3 |
-| 2.2.2 | 3 | 2 | 1 |
-| 2.4.2 | 5 | 1 | 4 |
-| 2.4.3 | 2 | 1 | 1 |
-| 2.4.4 | 36 | 22 | 14 |
-| 2.4.5 | 6 | 1 | 5 |
-| 2.4.6 | 4 | 2 | 2 |
-| 2.5.3 | 12 | 1 | 11 |
-| 3.1.1 | 4 | 1 | 3 |
-| 3.1.2 | 30 | 6 | 24 |
-| 3.2.2 | 4 | 1 | 3 |
-| 3.2.3 | 4 | 1 | 3 |
-| 3.2.4 | 4 | 1 | 3 |
-| 3.3.1 | 6 | 4 | 2 |
-| 3.3.2 | 4 | 2 | 2 |
-| 3.3.3 | 3 | 2 | 1 |
-| 3.3.4 | 3 | 2 | 1 |
-| 4.1.2 | 19 | 11 | 8 |
+| criterion | rows | issue | trap | set |
+|---|---|---|---|---|
+| 1.1.1 | 20 | 8 | 12 | 0 |
+| 1.3.1 | 12 | 4 | 8 | 0 |
+| 1.3.2 | 4 | 2 | 2 | 0 |
+| 1.3.3 | 9 | 3 | 6 | 0 |
+| 1.3.5 | 16 | 3 | 13 | 0 |
+| 1.4.1 | 11 | 6 | 5 | 0 |
+| 1.4.3 | 6 | 3 | 3 | 0 |
+| 1.4.5 | 4 | 3 | 1 | 0 |
+| 1.4.11 | 7 | 4 | 3 | 0 |
+| 2.2.2 | 3 | 2 | 1 | 0 |
+| 2.4.2 | 5 | 1 | 4 | 0 |
+| 2.4.3 | 2 | 1 | 1 | 0 |
+| 2.4.4 | 36 | 22 | 14 | 0 |
+| 2.4.5 | 6 | 1 | 0 | 5 |
+| 2.4.6 | 4 | 2 | 2 | 0 |
+| 2.5.3 | 12 | 1 | 11 | 0 |
+| 3.1.1 | 4 | 1 | 3 | 0 |
+| 3.1.2 | 30 | 6 | 24 | 0 |
+| 3.2.2 | 4 | 1 | 3 | 0 |
+| 3.2.3 | 4 | 1 | 0 | 3 |
+| 3.2.4 | 4 | 1 | 0 | 3 |
+| 3.3.1 | 6 | 4 | 2 | 0 |
+| 3.3.2 | 4 | 2 | 2 | 0 |
+| 3.3.3 | 3 | 2 | 1 | 0 |
+| 3.3.4 | 3 | 2 | 1 | 0 |
+| 4.1.2 | 19 | 11 | 8 | 0 |
 
 ## Barrierefreiheitserklärung – deliberate gaps (informational)
 

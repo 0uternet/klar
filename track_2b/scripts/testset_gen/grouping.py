@@ -117,9 +117,12 @@ def assign_templates(rows: list[dict], testset: Path) -> dict:
         for i in range(len(items)):
             comps[uf.find(i)].append(i)
         ordered = sorted(comps.values(), key=lambda idx: items[idx[0]]["case_id"])
-        for k, idx in enumerate(ordered, 1):
+        k = 0
+        for idx in ordered:
             hints = sorted({items[i]["template_hint"] for i in idx if items[i].get("template_hint")})
-            name = hints[0] if hints else f"auto{k:03d}"
+            if not any("addon" in (items[i].get("tags") or []) for i in idx):
+                k += 1                      # add-on groups do not consume numbers, so adding them
+            name = hints[0] if hints else f"auto{k:03d}"   # never renames existing auto groups
             tid = f"{crit}/{name}"
             for i in idx:
                 items[i]["template_id"] = tid

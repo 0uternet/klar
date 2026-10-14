@@ -34,23 +34,23 @@ It is meant for **evaluation**, not training. The `dev` split exists only so tha
 
 | Part | Folder | Cases | Labels |
 |---|---|---|---|
-| **Generated** (synthetic, trilingual) | `generated/<criterion>/` | **731 cases** over all 26 criteria, 14 to 85 per criterion. They include 6 prompt-injection cases, 38 designed 3.1.2 span cases and 42 multi-page mini sites (238 pages). | by construction, from the decision rules in [`PROTOCOL.md`](PROTOCOL.md) |
+| **Generated** (synthetic, trilingual) | `generated/<criterion>/` | **771 cases** over all 26 criteria, 14 to 85 per criterion. They include 6 prompt-injection cases, 78 designed add-on cases (38 for 3.1.2; 40 for 4.1.2, 3.3.2 and 1.3.5) and 42 multi-page mini sites (238 pages). | by construction, from the decision rules in [`PROTOCOL.md`](PROTOCOL.md) |
 | **W3C ACT Rules test cases** | `act/testcases/<rule>/` | **207 test cases** from the 14 ACT *judgement* rules that map to 11 of the 26 criteria (57 failed, 88 passed, 62 inapplicable). | the expected *rule* outcome, from `act/testcases-filtered.json` |
 
 Outcome mix of the generated cases:
 
 | Outcome | Cases | Share |
 |---|---:|---:|
-| `failed` | 288 | 39.4 % |
-| `passed` | 316 | 43.2 % |
-| `cantTell` | 114 | 15.6 % |
-| `inapplicable` | 13 | 1.8 % |
+| `failed` | 300 | 38.9 % |
+| `passed` | 340 | 44.1 % |
+| `cantTell` | 116 | 15.0 % |
+| `inapplicable` | 15 | 1.9 % |
 
-- **Exception traps:** 194, i.e. 59 % of the passed and inapplicable cases.
-- **`alt_expected`:** 34 cases also carry the strict or alternative reading (PROTOCOL § 7).
-- **Page languages:** DE 263, FR 232, IT 227, EN 9. Criterion 3.1.2 has 15 core cases per language, 2 injection cases and 38 designed span cases (quoted titles, standalone titles, institution + address, address only, and quoted-sentence contrasts), each category in both splits.
-- **Split:** 154 `dev` and 577 `test`. The headline criteria have 34 (1.1.1), 34 (2.4.4) and 57 (3.1.2) test cases.
-- **Size:** about 7.1 MB for `data/` in total.
+- **Exception traps:** 216, i.e. 61 % of the passed and inapplicable cases.
+- **`alt_expected`:** 36 cases also carry the strict or alternative reading (PROTOCOL § 7).
+- **Page languages:** DE 278, FR 245, IT 239, EN 9. Criterion 3.1.2 has 15 core cases per language, 2 injection cases and 38 designed span cases (quoted titles, standalone titles, institution + address, address only, and quoted-sentence contrasts), each category in both splits.
+- **Split:** 174 `dev` and 597 `test`. The headline criteria have 34 (1.1.1), 34 (2.4.4) and 57 (3.1.2) test cases.
+- **Size:** about 7.2 MB for `data/` in total.
 
 **Split by template group** (PROTOCOL § 6, decision D2). Every generated case belongs to a template group (`template_id`). Two cases share a group when they come from the same content pool, or when their texts under test have a Jaccard similarity ≥ 0.6. Whole groups go to `dev` (≈ 20 % per criterion and outcome, seed `20261014`) or to `test`. Designed add-on subsets (tag `addon`) carry a fixed, balanced split and do not shift the existing assignment. Dev and test therefore share no template, no near-duplicate and no surface form. All ACT cases are in `test`.
 

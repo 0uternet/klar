@@ -304,7 +304,7 @@ def build(R):
 </div>'''
     out['merci.html'] = page(L, 'thanks', 'Commande confirmée – Commune de Musterwil', main,
                              crumbs=[('Guichet en ligne', 'guichet-en-ligne.html'), 'Confirmation'])
-    R('fr/merci.html', None, '2.4.5', 'trap', 'passed', 'Understanding 2.4.5: confirmation page is the result of a process, an explicit exception.')
+    R('fr/merci.html', None, '2.4.5', 'set', 'passed', 'Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The French set PASSES 2.4.5: every content page is reachable through the main navigation, the site map and the search; fr/merci.html is exempt as the result of a process (Understanding 2.4.5).', scope='set', deciding_page=None)
     R('fr/merci.html', 'order-status', '1.4.1', 'trap', 'passed', 'Understanding 1.4.1: status uses colour, icon and text.')
 
     # ------------------------------------------------------------------ fr/calendrier-dechets.html
@@ -351,7 +351,7 @@ def build(R):
     R(P, 'waste-chart', '1.1.1', 'trap', 'passed', 'Understanding 1.1.1: the chart alt gives the type, unit, all twelve values, the total and the peak.')
     R(P, 'waste-calendar', '1.4.1', 'trap', 'passed', 'Understanding 1.4.1: each collection day shows a letter (O, V, P, C) explained in the legend, plus hidden text, not colour alone.')
     R(P, 'waste-dates-title', '1.3.1', 'trap', 'passed', 'Understanding 1.3.1: the section title is a real <h2>.')
-    R(P, 'main-nav', '3.2.3', 'trap', 'passed', 'Understanding 3.2.3: same navigation order as the other French pages.')
+    R(P, 'main-nav', '3.2.3', 'set', 'passed', 'Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The French set PASSES 3.2.3: the main navigation has the same order on every French page, including this one.', scope='set', deciding_page=None)
     R(P, 'regulation-pdf-link', '2.4.4', 'trap', 'passed', 'Understanding 2.4.4: link text names the document, its format, size and language.')
 
     # ------------------------------------------------------------------ fr/horaires.html
@@ -593,7 +593,7 @@ def build(R):
     <ul><li><a href="../sitemap.html" lang="de-CH" hreflang="de">Sitemap auf Deutsch</a></li><li><a href="../it/mappa-del-sito.html" lang="it-CH" hreflang="it">Mappa del sito in italiano</a></li></ul></section>
 </div>'''
     out['plan-du-site.html'] = page(L, 'sitemap', 'Plan du site – Commune de Musterwil', main, crumbs=['Plan du site'])
-    R('fr/plan-du-site.html', 'header-search-button', '3.2.4', 'trap', 'passed', 'Understanding 3.2.4: search button "Recherche" with magnifier, identical on all French pages.')
+    R('fr/plan-du-site.html', 'header-search-button', '3.2.4', 'set', 'passed', 'Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The French set PASSES 3.2.4: the search button reads «Recherche» with a magnifier on every French page, including the site map.', scope='set', deciding_page=None)
 
     # ------------------------------------------------------------------ fr/recherche.html
     entries = [

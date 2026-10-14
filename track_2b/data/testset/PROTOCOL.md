@@ -108,7 +108,7 @@ Connected components become the template groups (`template_id`).
 
 ## 7. Documented deviations and contested readings (`alt_expected`)
 
-Where W3C sources (SC text, Understanding, techniques, ACT rules) or established audit practice point to different outcomes, the case is labelled with the reading this protocol adopts and the other reading is stored in `alt_expected`, so results can be reported under both. 34 generated cases carry an `alt_expected` (generated from `manifest.jsonl`):
+Where W3C sources (SC text, Understanding, techniques, ACT rules) or established audit practice point to different outcomes, the case is labelled with the reading this protocol adopts and the other reading is stored in `alt_expected`, so results can be reported under both. 36 generated cases carry an `alt_expected` (generated from `manifest.jsonl`):
 
 | Criterion | Rule | Cases | Our label | Other reading | Case class (from § 10) |
 |---|---|---:|---|---|---|
@@ -131,7 +131,7 @@ Where W3C sources (SC text, Understanding, techniques, ACT rules) or established
 | 3.1.1 | `3.1.1/C1` | 2 | `cantTell` | `passed` | Two languages in roughly equal amounts (generator asserts a word-count ratio between 0.8 and 1.25), the second language NOT marked with `lang`, `lang` = one of the two. Understanding says "used most, or the first if used equally"; ACT ucwvc8 counts words … |
 | 3.2.3 | `3.2.3/C1` | 1 | `cantTell` | `failed` | Only the footer service links (legal notice, accessibility, contact) are in a different order on one page. Whether small footer link lists are "navigational mechanisms" in the sense of the SC is disputed; a strict reading treats them as such. |
 | 3.3.1 | `3.3.1/C2` | 2 | `cantTell` | `passed` | A visible message describes the cause ("Bitte genau 4 Ziffern eingeben.") but identifies the field only by visual proximity: it does not name the field and is not programmatically associated (no `aria-describedby`, no `aria-invalid`). ACT 36b590 accepts … |
-| 4.1.2 | `4.1.2/C1` | 1 | `cantTell` | `failed` | Role is debatable: a button that only changes the URL fragment (in-page link behaviour), `<a href="#">` opening a modal dialog (alt failed), a link that navigates on click and opens a sub-menu on hover/focus with script-updated `aria-expanded` (needs … |
+| 4.1.2 | `4.1.2/C1` | 3 | `cantTell` | `failed` | Role is debatable: a button that only changes the URL fragment (in-page link behaviour), `<a href="#">` opening a modal dialog (alt failed), a link that navigates on click and opens a sub-menu on hover/focus with script-updated `aria-expanded` (needs … |
 
 Two classes matter most for Klar.'s design: **2.4.4 heading-only link context** (H80 is advisory; the WCAG definition and ACT 5effbb exclude headings; Klar. routes these to human review, decision D1) and **2.4.4 `title`-only purpose** (H33 still listed in Understanding 2.1 with an AT-support caveat, not ACT context).
 
@@ -334,6 +334,16 @@ Each section lists:
 **Not cantTell.** Annotator uncertainty is not a label; if a case cannot be fitted to a rule above it is discarded, not labelled cantTell.
 
 **Construction notes.** 26 cases (de 10 / fr 8 / it 7 / en 1): 10 failed, 12 passed incl. 2 inapplicable (7 traps), 4 cantTell. Missing autocomplete appears in failed (F1), trap (T1, T2) and cantTell cases; field labels such as "Name", "Téléphone", "Indirizzo" occur on both sides, so the decisive cue is *whose* data the field collects (legends, field labels "… des Kindes", "du destinataire", page text). Invalid tokens are plausible look-alikes (Italian "cap", "birthday", "phone", "address").
+
+**Add-on cases (review A, 8 cases, 4 dev / 4 test, tag `addon`).**
+
+| Case | Rule → label | dev / test |
+|---|---|---|
+| Password-type field for a shared venue Wi-Fi access code, the only field on the page | N1 → inapplicable (trap) | 1 / 1 |
+| The same field next to the user's own e-mail field, which carries `autocomplete="email"` | T2 → passed (trap) | 1 / 1 |
+| Login form: the user's own password field (a §7 purpose, `current-password`) without `autocomplete` | F1 → failed | 2 / 2 |
+
+The Wi-Fi code is a shared code printed on a ticket. It is not the user's own credential, so it is not information about the user.
 
 ---
 
@@ -862,6 +872,15 @@ Every category appears in both splits and in all three page languages. Each case
 
 **Construction notes.** 26 forms (10 failed, 12 passed incl. 7 traps, 4 cantTell; DE 9, FR 8, IT 9: newsletter, Fundbüro, Ferienpass, swimming courses, dog registration, waste-bag orders, school canteen, IBAN refunds). Placeholders, asterisks, missing `<label>` elements and `required` attributes occur in both failed and passed cases (T1, T2, T5, T6, T7), so none of these surface features predicts the label.
 
+**Add-on cases (review A, 16 cases, 8 dev / 8 test, tag `addon`).** These cases apply F3 strictly as written: F3 covers only *non-obvious* author formats.
+
+| Field | Rule → label | dev / test |
+|---|---|---|
+| Postcode with `pattern="[0-9]{4}"`, no hint (the standard 4-digit Swiss postcode) | P1 → passed (trap) | 2 / 2 |
+| Birth year with a 4-digit pattern, no hint | P1 → passed (trap) | 2 / 2 |
+| AHV/AVS number whose pattern requires dots, no hint | F3 → failed | 2 / 2 |
+| The same pattern with a visible format hint | P1 → passed | 2 / 2 |
+
 ---
 
 ### 3.3.3 Error Suggestion (Level AA)
@@ -944,6 +963,18 @@ Every category appears in both splits and in all three page languages. Each case
 
 **Construction notes.** 28 cases (de 10 / fr 9 / it 9): 11 failed, 13 passed (7 traps), 4 cantTell. Click handlers on non-native elements appear in failed (F1) and trap (T1, T4) cases; icon-only buttons in failed (F4) and trap (T5) cases; aria-hidden in failed (F6) and trap (T4, T6) cases; aria-expanded is missing, stale, correct or script-driven across F2, P2 and C1, so no single attribute decides the label.
 
+**Add-on cases (review A, 16 cases, 8 dev / 8 test, tag `addon`).** These cases are labelled with the existing rules; no rule was changed. Every listener is real inline JavaScript.
+
+| Pattern | Rule → label | dev / test |
+|---|---|---|
+| Swipe slider: pointer and touch listeners on the container, plus native named previous/next buttons | P1 → passed (trap) | 2 / 2 |
+| Map surface with `role="application"`, a name, its own key handling, and native zoom buttons | T1 → passed (trap) | 1 / 1 |
+| Focusable map surface with pointer and arrow-key listeners, no role and no name | C1 → cantTell (`alt_expected` failed) | 1 / 1 |
+| Card whose click listener only repeats the action of the native link in its heading | T4 → passed (trap) | 2 / 2 |
+| `div` with a click listener as the only way to clear or cancel, no role and no tabindex | F1 → failed | 2 / 2 |
+
+The swipe surface and the card are not separate user-interface components, because their pointer actions duplicate native controls that are exposed. The card is labelled T4: a mouse-only duplicate of a native link, neither focusable nor a function of its own.
+
 ---
 
 ## 11. Change log
@@ -954,7 +985,8 @@ Every category appears in both splits and in all three page languages. Each case
 | 2026-10-14 | v1 (draft) | 3.1.2: language-selector links without `lang` moved from a cantTell class to failed (rule F4) before labelling. | Understanding 3.1.2 shows `lang` on language-selector links (H58). |
 | 2026-10-14 | v1.1 (pre-freeze, no model run yet) | Supervisor review: binding decisions D1–D5 added. The split became a group split by `template_id` (D2). The 3.1.2 traps and cantTell texts were rewritten with fictional, prompt-disjoint vocabulary, and `surface_forms` were recorded (D3). Invalid-tag values and file-name alts that appeared in application prompts were replaced. Text shared with the demo site was removed from all generated cases (place names, addresses, a sensory instruction, a form label, button names). 6 prompt-injection cases were added (D4). ACT was restricted to the 14 judgement rules, and a per-row `license` was added. Labels of existing cases are unchanged except where their text changed. | P0-1, P0-2, EVAL-1, EVAL-5, EVAL-6, SEC-1, COMP-4, HYG-2 |
 | 2026-10-14 | v1.2 (pre-freeze, no model run yet) | 3.1.2: 38 add-on cases for the span categories quoted title in running text, standalone title, institution + address, address only, plus contrast cases (quoted foreign sentence with and without `lang`). Labelled by the existing rules C3, T1, F1 and P1; protocol rules unchanged. Each category is in both splits; no existing case changed. The leakage check now ignores third-party and build artefacts (vendored libraries, compiled UI, licence texts). | backend review: 3.1.2 exemptions not exercised |
-| _pending_ | v1.2 → `labels-v1` | Freeze after the second-annotator review of `review_sample.csv` (κ reported in the technical report). | — |
+| 2026-10-14 | v1.3 (pre-freeze, no model run yet) | Added 40 review-A add-on cases. 4.1.2: swipe slider, map surface exposed and unexposed, clickable card, div button. 3.3.2: postcode and birth-year patterns without a hint, AHV pattern with and without a hint. 1.3.5: venue Wi-Fi code, login password. Every item has cases in both splits, labelled by the existing rules; no rule changed and no existing case moved. Renamed asset files whose names revealed a subset or a class (the prompt-injection charts and the 1.4.5 / 1.4.11 fixture names). The generator's leak scan now also rejects subset and split markers (inj, test, dev, addon …) in ids, classes, data attributes and URLs. | review A |
+| _pending_ | v1.3 → `labels-v1` | Freeze after the second-annotator review of `review_sample.csv` (κ reported in the technical report). | — |
 
 ## 12. References
 

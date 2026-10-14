@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agenda de décembre – Commune d&#x27;Exempleval</title>
+<style>body{margin:0;font-family:Verdana, Geneva, sans-serif;color:#102a43;background:#f7fafc;line-height:1.5}a{color:#0a558c}.site-header{background:#1f6f8b;color:#ffffff;padding:12px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}.site-header a{color:#ffffff}.site-name{font-weight:700;font-size:1.15rem;text-decoration:none}.site-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:14px}.site-nav a{text-decoration:none}main{max-width:960px;margin:0 auto;padding:24px}.site-footer{border-top:1px solid #c5d5e4;color:#486581;padding:16px 24px;font-size:.9rem}.box{background:#e3eef6;padding:16px;border-radius:8px}.muted{color:#486581}img{max-width:100%;height:auto}label{display:block;font-weight:600;margin-top:12px}input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #6b7280;border-radius:6px}button{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid #1f6f8b;background:#1f6f8b;color:#ffffff;cursor:pointer}table{border-collapse:collapse}th,td{border:1px solid #c5d5e4;padding:6px 10px;text-align:left}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.card{border:1px solid #c5d5e4;border-radius:10px;padding:12px;background:#ffffff}.event-card{cursor:pointer;border:1px solid #c9d3d8;border-radius:10px;padding:12px;margin-bottom:12px}.event-card:hover{background:#f1f2f5}.visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.event-card').forEach(function (card) {
+    var link = card.querySelector('a');
+    card.addEventListener('click', function (e) { if (e.target.closest('a')) return; window.location.href = link.href; });
+  });
+});
+</script></head>
+<body>
+<header class="site-header"><a class="site-name" href="index.html">Commune d&#x27;Exempleval</a><nav class="site-nav" aria-label="Navigation principale"><ul><li><a href="accueil.html">Accueil</a></li><li><a href="actualites.html">Actualités</a></li><li><a href="administration.html">Administration</a></li><li><a href="vie-pratique.html">Vie pratique</a></li><li><a href="loisirs.html">Loisirs</a></li></ul></nav></header>
+<main>
+<h1>Agenda de décembre</h1><article class="event-card" id="karte-anlass-1"><h2><a href="concert-avent.html">Concert de l&#x27;Avent du chœur d&#x27;enfants</a></h2><p>dimanche 6 décembre, 17 h, temple de Valfictif</p></article><article class="event-card" id="karte-anlass-2"><h2><a href="atelier-biscuits.html">Atelier de biscuits de Noël</a></h2><p>mercredi 9 décembre, 14 h, salle des Tilleuls</p></article>
+</main>
+<footer class="site-footer"><p>Commune d&#x27;Exempleval · Rue des Tilleuls 6 · <a href="kontakt.html">Contact</a></p></footer>
+</body>
+</html>

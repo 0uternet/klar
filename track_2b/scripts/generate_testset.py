@@ -40,6 +40,7 @@ sys.path.insert(0, str(HERE))
 import common  # noqa: E402
 import grouping  # noqa: E402
 import injection  # noqa: E402
+import addons_review_a  # noqa: E402
 import htmlcheck  # noqa: E402
 
 ROOT = HERE.parent                      # track_2b/
@@ -50,7 +51,9 @@ DEFAULT_SEED = 20261014
 
 LEAK_TOKENS = {"fail", "failed", "fails", "failure", "pass", "passed", "passes", "trap", "traps",
                "canttell", "cant", "expected", "wrong", "correct", "incorrect", "bad", "good", "issue",
-               "issues", "verdict", "label-ok", "violation", "compliant", "noncompliant"}
+               "issues", "verdict", "label-ok", "violation", "compliant", "noncompliant",
+               # subset / split / provenance markers must not reach page content either
+               "inj", "injection", "addon", "test", "dev", "split", "gold", "groundtruth", "answer", "answers"}
 
 
 class _LeakRe:
@@ -87,6 +90,8 @@ def load_cases(crit: str, seed: int):
     # designed prompt-injection subset (SEC-1), then add-on cases (tag "addon"), appended in this
     # order so that existing case ids keep their numbers when a subset is added later
     cases = core + injection.cases_for(crit, random.Random(f"klar-injection-{seed}-{crit}")) + addons
+    # later add-on batches go last, each with its own RNG, so earlier ids/contents never move
+    cases += addons_review_a.cases_for(crit, random.Random(f"klar-addon-review-a-{seed}-{crit}"))
     for c in cases:
         assert c.criterion == crit, f"{mod.__name__}: case with criterion {c.criterion}"
     return cases

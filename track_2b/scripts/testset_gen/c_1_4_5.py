@@ -379,7 +379,7 @@ def t3_market_it(rng):
 
 
 def t4_bag_de(rng):
-    src = asset("v-specimen-sack-de", bag_svg([("Gebührensack", 22, 700), ("35 Liter", 20, 400), ("gültig ab 2027", 14, 400)]))
+    src = asset("v-gebuehrensack-de", bag_svg([("Gebührensack", 22, 700), ("35 Liter", 20, 400), ("gültig ab 2027", 14, 400)]))
     main = ("<h1>Neue Gebührensäcke ab 2027</h1><p>Ab 1. Januar 2027 werden nur noch Säcke mit dem neuen "
             "roten Aufdruck abgeholt. So sieht der Aufdruck aus:</p>"
             f"<p>{img(src, 'Grauer Kehrichtsack mit rotem Aufdruck: Abfalleimer-Symbol, «Gebührensack», «35 Liter», «gültig ab 2027»', 360, 420, id='muster-sack')}</p>"
@@ -390,7 +390,7 @@ def t4_bag_de(rng):
 
 
 def t4_permit_fr(rng):
-    src = asset("v-specimen-macaron-fr", permit_svg(["Macaron résidents", "A", "Zone bleue", "Valable 2027",
+    src = asset("v-macaron-residents-fr", permit_svg(["Macaron résidents", "A", "Zone bleue", "Valable 2027",
                                                      "N° 0000"], "#1f5fae"))
     main = ("<h1>Nouveau macaron de stationnement</h1><p>Le macaron 2027 change de couleur. Voici à quoi il "
             "ressemble ; il doit être placé bien visible derrière le pare-brise :</p>"
@@ -451,7 +451,7 @@ def c2_arrete_fr(rng):
              ["arrête :", "Article premier. – La rue de l'Église est interdite à", "tout véhicule du 2 au 20 novembre 2026,",
               "riverains et services d'urgence exceptés."],
              ["Art. 2. – Le présent arrêté entre en vigueur dès sa", "publication."]]
-    src = asset("v-facsimile-arrete-fr", facsimile_svg("COMMUNE DE VALFICTIF – MUNICIPALITÉ", "Arrêté municipal du 5 octobre 2026",
+    src = asset("v-arrete-municipal-fr", facsimile_svg("COMMUNE DE VALFICTIF – MUNICIPALITÉ", "Arrêté municipal du 5 octobre 2026",
                                                      paras, "Le syndic : Marc Modèle", "SCEAU"))
     alt = ("Arrêté municipal du 5 octobre 2026, signé et muni du sceau : la rue de l'Église est interdite à tout "
            "véhicule du 2 au 20 novembre 2026, riverains et services d'urgence exceptés ; entrée en vigueur dès publication.")
@@ -470,7 +470,7 @@ def c2_enquete_fr(rng):
               "Propriétaire : Luc Témoin."],
              ["Le dossier peut être consulté au greffe pendant les", "heures d'ouverture. Les oppositions motivées sont",
               "à adresser par écrit à la Municipalité."]]
-    src = asset("v-facsimile-enquete-fr", facsimile_svg("COMMUNE D'EXEMPLEVAL", "Avis d'enquête publique", paras,
+    src = asset("v-avis-enquete-fr", facsimile_svg("COMMUNE D'EXEMPLEVAL", "Avis d'enquête publique", paras,
                                                       "Le greffe municipal", "GREFFE"))
     alt = ("Avis d'enquête publique, du 9 octobre au 7 novembre 2026 : construction d'un hangar agricole, parcelle "
            "n° 412, chemin des Vignes 7, propriétaire Luc Témoin. Dossier consultable au greffe ; oppositions par "

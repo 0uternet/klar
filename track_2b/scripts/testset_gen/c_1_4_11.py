@@ -372,7 +372,7 @@ def t1_disabled_check_it(rng):
 def t2_pie_de(rng):
     labels = ["Wald", "Landwirtschaft", "Siedlung", "Gewässer", "Unproduktiv"]
     vals = [41, 33, 14, 7, 5]
-    src = asset("v-chart-pie-labelled-de", pie_labelled("Bodennutzung Gemeindegebiet", labels, vals))
+    src = asset("v-chart-landuse-de", pie_labelled("Bodennutzung Gemeindegebiet", labels, vals))
     alt = "Bodennutzung: " + ", ".join(f"{l} {v} %" for l, v in zip(labels, vals))
     main = ("<h1>Zahlen und Fakten</h1><p>Das Gemeindegebiet umfasst 1 240 Hektaren zwischen See und "
             "Jurasüdfuss.</p>"

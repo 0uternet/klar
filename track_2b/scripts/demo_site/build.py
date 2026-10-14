@@ -32,8 +32,11 @@ if '--out' in sys.argv:
 ROWS = []
 
 
-def R(page, testid, criterion, kind, expected, rationale):
-    assert kind in ('issue', 'trap'), kind
+def R(page, testid, criterion, kind, expected, rationale, *, scope='page', deciding_page=None):
+    """kind: issue (planted defect) | trap (correct/exempt element) | set (a page of a set-level
+    criterion whose expected outcome is the outcome of the whole language version)."""
+    assert kind in ('issue', 'trap', 'set'), kind
+    assert scope in ('page', 'set'), scope
     assert expected in ('failed', 'passed', 'cantTell', 'inapplicable'), expected
     lang = 'fr' if page.startswith('fr/') else 'it' if page.startswith('it/') else 'de'
     ROWS.append(OrderedDict(
@@ -44,6 +47,8 @@ def R(page, testid, criterion, kind, expected, rationale):
         expected=expected,
         rationale=rationale,
         lang=lang,
+        scope=scope,
+        deciding_page=deciding_page,
     ))
 
 
@@ -174,7 +179,13 @@ def write_docs(rows):
                  '(strict ACT 5effbb reading: `failed`); links with no context at all (the "Kurz gemeldet" tiles) are `failed`.\n'
                  '- Error containers (`form-error-summary`, `form-plz-error`) exist empty and `hidden` in the static DOM; their text is injected '
                  'by `assets/js/forms.js` when the form is submitted.\n'
-                 '- `velo-aktion.html` is intentionally reachable only from the 4th news card on `index.html` (not in nav, sitemap or search index).\n')
+                 '- `velo-aktion.html` is intentionally reachable only from the 4th news card on `index.html` (not in nav, sitemap or search index).\n'
+                 '- **Set-level criteria (2.4.5, 3.2.3, 3.2.4).** As in `data/testset/PROTOCOL.md`, the label applies to the *set of pages*; '
+                 'each language version (German root, `fr/`, `it/`) is one set. Rows for these criteria have `scope = set`, their `expected` '
+                 'is the outcome of the whole set on every page where the row applies, and `deciding_page` names the page that decides it. '
+                 'The German set is designed to fail all three, each because of one page: 2.4.5 → `velo-aktion.html`, '
+                 '3.2.3 → `abfallkalender.html`, 3.2.4 → `sitemap.html`; the French and Italian sets pass. `kind = set` marks a row whose '
+                 'page itself is fine (or exempt) but which carries the set outcome; the deciding page keeps `kind = issue`.\n')
     lines.append('## Highlights\n')
     lines.append('| | Finding | Page | Selector | Criterion | Expected |\n|---|---|---|---|---|---|')
     for k, desc, page, sel, crit, exp in HIGHLIGHTS:
@@ -187,14 +198,15 @@ def write_docs(rows):
         lines.append(f'| {i} | `{r["page"]}` | {sel} | {r["criterion"]} | {r["kind"]} | {r["expected"]} | {md_escape(r["rationale"])} |')
     lines.append('')
     lines.append('### Rows per criterion\n')
-    lines.append('| criterion | rows | issue | trap |\n|---|---|---|---|')
+    lines.append('| criterion | rows | issue | trap | set |\n|---|---|---|---|---|')
 
     def key(c):
         return tuple(int(x) for x in c.split('.'))
     for crit in sorted(by_crit, key=key):
         iss = sum(1 for r in rows if r['criterion'] == crit and r['kind'] == 'issue')
         trp = sum(1 for r in rows if r['criterion'] == crit and r['kind'] == 'trap')
-        lines.append(f'| {crit} | {by_crit[crit]} | {iss} | {trp} |')
+        st = sum(1 for r in rows if r['criterion'] == crit and r['kind'] == 'set')
+        lines.append(f'| {crit} | {by_crit[crit]} | {iss} | {trp} | {st} |')
     lines.append('')
     lines.append('## Barrierefreiheitserklärung – deliberate gaps (informational)\n')
     lines.append('`barrierefreiheit.html` (and the FR/IT translations `fr/accessibilite.html`, `it/accessibilita.html`) is a realistic '

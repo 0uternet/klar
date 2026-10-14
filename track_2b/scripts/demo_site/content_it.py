@@ -257,7 +257,7 @@ def build(R):
   <p class="button-row"><a class="btn" href="index.html">Torna alla pagina iniziale</a> <a class="btn btn-secondary" href="sportello-online.html">Nuovo ordine</a></p>
 </div>'''
     out['grazie.html'] = page(L, 'thanks', 'Ordine confermato – Comune di Musterwil', main, crumbs=[('Sportello online', 'sportello-online.html'), 'Conferma'])
-    R('it/grazie.html', None, '2.4.5', 'trap', 'passed', 'Understanding 2.4.5: confirmation page is the result of a process, an explicit exception.')
+    R('it/grazie.html', None, '2.4.5', 'set', 'passed', 'Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The Italian set PASSES 2.4.5: every content page is reachable through the main navigation, the site map and the search; it/grazie.html is exempt as the result of a process (Understanding 2.4.5).', scope='set', deciding_page=None)
 
     # ------------------------------------------------------------------ it/calendario-rifiuti.html
     main = f'''<div class="container page-head">
@@ -296,7 +296,7 @@ def build(R):
     R(P, 'waste-chart', '1.1.1', 'issue', 'failed', 'Understanding 1.1.1 / F30: the bar chart has alt="grafico.svg", a file name; data are not conveyed.')
     R(P, 'waste-calendar', '1.4.1', 'issue', 'failed', 'Understanding 1.4.1: collection types in the calendar are distinguished by dot colour only.')
     R(P, 'collection-points-table', '1.3.1', 'trap', 'passed', 'Understanding 1.3.1: table with caption and th scope.')
-    R(P, 'main-nav', '3.2.3', 'trap', 'passed', 'Understanding 3.2.3: same navigation order as the other Italian pages.')
+    R(P, 'main-nav', '3.2.3', 'set', 'passed', 'Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The Italian set PASSES 3.2.3: the main navigation has the same order on every Italian page, including this one.', scope='set', deciding_page=None)
 
     # ------------------------------------------------------------------ it/orari.html  (lang="de-CH" by mistake)
     lib = hours_grid([('Lunedì', 'chiuso'), ('Martedì', '15.00–18.00'), ('Mercoledì', '14.00–18.00'),
