@@ -223,7 +223,7 @@ def build(R):
     R(P, 'event-maerit', '3.1.2', 'trap', 'passed', 'Understanding 3.1.2: "Märit" and "Apéro" are Swiss Standard German words (helvetisms), part of the surrounding language.')
     R(P, 'news-card-4-teaser', '3.1.2', 'trap', 'passed', 'Understanding 3.1.2: "Velo" and "Trottinett" are helvetisms of Swiss Standard German, not foreign phrases.')
     R(P, 'stats-source', '3.1.2', 'trap', 'passed', 'Understanding 3.1.2: "Office fédéral de la statistique" is the proper name of an institution; proper names are exempt.')
-    R(P, None, '2.4.2', 'trap', 'passed', 'Understanding 2.4.2: the home page title "Gemeinde Musterwil" identifies the site and the home page.')
+    R(P, None, '2.4.2', 'set', 'failed', "Set-level reading (2.4.2 duplicate titles across pages, as for 2.4.5, 3.2.3 and 3.2.4): the label applies to the set of pages of this language version. The German set FAILS 2.4.2, decided by oeffnungszeiten.html, whose title repeats the home page title „Gemeinde Musterwil“ although it is about opening hours (designed failure). This page's own title „Gemeinde Musterwil“ is fine for the home page: the site name identifies the site and its home page (T3).", scope='set', deciding_page='oeffnungszeiten.html')
     R(P, None, '3.1.1', 'trap', 'passed', 'Understanding 3.1.1: <html lang="de-CH"> matches the German content.')
 
     # ------------------------------------------------------------------ online-schalter.html
@@ -398,7 +398,7 @@ def build(R):
     R(P, 'waste-calendar', '1.4.1', 'issue', 'failed', 'Understanding 1.4.1: in the calendar the collection type (Kehricht, Grüngut, Papier, Karton) is shown only by the colour of a dot; the legend maps colours to names.')
     R(P, 'main-nav', '3.2.3', 'issue', 'failed', 'Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). Designed set-level failure; this page decides it: the main navigation lists the same links in a different order (Abfallkalender first) than on all other German pages (Understanding 3.2.3).', scope='set', deciding_page='abfallkalender.html')
     R(P, 'regulation-pdf-link', '2.4.4', 'trap', 'passed', 'Understanding 2.4.4: link text "Abfallreglement (PDF, n KB)" states the target and its format.')
-    R(P, None, '2.4.2', 'trap', 'passed', 'Understanding 2.4.2: title "Abfallkalender 2026 – Gemeinde Musterwil" describes topic and site.')
+    R(P, None, '2.4.2', 'set', 'failed', "Set-level reading (2.4.2 duplicate titles across pages, as for 2.4.5, 3.2.3 and 3.2.4): the label applies to the set of pages of this language version. The German set FAILS 2.4.2, decided by oeffnungszeiten.html, whose title repeats the home page title „Gemeinde Musterwil“ although it is about opening hours (designed failure). This page's own title „Abfallkalender 2026 – Gemeinde Musterwil“ describes topic and site (P1).", scope='set', deciding_page='oeffnungszeiten.html')
     R(P, None, '2.4.5', 'set', 'failed', 'Set-level criterion (PROTOCOL.md: the label applies to the set of pages of this language version). The German set FAILS 2.4.5, decided by velo-aktion.html, which is reachable only through one home-page teaser (designed failure). abfallkalender.html itself is reachable via main navigation, sitemap and search.', scope='set', deciding_page='velo-aktion.html')
 
     # ------------------------------------------------------------------ oeffnungszeiten.html
@@ -480,7 +480,7 @@ def build(R):
 </div>'''
     out['oeffnungszeiten.html'] = page(L, 'hours', 'Gemeinde Musterwil', main, crumbs=['Öffnungszeiten'], scripts=('accordion.js',))
     P = 'oeffnungszeiten.html'
-    R(P, None, '2.4.2', 'issue', 'failed', 'Understanding 2.4.2 / F25: <title> is "Gemeinde Musterwil", identical to the home page, although the page is about opening hours.')
+    R(P, None, '2.4.2', 'issue', 'failed', 'Set-level reading (2.4.2 duplicate titles across pages, as for 2.4.5, 3.2.3 and 3.2.4): the label applies to the set of pages of this language version. Designed set-level failure; this page decides it: its <title> is „Gemeinde Musterwil“, identical to the home page, although the page is about opening hours (Understanding 2.4.2, F25; PROTOCOL 2.4.2/F4).', scope='set', deciding_page='oeffnungszeiten.html')
     R(P, 'hours-admin', '1.3.1', 'trap', 'passed', 'Understanding 1.3.1: opening-hours table with caption and th scope="col"/"row".')
     R(P, 'hours-werkhof', '1.3.1', 'issue', 'failed', 'Understanding 1.3.1 / F91: data table without <th>; the bold first row only looks like a header row.')
     R(P, 'werkhof-heading', '2.4.6', 'issue', 'failed', 'Understanding 2.4.6: the heading "Allgemeines" does not describe the section below (Werkhof opening hours).')

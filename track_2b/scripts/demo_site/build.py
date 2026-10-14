@@ -180,10 +180,10 @@ def write_docs(rows):
                  '- Error containers (`form-error-summary`, `form-plz-error`) exist empty and `hidden` in the static DOM; their text is injected '
                  'by `assets/js/forms.js` when the form is submitted.\n'
                  '- `velo-aktion.html` is intentionally reachable only from the 4th news card on `index.html` (not in nav, sitemap or search index).\n'
-                 '- **Set-level criteria (2.4.5, 3.2.3, 3.2.4).** As in `data/testset/PROTOCOL.md`, the label applies to the *set of pages*; '
+                 '- **Set-level criteria (2.4.5, 3.2.3, 3.2.4; and 2.4.2 for titles duplicated across pages).** As in `data/testset/PROTOCOL.md`, the label applies to the *set of pages*; '
                  'each language version (German root, `fr/`, `it/`) is one set. Rows for these criteria have `scope = set`, their `expected` '
                  'is the outcome of the whole set on every page where the row applies, and `deciding_page` names the page that decides it. '
-                 'The German set is designed to fail all three, each because of one page: 2.4.5 → `velo-aktion.html`, '
+                 'The German set is designed to fail each of them because of one page: 2.4.2 → `oeffnungszeiten.html`, 2.4.5 → `velo-aktion.html`, '
                  '3.2.3 → `abfallkalender.html`, 3.2.4 → `sitemap.html`; the French and Italian sets pass. `kind = set` marks a row whose '
                  'page itself is fine (or exempt) but which carries the set outcome; the deciding page keeps `kind = issue`.\n')
     lines.append('## Highlights\n')
