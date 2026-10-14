@@ -124,8 +124,9 @@ jobs:
           python3 - <<'EOF'
           import json
           d = json.load(open("var/reports/demo-latest.json", encoding="utf-8"))
-          s = d.get("stats", {})
-          print("findings:", len(d.get("findings", [])), "| not_recorded:", s.get("not_recorded"), "| llm_errors:", s.get("llm_errors"))
+          s = d.get("stats") or d          # the demo summary has its counts at the top level
+          print("pages:", s.get("pages"), "| failed:", s.get("failed"), "| review:", s.get("cantTell"),
+                "| not_recorded:", s.get("not_recorded"), "| llm_errors:", s.get("llm_errors"))
           assert d.get("mode") == "replay", d.get("mode")
           assert s.get("not_recorded") == 0, f"not_recorded = {s.get('not_recorded')}"
           assert s.get("llm_errors") == 0, f"llm_errors = {s.get('llm_errors')}"
@@ -276,7 +277,7 @@ jobs:
           curl -fsS http://localhost:8080/api/health | tee health.json
           echo
           python3 -c "import json; h = json.load(open('health.json')); assert h.get('mode') == 'replay', h"
-          python3 -c "import json; s = json.load(open('var/reports/demo-latest.json', encoding='utf-8')).get('stats', {}); print(s.get('not_recorded'), s.get('llm_errors')); assert s.get('not_recorded') == 0 and s.get('llm_errors') == 0, s"
+          python3 -c "import json; d = json.load(open('var/reports/demo-latest.json', encoding='utf-8')); s = d.get('stats') or d; print(s.get('not_recorded'), s.get('llm_errors')); assert s.get('not_recorded') == 0 and s.get('llm_errors') == 0, s"
       - name: Container logs
         if: failure()
         run: docker compose logs --no-color --tail=300 || true

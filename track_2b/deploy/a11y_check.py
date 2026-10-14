@@ -32,7 +32,9 @@ data_dir = Path(os.environ.get("KLAR_DATA_DIR", "/app/var"))
 views = ["/#/", "/#/about", "/#/human"]
 latest = data_dir / "reports" / "demo-latest.json"
 if latest.is_file():
-    scan_id = json.loads(latest.read_text(encoding="utf-8")).get("id")
+    summary = json.loads(latest.read_text(encoding="utf-8"))
+    # demo summary: {"scans": [{"scan_id": ...}, ...]}; a single-scan report: {"id": ...}
+    scan_id = (summary.get("scans") or [{}])[0].get("scan_id") or summary.get("id")
     if scan_id:
         views += [f"/#/scan/{scan_id}", f"/#/report/{scan_id}"]
 views += [v.strip() for v in os.environ.get("KLAR_A11Y_VIEWS", "").split(",") if v.strip()]

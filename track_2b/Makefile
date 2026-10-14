@@ -8,6 +8,8 @@
 #   make run-gpu        + Apertus 1.5 8B on the local NVIDIA GPU (official swiss-ai vLLM image)
 #   make run-cpu        + Apertus 1.5 8B text-only GGUF on CPU (llama.cpp), downloaded + verified
 #   make eval           evaluation on data/testset -> eval/results/ (test split: git fetch --tags first)
+#                       [SPLIT=test|dev] [SYSTEMS=axe,baseline,ours,...] [OUT=eval/results/<name>]
+#   make record         record the demo replay from a live Apertus endpoint into data/replay/ [KEEP=1]
 #   make test           pytest + web type-check, inside Docker
 #   make airgap-check   proof of offline operation (internal-only Docker network)
 #   make bundle         offline bundle (images + weights) for an air-gapped site
@@ -41,6 +43,10 @@ DEMO        ?= 1
 APP_WAIT    ?= 300
 LLM_WAIT    ?= 3600
 AIRGAP_LLM  ?= replay
+SPLIT       ?= test
+SYSTEMS     ?=
+OUT         ?= eval/results
+KEEP        ?= 0
 BUNDLE      ?= cpu
 MODEL       := swiss-ai/Apertus-v1.5-8B
 # URL used by the host to reach the app: follows KLAR_BIND (a wildcard or loopback bind -> localhost).
@@ -62,6 +68,7 @@ override KLAR_ALLOWED_HOSTS := $(if $(strip $(KLAR_ALLOWED_HOSTS)),$(KLAR_ALLOWE
 export KLAR_ALLOWED_HOSTS
 endif
 DC           = $(COMPOSE)
+EVAL_ARGS    = --split $(SPLIT) --out /app/eval/run$(if $(strip $(SYSTEMS)), --systems $(SYSTEMS))
 
 # The app container runs as the host user, so files in ./var stay yours.
 # As root (or without `id`) it keeps the image's own non-root user (10001).
@@ -91,6 +98,12 @@ HAVE_HF_TOKEN    := $(if $(or $(HF_TOKEN),$(call dotenv,HF_TOKEN)),1)
 BUNDLED          := //llm: //llm/ //llm-gpu: //llm-gpu/ //llm-cpu: //llm-cpu/
 ENV_EXT_URL      := $(if $(strip $(foreach h,$(BUNDLED),$(findstring $(h),$(ENV_LLM_BASE_URL)))),,$(ENV_LLM_BASE_URL))
 
+# make eval / make record: a bundled model server that is running and healthy (llm-gpu first,
+# then llm-cpu) is the default endpoint. Detected only for these goals (it asks Docker).
+ifneq ($(filter eval record,$(MAKECMDGOALS)),)
+LIVE_LLM := $(shell sh deploy/live_llm.sh 2>/dev/null)
+endif
+
 # Which source set LLM_BASE_URL, for the banner: make command line, shell environment or .env.
 URL_ORIGIN := $(origin LLM_BASE_URL)
 SRC_CLI    := $(filter command%,$(URL_ORIGIN))
@@ -102,12 +115,22 @@ export KLAR_UID KLAR_GID KLAR_PORT KLAR_BIND KLAR_IMAGE LLAMA_THREADS
 # Per-target endpoint, exported to docker compose (target-specific export: GNU make >= 3.81).
 # Precedence: make command line > shell environment > .env > the target's default below.
 # An exported but EMPTY LLM_BASE_URL= also wins over .env (it means: replay mode).
-# make run, make eval: replay mode only when no non-empty LLM_BASE_URL is set anywhere.
-run eval: export LLM_BASE_URL ?= $(ENV_LLM_BASE_URL)
-run eval: export KLAR_REPLAY  ?= $(or $(ENV_KLAR_REPLAY),$(if $(strip $(LLM_BASE_URL)),0,1))
-run eval: export LLM_NAME     ?= $(or $(ENV_LLM_NAME),$(MODEL))
-run eval: export LLM_API_KEY  ?= $(or $(ENV_LLM_API_KEY),local)
-run eval: CFG_SRC = $(or $(SRC_ANY),$(if $(ENV_LLM_BASE_URL),.env,nothing set: replay mode))
+# make run: replay mode only when no non-empty LLM_BASE_URL is set anywhere.
+run: export LLM_BASE_URL ?= $(ENV_LLM_BASE_URL)
+run: export KLAR_REPLAY  ?= $(or $(ENV_KLAR_REPLAY),$(if $(strip $(LLM_BASE_URL)),0,1))
+run: export LLM_NAME     ?= $(or $(ENV_LLM_NAME),$(MODEL))
+run: export LLM_API_KEY  ?= $(or $(ENV_LLM_API_KEY),local)
+run: CFG_SRC = $(or $(SRC_ANY),$(if $(ENV_LLM_BASE_URL),.env,nothing set: replay mode))
+
+# make eval, make record: command line / shell > running bundled server (llm-gpu, llm-cpu) > .env.
+# make eval falls back to replay mode; make record always needs a live endpoint.
+LIVE_USED = $(if $(SRC_ANY),,$(LIVE_LLM))
+eval record: export LLM_BASE_URL ?= $(or $(LIVE_USED),$(ENV_LLM_BASE_URL))
+eval record: export LLM_NAME     ?= $(if $(LIVE_USED),$(MODEL),$(or $(ENV_LLM_NAME),$(MODEL)))
+eval record: export LLM_API_KEY  ?= $(if $(LIVE_USED),local,$(or $(ENV_LLM_API_KEY),local))
+eval: export KLAR_REPLAY ?= $(or $(ENV_KLAR_REPLAY),$(if $(strip $(LLM_BASE_URL)),0,1))
+record: export KLAR_REPLAY = 0
+eval record: CFG_SRC = $(or $(SRC_ANY),$(if $(LIVE_USED),running bundled model server,$(if $(ENV_LLM_BASE_URL),.env,nothing set)))
 
 run-gpu: DC = $(COMPOSE) --profile gpu
 run-gpu: export KLAR_REPLAY  ?= $(or $(ENV_KLAR_REPLAY),0)
@@ -123,7 +146,7 @@ run-cpu: export LLM_NAME     ?= $(if $(ENV_EXT_URL),$(or $(ENV_LLM_NAME),$(MODEL
 run-cpu: export LLM_API_KEY  ?= $(if $(ENV_EXT_URL),$(or $(ENV_LLM_API_KEY),local),local)
 run-cpu: CFG_SRC = $(or $(SRC_ANY),$(if $(ENV_EXT_URL),.env,make run-cpu default (bundled llama.cpp service)))
 
-.PHONY: help run run-gpu run-cpu eval test airgap-check download-model bundle \
+.PHONY: help run run-gpu run-cpu eval record test airgap-check download-model bundle \
         stop logs clean preflight preflight-gpu dirs
 
 help:
@@ -133,6 +156,8 @@ help:
 	@echo "  make run-gpu        + Apertus 1.5 8B on the local NVIDIA GPU (vLLM, driver >= 580, HF_TOKEN once)"
 	@echo "  make run-cpu        + Apertus 1.5 8B text-only GGUF on CPU (llama.cpp, 5 GB download once)"
 	@echo "  make eval           evaluation on data/testset -> eval/results/ (test split: needs the tag labels-v1, git fetch --tags)"
+	@echo "                      SPLIT=test|dev  SYSTEMS=axe,baseline,ours,ours_no_guard,ours_no_context  OUT=eval/results/<name>"
+	@echo "  make record         record the demo replay from the live endpoint into data/replay/ (old files -> var/; KEEP=1 appends)"
 	@echo "  make test           pytest + web type-check in Docker"
 	@echo "  make airgap-check   prove offline operation [AIRGAP_LLM=replay|cpu|gpu]"
 	@echo "  make bundle         offline bundle for an air-gapped site [BUNDLE=cpu|gpu|all]"
@@ -196,6 +221,7 @@ download-model: dirs
 eval: preflight dirs
 	@sh deploy/endpoint.sh eval "$(KLAR_REPLAY)" "$(LLM_BASE_URL)" "$(LLM_NAME)" ./var "$(CFG_SRC)"
 	$(if $(filter 1,$(BUILD)),$(DC) build app)
+	@mkdir -p "$(OUT)"
 	@if command -v sha256sum >/dev/null 2>&1; then hash="sha256sum"; else hash="shasum -a 256"; fi; \
 	sha=""; if git cat-file -e labels-v1:track_2b/data/testset/manifest.jsonl 2>/dev/null; then \
 	  sha=$$(git show labels-v1:track_2b/data/testset/manifest.jsonl | $$hash | cut -d" " -f1); fi; \
@@ -205,11 +231,21 @@ eval: preflight dirs
 	  echo "    NOTE: the test split needs the git tag labels-v1. In a shallow clone or a download without"; \
 	  echo "          tags run: git fetch --tags   (then make eval again). Without it the test split is refused."; \
 	fi; \
-	echo "$(DC) run --rm --no-deps -e KLAR_LABELS_MANIFEST_SHA256 -e KLAR_GIT_COMMIT -v .../data/testset:/app/data/testset:ro,z app klar eval"; \
+	echo "$(DC) run --rm --no-deps ... app klar eval $(EVAL_ARGS)   (results -> $(OUT))"; \
 	KLAR_LABELS_MANIFEST_SHA256="$$sha" KLAR_GIT_COMMIT="$$commit" \
 	  $(DC) run --rm --no-deps -e KLAR_LABELS_MANIFEST_SHA256 -e KLAR_GIT_COMMIT \
-	  -v "$(CURDIR)/data/testset:/app/data/testset:ro,z" app klar eval
-	@echo; echo "==> Evaluation results: ./eval/results/"; ls -1 eval/results 2>/dev/null || true
+	  -v "$(CURDIR)/data/testset:/app/data/testset:ro,z" -v "$(abspath $(OUT)):/app/eval/run:z" \
+	  app klar eval $(EVAL_ARGS)
+	@echo; echo "==> Evaluation results: ./$(OUT)/"; ls -1 "$(OUT)" 2>/dev/null || true
+
+# Record the demo replay from the live endpoint (deploy/record.sh): data/replay/*.jsonl + RECORDING.json.
+record: preflight dirs
+	@sh deploy/endpoint.sh record "$(KLAR_REPLAY)" "$(LLM_BASE_URL)" "$(LLM_NAME)" ./var "$(CFG_SRC)"
+	@if [ -z "$(strip $(LLM_BASE_URL))" ]; then \
+	  echo "ERROR: make record needs a live Apertus endpoint. Start one (make run-gpu DEMO=0) or set" >&2; \
+	  echo "       LLM_BASE_URL / LLM_NAME / LLM_API_KEY in the shell or .env." >&2; exit 2; fi
+	$(if $(filter 1,$(BUILD)),$(DC) build app)
+	@KEEP="$(KEEP)" DC="$(DC)" sh deploy/record.sh
 
 test: preflight
 	docker build --target test -t klar-test:local .

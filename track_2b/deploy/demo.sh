@@ -42,10 +42,13 @@ try:
     d = json.load(open(path, encoding="utf-8"))
 except Exception:
     sys.exit(0)
-s = d.get("stats") or {}
+s = d.get("stats") or d                      # demo summary (top-level counts) or a single Scan
 ai = s.get("ai_requests", s.get("external_ai_requests"))
-print("mode=%s findings=%s not_recorded=%s llm_errors=%s ai_requests_leaving=%s" % (
-    d.get("mode"), len(d.get("findings") or []), s.get("not_recorded"), s.get("llm_errors"), ai))
+if isinstance(ai, dict):
+    ai = ai.get("swiss_cloud", 0) + ai.get("external", 0)
+print("mode=%s pages=%s failed=%s review=%s not_recorded=%s llm_errors=%s ai_requests_leaving=%s" % (
+    d.get("mode"), s.get("pages", 1), s.get("failed"), s.get("cantTell"), s.get("not_recorded"),
+    s.get("llm_errors"), ai))
 ' 2>/dev/null || true)
 
 echo

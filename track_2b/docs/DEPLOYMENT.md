@@ -38,7 +38,8 @@ query strings.
 | `make run` | Build the image, start the app on <http://localhost:8080>, scan the bundled demo site (`klar demo`) and print the report path (`./var/reports/demo-latest.html`). |
 | `make run-gpu` | Same, plus the official Apertus 1.5 vLLM image on the local NVIDIA GPU (`--profile gpu`). |
 | `make run-cpu` | Same, plus llama.cpp with the text-only GGUF on CPU (`--profile cpu`). Downloads and sha256-verifies the GGUF once. |
-| `make eval` | `klar eval` on `data/testset`, results in `eval/results/`. The test split is checked against the git tag `labels-v1`, so it needs a clone with tags: run `git fetch --tags` first in a shallow clone. |
+| `make eval [SPLIT=test\|dev] [SYSTEMS=...] [OUT=eval/results/<name>]` | `klar eval` on `data/testset`; results (`results.json`, `table.md`, `responses.jsonl`, `RUNLOG.jsonl`) in `OUT` on the host (default `eval/results`). `SYSTEMS` is a comma list from `axe,baseline,ours,ours_no_guard,ours_no_context`. Use one `OUT` per model, e.g. `eval/results/apertus-8b-gpu` and `eval/results/apertus-70b-phoeniqs`. The test split is checked against the git tag `labels-v1`, so it needs a clone with tags: run `git fetch --tags` first in a shallow clone. |
+| `make record [KEEP=1]` | Records the Apertus answers for every demo page into `data/replay/` (to commit), checks them with `klar replay-check --rescan` in replay mode, and writes `data/replay/RECORDING.json` (model, revision, endpoint host, date, commit, counts). Previous files move to `var/replay-backup-<time>/`; `KEEP=1` appends instead. |
 | `make test` | pytest and the web type-check, inside the Docker `test` stage. |
 | `make airgap-check [AIRGAP_LLM=replay\|cpu\|gpu]` | Proof of offline operation (section 3b). |
 | `make bundle [BUNDLE=cpu\|gpu\|all]` | Offline bundle for an air-gapped site (section 3b). |
@@ -102,6 +103,34 @@ and the KV cache. Assuming the Apertus-8B backbone (32 layers, 8 KV heads × 128
 costs about 128 KiB per token, so one full 32 768-token context is about 4 GiB. vLLM prints the real
 KV capacity at start-up ("GPU KV cache size"). On a 24 GB card use `VLLM_MAX_MODEL_LEN=8192
 VLLM_GPU_MEMORY_UTILIZATION=0.92`. If the GPU also drives the desktop, lower the utilisation.
+
+**Endpoint of `make eval` and `make record`.** The make command line or the shell wins. Otherwise a
+bundled model server that is running and healthy is used (`llm-gpu`, then `llm-cpu`), then `.env`.
+`make eval` falls back to replay mode; `make record` refuses to run without a live endpoint.
+
+**One GPU session: record the demo replay and evaluate** (not run by CI). From `track_2b/` on the
+GPU machine (Linux, or WSL2 on Windows), with `HF_TOKEN` in `.env`:
+
+```sh
+sh deploy/gpu_session.sh
+```
+
+It runs these steps, logs to `var/gpu_session.log`, and remembers finished steps in
+`var/gpu_session.done`, so running it again resumes (`--redo <step>` repeats one step):
+1. **preflight:** driver ≥ 580, GPU visible from a container (NVIDIA Container Toolkit), at least
+   60 GB free, `HF_TOKEN` present unless the weights are cached;
+2. **start:** `make run-gpu DEMO=0`;
+3. **probe:** vLLM healthy, and Klar.'s vision probe answers;
+4. **record:** `make record`;
+5. **eval:** `make eval SPLIT=test OUT=eval/results/apertus-8b-gpu` with all five systems. Without
+   the tag `labels-v1` it runs the dev split and warns loudly;
+6. **hardware:** GPU, driver, CUDA, CPU, RAM and Docker versions in
+   `eval/results/apertus-8b-gpu/HARDWARE.json`;
+7. **summary:** the files to commit (`data/replay/` and the `OUT` folder).
+
+A Swiss-cloud run writes to its own folder: export `LLM_BASE_URL`, `LLM_NAME` and `LLM_API_KEY` in
+the shell (the shell wins over a running local server and over `.env`; the key stays out of the
+command line), then `make eval OUT=eval/results/apertus-70b-phoeniqs`.
 
 **CPU only** (`make run-cpu`): llama.cpp serves the text-only Q4_K_M GGUF with `--jinja -c 8192
 --parallel 1 --threads $LLAMA_THREADS` (about one thread per physical core). Criteria that need

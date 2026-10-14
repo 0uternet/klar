@@ -74,9 +74,9 @@ if [ "$mode" = replay ]; then
   esac
 else
   case $host in
-    llm|llm-gpu) [ "$target" = run-gpu ] || [ "$target" = eval ] \
+    llm|llm-gpu) [ "$target" = run-gpu ] || [ "$target" = eval ] || [ "$target" = record ] \
       || echo "    WARNING: LLM_BASE_URL points to the bundled vLLM server, which only 'make run-gpu' starts." ;;
-    llm-cpu) [ "$target" = run-cpu ] || [ "$target" = eval ] \
+    llm-cpu) [ "$target" = run-cpu ] || [ "$target" = eval ] || [ "$target" = record ] \
       || echo "    WARNING: LLM_BASE_URL points to the bundled llama.cpp server, which only 'make run-cpu' starts." ;;
     *) case $target in run-gpu|run-cpu)
          echo "    NOTE: LLM_BASE_URL ($source) is the endpoint above, so the local model server is started but not used."

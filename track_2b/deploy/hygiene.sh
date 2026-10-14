@@ -39,7 +39,8 @@ sizes() { # "size path" for the tracked files matching the pathspec (GNU or BSD 
   if stat -c '%s' . >/dev/null 2>&1; then git ls-files -z -- "$@" | xargs -0 stat -c '%s %n' 2>/dev/null
   else git ls-files -z -- "$@" | xargs -0 stat -f '%z %N' 2>/dev/null; fi
 }
-check "files larger than 5 MB outside track_2b/data/" "$(sizes ':!track_2b/data/' | awk '$1 > 5242880')"
+check "files larger than 5 MB outside track_2b/data/ and track_2b/eval/results/" "$(sizes ':!track_2b/data/' ':!track_2b/eval/results/' | awk '$1 > 5242880')"
+check "evaluation outputs larger than 25 MB" "$(sizes track_2b/eval/results | awk '$1 > 26214400')"
 data=$(sizes track_2b/data | awk '{t += $1} END {print t + 0}')
 echo "tracked data: $data bytes"
 [ "$data" -le 104857600 ] || found "track_2b/data is larger than 100 MB" "$data bytes"
