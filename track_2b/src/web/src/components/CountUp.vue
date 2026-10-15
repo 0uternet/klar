@@ -1,10 +1,11 @@
 <script setup lang="ts">
 // A number that counts up when it appears or changes; screen readers get the final value only.
+import { formatNumber } from '@/i18n'
 import { useCountUp } from '@/lib/motion'
 
 const props = withDefaults(defineProps<{ value: number; duration?: number; format?: (n: number) => string }>(), {
   duration: 900,
-  format: (n: number) => Math.round(n).toLocaleString(),
+  format: (n: number) => formatNumber(Math.round(n)),  // the UI language, not the browser's
 })
 const shown = useCountUp(() => props.value, props.duration)
 </script>

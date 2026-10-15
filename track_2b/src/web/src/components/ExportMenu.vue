@@ -70,7 +70,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
       :id="btnId"
       ref="button"
       type="button"
-      class="btn btn--secondary"
+      class="export__btn"
       aria-haspopup="menu"
       :aria-expanded="open"
       :aria-controls="menuId"
@@ -79,24 +79,26 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
     >
       <Download :size="16" aria-hidden="true" />
       {{ t('export.label') }}
-      <ChevronDown :size="16" aria-hidden="true" class="export__chev" :class="{ 'is-open': open }" />
+      <ChevronDown :size="15" aria-hidden="true" class="export__chev" :class="{ 'is-open': open }" />
     </button>
-    <ul v-show="open" :id="menuId" class="export__menu" role="menu" :aria-labelledby="btnId">
-      <li v-for="(f, i) in EXPORT_FORMATS" :key="f" role="none">
-        <button
-          :ref="(el) => { if (el) items[i] = el as HTMLElement }"
-          type="button"
-          role="menuitem"
-          tabindex="-1"
-          class="export__item"
-          @click="choose(f)"
-          @keydown="onItemKey($event, i)"
-        >
-          <span class="export__fmt">{{ t(`export.${f}`) }}</span>
-          <span class="export__desc">{{ t(`export.${f}.desc`) }}</span>
-        </button>
-      </li>
-    </ul>
+    <Transition name="fade-rise">
+      <ul v-show="open" :id="menuId" class="export__menu" role="menu" :aria-labelledby="btnId">
+        <li v-for="(f, i) in EXPORT_FORMATS" :key="f" role="none">
+          <button
+            :ref="(el) => { if (el) items[i] = el as HTMLElement }"
+            type="button"
+            role="menuitem"
+            tabindex="-1"
+            class="export__item"
+            @click="choose(f)"
+            @keydown="onItemKey($event, i)"
+          >
+            <span class="export__fmt">{{ t(`export.${f}`) }}</span>
+            <span class="export__desc">{{ t(`export.${f}.desc`) }}</span>
+          </button>
+        </li>
+      </ul>
+    </Transition>
   </div>
 </template>
 
@@ -104,8 +106,29 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
 .export {
   position: relative;
 }
+.export__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 10px 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-control);
+  background: transparent;
+  color: var(--ink);
+  font-size: var(--fs-14);
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color var(--dur-1) var(--ease-out), border-color var(--dur-1) var(--ease-out);
+}
+.export__btn:hover,
+.export__btn[aria-expanded='true'] {
+  background: var(--surface-2);
+  border-color: var(--control-border);
+}
 .export__chev {
-  transition: transform var(--dur-1) var(--ease);
+  color: var(--muted);
+  transition: transform var(--dur-2) var(--ease-out);
 }
 .export__chev.is-open {
   transform: rotate(180deg);
@@ -115,26 +138,28 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
   right: 0;
   top: calc(100% + 6px);
   z-index: 40;
-  min-width: 260px;
+  min-width: 300px;
+  max-width: calc(100vw - 2 * var(--page-pad));
   margin: 0;
-  padding: 6px;
+  padding: 4px;
   list-style: none;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--r-card);
   box-shadow: var(--shadow-overlay);
-  animation: klar-fade-up var(--dur-1) var(--ease);
+  transform-origin: top right;
 }
 .export__item {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
-  padding: 8px 12px;
+  padding: 7px 10px;
   background: transparent;
   border: 0;
   border-radius: 6px;
   text-align: left;
+  color: var(--ink);
 }
 .export__item:hover,
 .export__item:focus-visible {
@@ -150,5 +175,12 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
 .export__desc {
   font-size: var(--fs-12);
   color: var(--muted);
+}
+@media (max-width: 640px) {
+  .export__menu {
+    right: auto;
+    left: 0;
+    transform-origin: top left;
+  }
 }
 </style>

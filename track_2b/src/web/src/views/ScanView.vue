@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { ArrowRight, ExternalLink } from '@lucide/vue'
-import type { ProgressStep, Scan } from '@/types'
+import type { Outcome, ProgressStep, Scan } from '@/types'
 import { KNOWN_STEPS } from '@/types'
 import { api, ApiError } from '@/api'
 import { formatNumber, polish, t, tp, type MessageKey } from '@/i18n'
-import { ensureBooted, health, lastScanId, refreshHealth, unreachable } from '@/stores/app'
+import { ensureBooted, lastScanId, refreshHealth, unreachable } from '@/stores/app'
 import { applyDone, applyFinding, applyProgress, loadScan, scans } from '@/stores/scans'
-import { prettyModel, scanTitle } from '@/lib/format'
+import { scanTitle } from '@/lib/format'
 import { classifyScanError, hostOf, renderProblem, type Problem, type ProblemAction } from '@/lib/errors'
 import { evidenceLine, rowTitle } from '@/lib/finding-text'
 import { groupFindings, type FindingGroup } from '@/lib/group'
@@ -16,10 +16,11 @@ import { useDocumentTitle } from '@/composables/useDocumentTitle'
 import { useNow } from '@/composables/useNow'
 import { useRerun } from '@/composables/useRerun'
 import ProgressStepper from '@/components/ProgressStepper.vue'
-import SovereigntyBadge from '@/components/SovereigntyBadge.vue'
 import VerdictChip from '@/components/VerdictChip.vue'
 import CriterionTag from '@/components/CriterionTag.vue'
 import ErrorState from '@/components/ErrorState.vue'
+import ShapeIcon from '@/components/ShapeIcon.vue'
+import CountUp from '@/components/CountUp.vue'
 
 const props = defineProps<{ id: string }>()
 const router = useRouter()
@@ -34,26 +35,34 @@ const announcement = ref('')
 const startedAt = ref<number | null>(null)
 const finishedAt = ref<number | null>(null)
 const unsubscribe = shallowRef<(() => void) | null>(null)
-let navTimer: number | undefined
+const cta = ref<HTMLElement | null>(null)
 
 /** H1 = the page title once the page is loaded, else the address (UX-11). */
 const head = computed(() => (scan.value ? scanTitle(scan.value) : null))
 const headTitle = computed(() => (head.value ? (head.value.title ?? t('report.pastedHtml')) : t('scan.connecting')))
-/** The linked address under the H1, when the H1 is a page title rather than the address itself. */
+/** One line under the H1: the address when the H1 is a page title, or "Pasted HTML" under a pasted page's own title. */
 const subUrl = computed(() => {
   const h = head.value
   if (!h?.url) return null
   const bare = h.url.replace(/^https?:\/\//, '')
   return h.title && !bare.startsWith(h.title) ? bare : null
 })
+const subPasted = computed(() => !!head.value?.pasted && !!head.value.title)
 useDocumentTitle(() => t('scan.docTitle', { url: scan.value ? headTitle.value : '…' }))
 
 const finished = computed(() => scan.value?.state === 'done')
 const failedState = computed(() => scan.value?.state === 'error')
+/** The stream dropped mid-check: say so instead of a live "Checking" mark. */
+const offline = computed(() => transportError.value !== null && !finished.value && !failedState.value)
+const phase = computed(() => (failedState.value || offline.value ? 'failed' : finished.value ? 'done' : 'running'))
+const statusText = computed(() =>
+  failedState.value ? t('scan.failedEyebrow') : offline.value ? t('offline.badge') : finished.value ? t('scan.done') : t('scan.eyebrow'),
+)
 const elapsed = computed(() => {
   if (!startedAt.value) return 0
   return ((finishedAt.value ?? now.value) - startedAt.value) / 1000
 })
+
 /** Newest first; identical findings (and notes with the same reason) collapse into one row with ×N. */
 const live = computed(() => groupFindings(scan.value?.findings ?? []).reverse())
 function liveTitle(g: FindingGroup) {
@@ -61,6 +70,19 @@ function liveTitle(g: FindingGroup) {
   const r = rowTitle(g.lead, lang)
   return { text: r.lang ? polish(r.text, r.lang) : r.text, lang: r.lang ?? undefined }
 }
+
+/** Status at a glance: one counter per outcome, counting up as findings stream in. */
+const COUNTED: { outcome: Outcome; shape: 'square' | 'diamond' | 'circle'; color: string }[] = [
+  { outcome: 'failed', shape: 'square', color: 'var(--klar-red)' },
+  { outcome: 'cantTell', shape: 'diamond', color: 'var(--amber)' },
+  { outcome: 'passed', shape: 'circle', color: 'var(--green)' },
+]
+const counts = computed(() => {
+  const by: Record<string, number> = {}
+  for (const f of scan.value?.findings ?? []) by[f.outcome] = (by[f.outcome] ?? 0) + 1
+  return COUNTED.map((c) => ({ ...c, n: by[c.outcome] ?? 0 }))
+})
+const fmt = (n: number) => formatNumber(Math.round(n))
 
 /** UX-6: a failed check says what happened in plain words; the raw text stays under Details. */
 const failure = computed<Problem | null>(() => {
@@ -105,6 +127,17 @@ function onProgress(data: ProgressStep | ProgressStep[]) {
   }
 }
 
+/**
+ * The check is complete: the primary action ("Open the report") rises in and takes the
+ * focus, unless the person is busy elsewhere on the page (then it waits for them).
+ */
+async function focusCta() {
+  await nextTick()
+  const a = document.activeElement
+  const idle = !a || a === document.body || a.id === 'main' || a.tagName === 'H1'
+  if (idle) cta.value?.querySelector<HTMLElement>('a')?.focus({ preventScroll: true })
+}
+
 async function finish(data: Partial<Scan>) {
   const s = scan.value
   if (!s) return
@@ -120,7 +153,7 @@ async function finish(data: Partial<Scan>) {
     return
   }
   announcement.value = t('scan.announce.done', { n: formatNumber(s.findings.length) })
-  navTimer = window.setTimeout(() => void router.replace({ name: 'report', params: { id: props.id } }), 1600)
+  void focusCta()
 }
 
 onMounted(async () => {
@@ -150,14 +183,16 @@ onMounted(async () => {
       // Maybe the check ended while the stream dropped: ask the server before showing an error.
       const fresh = await loadScan(props.id, true).catch(() => null)
       if (fresh && (fresh.state === 'done' || fresh.state === 'error')) void finish({ state: fresh.state })
-      else transportError.value = m
+      else {
+        transportError.value = m
+        finishedAt.value ??= Date.now()
+      }
     },
   })
 })
 
 onBeforeUnmount(() => {
   unsubscribe.value?.()
-  if (navTimer) window.clearTimeout(navTimer)
 })
 
 function reload() {
@@ -171,26 +206,51 @@ function reload() {
       <RouterLink class="btn btn--primary" :to="{ name: 'home' }">{{ t('report.newCheck') }}</RouterLink>
       <RouterLink class="btn btn--ghost" :to="{ name: 'home', hash: '#recent' }">{{ t('recent.title') }}</RouterLink>
     </ErrorState>
+    <!-- Nothing loaded and the server is not answering: the problem is the page, with one way forward. -->
+    <ErrorState
+      v-else-if="transportError !== null && !scan"
+      :title="t('offline.title')"
+      :body="unreachable ? t('offline.body') : t('start.network.body')"
+      :details="transportError"
+      :heading-level="1"
+      role="alert"
+    >
+      <button type="button" class="btn btn--primary" @click="reload">{{ t('common.retry') }}</button>
+      <RouterLink class="btn btn--ghost" :to="{ name: 'home' }">{{ t('report.newCheck') }}</RouterLink>
+    </ErrorState>
 
     <template v-else>
       <header class="scan__head">
-        <p class="eyebrow">{{ failedState ? t('scan.failedEyebrow') : finished ? t('scan.done') : t('scan.eyebrow') }}</p>
-        <h1 class="h1 scan__url" tabindex="-1">{{ headTitle }}</h1>
-        <p v-if="subUrl || head?.pasted" class="scan__sub">
-          <a v-if="subUrl && head?.url" :href="head.url" target="_blank" rel="noopener noreferrer" class="mono">
-            {{ subUrl }}<ExternalLink :size="13" aria-hidden="true" /><span class="sr-only"> {{ t('finding.newTab') }}</span>
-          </a>
-          <span v-else>{{ t('report.pastedHtml') }}</span>
-        </p>
-        <p class="scan__meta">
-          <SovereigntyBadge variant="inline" :health="health" :mode="scan?.mode" :model="scan?.model" />
-          <span aria-hidden="true">·</span>
-          <span>{{ prettyModel(scan?.model ?? health?.model) }}</span>
-          <span aria-hidden="true">·</span>
-          <span class="tabular mono scan__elapsed">
-            <span class="sr-only">{{ t('scan.elapsed') }}: </span>{{ formatNumber(elapsed, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) }} s
-          </span>
-        </p>
+        <div class="scan__title">
+          <p class="scan__status m-rise" :class="`is-${phase}`">
+            <span class="scan__mark" aria-hidden="true">
+              <svg v-if="phase === 'done'" viewBox="0 0 16 16" width="12" height="12" focusable="false">
+                <path class="m-draw" pathLength="1" d="M3.2 8.6 6.4 11.6 12.8 4.6" />
+              </svg>
+            </span>
+            <span>{{ statusText }}</span>{{ ' ' }}
+            <template v-if="startedAt">
+              <span class="scan__sep" aria-hidden="true">·</span>
+              <span class="tabular scan__elapsed"
+                ><span class="sr-only">{{ t('scan.elapsed') }}: </span>{{ formatNumber(elapsed, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) }} s</span
+              >
+            </template>
+          </p>
+          <h1 class="h1 scan__h1 m-rise" style="--i: 1" tabindex="-1">{{ headTitle }}</h1>
+          <p v-if="subUrl || subPasted" class="scan__sub m-rise" style="--i: 2">
+            <a v-if="subUrl && head?.url" :href="head.url" target="_blank" rel="noopener noreferrer" class="mono">
+              {{ subUrl }}<ExternalLink :size="13" aria-hidden="true" /><span class="sr-only"> {{ t('finding.newTab') }}</span>
+            </a>
+            <span v-else>{{ t('report.pastedHtml') }}</span>
+          </p>
+        </div>
+        <Transition name="fade-rise">
+          <div v-if="finished" ref="cta" class="scan__cta">
+            <RouterLink class="btn btn--primary scan__open" :to="{ name: 'report', params: { id } }">
+              {{ t('scan.openReport') }} <ArrowRight :size="18" aria-hidden="true" class="scan__open-arrow" />
+            </RouterLink>
+          </div>
+        </Transition>
       </header>
 
       <div v-if="failure && failureText" class="scan__error">
@@ -206,35 +266,46 @@ function reload() {
       </div>
 
       <div class="scan__grid">
-        <section class="scan__progress" aria-labelledby="scan-progress">
+        <section class="scan__progress m-rise" style="--i: 3" aria-labelledby="scan-progress">
           <h2 id="scan-progress" class="scan__h">{{ t('scan.progress') }}</h2>
           <ProgressStepper :steps="scan?.progress ?? []" :failed="failedState" :error-title="failureText?.title" />
-          <div v-if="finished" class="scan__done">
-            <RouterLink class="btn btn--primary" :to="{ name: 'report', params: { id } }">
-              {{ t('scan.openReport') }} <ArrowRight :size="18" aria-hidden="true" />
-            </RouterLink>
-          </div>
         </section>
 
         <!-- Hidden when a failed check found nothing: an empty "arriving" box would suggest work still going on. -->
-        <section v-if="!(failedState && !live.length)" class="scan__live" aria-labelledby="scan-live">
-          <div class="scan__live-head">
+        <section v-if="!(failedState && !live.length)" class="live m-rise" style="--i: 4" aria-labelledby="scan-live">
+          <div class="live__head">
             <h2 id="scan-live" class="scan__h">{{ t('scan.live') }}</h2>
-            <p class="scan__count tabular">{{ tp('scan.count', scan?.findings.length ?? 0) }}</p>
+            <ul class="live__counts" role="list">
+              <li v-for="c in counts" :key="c.outcome" class="live__count" :class="{ 'is-zero': !c.n }">
+                <ShapeIcon :shape="c.shape" :color="c.color" :size="9" />
+                <CountUp class="live__n" :value="c.n" :duration="560" :format="fmt" />{{ ' ' }}
+                <span class="live__label">{{ t(`outcome.${c.outcome}`) }}</span>
+              </li>
+            </ul>
           </div>
-          <p v-if="!live.length" class="scan__waiting">
-            <span class="scan__pulse" aria-hidden="true" />{{ t('scan.waiting') }}
-          </p>
-          <TransitionGroup v-else tag="ul" name="arrive" class="scan__list" role="list">
-            <li v-for="g in live" :key="g.key" class="scan__item">
-              <VerdictChip :outcome="g.lead.outcome" size="sm" />
-              <span class="scan__item-main">
-                <span class="scan__item-head">
-                  <CriterionTag :code="g.lead.criterion" :name="g.lead.criterion_name" />
-                  <span v-if="g.items.length > 1" class="scan__times tabular">×{{ g.items.length }}<span class="sr-only">, {{ tp('group.places', g.items.length) }}</span></span>
+
+          <div v-if="!live.length" class="live__waiting">
+            <p class="live__wait-text">{{ t('scan.waiting') }}</p>
+            <ul class="live__skel" role="list" aria-hidden="true">
+              <li v-for="n in 3" :key="n" class="live__skel-row">
+                <span class="skel live__skel-chip" />
+                <span class="live__skel-lines">
+                  <span class="skel live__skel-line" :style="{ width: `${[62, 78, 54][n - 1]}%` }" />
+                  <span class="skel live__skel-line live__skel-line--sm" :style="{ width: `${[38, 46, 30][n - 1]}%` }" />
                 </span>
-                <span class="scan__item-impact" :lang="liveTitle(g).lang">{{ liveTitle(g).text }}</span>
-                <span v-if="evidenceLine(g.lead)" class="scan__evidence mono muted" :lang="g.lead.content_lang ?? undefined" translate="no">{{ evidenceLine(g.lead) }}</span>
+              </li>
+            </ul>
+          </div>
+          <TransitionGroup v-else tag="ul" name="list" class="live__list" role="list">
+            <li v-for="g in live" :key="g.key" class="live__item">
+              <VerdictChip :outcome="g.lead.outcome" size="sm" />
+              <span class="live__main">
+                <span class="live__item-head">
+                  <CriterionTag :code="g.lead.criterion" :name="g.lead.criterion_name" />
+                  <span v-if="g.items.length > 1" class="live__times tabular">×{{ g.items.length }}<span class="sr-only">, {{ tp('group.places', g.items.length) }}</span></span>
+                </span>
+                <span class="live__impact" :lang="liveTitle(g).lang">{{ liveTitle(g).text }}</span>
+                <span v-if="evidenceLine(g.lead)" class="live__evidence mono" :lang="g.lead.content_lang ?? undefined" translate="no">{{ evidenceLine(g.lead) }}</span>
               </span>
             </li>
           </TransitionGroup>
@@ -248,16 +319,89 @@ function reload() {
 
 <style scoped>
 .scan {
-  padding-top: var(--s-8);
+  padding-top: clamp(var(--s-6), 5vw, var(--s-8));
+  padding-bottom: var(--s-8);
 }
+
+/* ---- Header: status, title, one address line; the primary action on completion ---- */
 .scan__head {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-3);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--s-5) var(--s-6);
   padding-bottom: var(--s-6);
   border-bottom: 1px solid var(--line);
 }
-.scan__url {
+.scan__title {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  min-width: 0;
+}
+.scan__status {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  min-height: 28px;
+  padding: 0 12px 0 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  font-size: var(--fs-14);
+  font-weight: 600;
+  color: var(--ink);
+}
+.scan__mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 12px;
+  height: 12px;
+}
+/* Running: a red square, breathing. Done: a green disc whose check draws itself. */
+.is-running .scan__mark::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: var(--klar-red);
+  animation: klar-pulse 1.2s ease-in-out infinite;
+}
+.is-failed .scan__mark::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: var(--klar-red);
+}
+.is-done .scan__mark {
+  border-radius: 50%;
+  background: var(--green);
+  animation: scan-pop var(--dur-3) var(--ease-spring) both;
+}
+.is-done .scan__mark svg {
+  fill: none;
+  stroke: var(--surface);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.is-done .scan__mark .m-draw {
+  animation-delay: 120ms;
+}
+@keyframes scan-pop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+}
+.scan__sep {
+  color: var(--muted);
+}
+.scan__elapsed {
+  font-weight: 500;
+  color: var(--muted);
+}
+.scan__h1 {
   overflow-wrap: anywhere;
 }
 .scan__sub {
@@ -274,37 +418,30 @@ function reload() {
 .scan__sub a:hover {
   color: var(--ink);
 }
-.scan__evidence {
-  display: block;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font-size: var(--fs-12);
+.scan__cta {
+  justify-self: end;
 }
-.scan__meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 10px;
-  font-size: var(--fs-14);
-  color: var(--muted);
+.scan__open {
+  --btn-h: 52px;
+  gap: 10px;
+  padding: 0 20px 0 24px;
+  border-radius: 12px;
+  font-size: var(--fs-16);
+  box-shadow: var(--shadow-lift);
 }
-.scan__meta :deep(strong) {
-  color: var(--ink);
+.scan__open-arrow {
+  transition: transform var(--dur-2) var(--ease-out);
 }
-.scan__elapsed {
-  color: var(--ink);
-}
-.scan__note {
-  margin-top: var(--s-5);
-  padding: var(--s-3) var(--s-4);
-  background: var(--amber-tint);
-  border-radius: var(--r-control);
-  font-size: var(--fs-14);
+@media (hover: hover) {
+  .scan__open:hover .scan__open-arrow {
+    transform: translateX(3px);
+  }
 }
 .scan__error {
   margin-top: var(--s-5);
 }
+
+/* ---- Body ---- */
 .scan__grid {
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
@@ -312,18 +449,110 @@ function reload() {
   padding-top: var(--s-6);
 }
 .scan__h {
-  margin-bottom: var(--s-5);
   font-size: var(--fs-16);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.scan__progress .scan__h {
+  margin-bottom: var(--s-5);
+}
+
+/* ---- Live findings ---- */
+.live__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-2) var(--s-4);
+  margin-bottom: var(--s-4);
+}
+.live__counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-4);
+  margin: 0;
+  padding: 0;
+}
+.live__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-14);
+  color: var(--muted);
+}
+.live__n {
   font-weight: 700;
   color: var(--ink);
 }
-.scan__item-head {
+.live__count.is-zero .live__n {
+  color: var(--muted);
+}
+.live__waiting {
+  border-top: 1px solid var(--line);
+}
+.live__wait-text {
+  padding: var(--s-4) 0 var(--s-2);
+  font-size: var(--fs-14);
+  color: var(--muted);
+}
+.live__skel {
+  margin: 0;
+  padding: 0;
+}
+.live__skel-row {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: var(--s-4);
+  padding: 14px 0;
+}
+.live__skel-chip {
+  width: 76px;
+  height: 22px;
+  border-radius: var(--r-pill);
+}
+.live__skel-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.live__skel-line {
+  height: 14px;
+}
+.live__skel-line--sm {
+  height: 10px;
+}
+.live__list {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.live__item {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: var(--s-4);
+  align-items: start;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+.live__item > .verdict {
+  justify-self: start;
+}
+.live__main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.live__item-head {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 8px;
 }
-.scan__times {
+.live__times {
   padding: 0 7px;
   border-radius: var(--r-pill);
   background: var(--ink);
@@ -332,83 +561,51 @@ function reload() {
   font-weight: 700;
   line-height: 18px;
 }
-.scan__done {
-  margin-top: var(--s-6);
-  animation: klar-fade-up var(--dur-3) var(--ease);
-}
-.scan__live-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--s-3);
-}
-.scan__count {
-  font-size: var(--fs-14);
-  color: var(--muted);
-}
-.scan__waiting {
-  display: flex;
-  align-items: center;
-  gap: var(--s-3);
-  padding: var(--s-6) var(--s-5);
-  border: 1px dashed var(--control-border);
-  border-radius: var(--r-card);
-  color: var(--muted);
-}
-.scan__pulse {
-  width: 10px;
-  height: 10px;
-  background: var(--klar-red);
-  animation: klar-pulse 1.2s ease-in-out infinite;
-  flex: none;
-}
-.scan__list {
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--line);
-}
-.scan__item {
-  display: grid;
-  grid-template-columns: 9.5rem minmax(0, 1fr);
-  gap: var(--s-4);
-  align-items: start;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--line);
-}
-.scan__item > .verdict {
-  justify-self: start;
-}
-.scan__item-main {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-.scan__item-impact {
+.live__impact {
   font-size: var(--fs-14);
   color: var(--ink);
 }
-.arrive-enter-active {
-  transition: opacity var(--dur-3) var(--ease), transform var(--dur-3) var(--ease), background-color 1.2s var(--ease);
+.live__evidence {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: var(--fs-12);
+  color: var(--muted);
 }
-.arrive-enter-from {
-  opacity: 0;
-  transform: translateY(-6px);
-  background-color: var(--surface-2);
-}
-.arrive-move {
-  transition: transform var(--dur-2) var(--ease);
-}
+
 @media (max-width: 900px) {
   .scan__grid {
     grid-template-columns: 1fr;
     gap: var(--s-7);
   }
 }
+@media (max-width: 640px) {
+  .scan__head {
+    grid-template-columns: 1fr;
+  }
+  .scan__cta {
+    justify-self: stretch;
+  }
+  .scan__open {
+    width: 100%;
+  }
+}
 @media (max-width: 560px) {
-  .scan__item {
+  .live__item,
+  .live__skel-row {
     grid-template-columns: 1fr;
     gap: var(--s-2);
+  }
+}
+@media (forced-colors: active) {
+  .is-running .scan__mark::before,
+  .is-failed .scan__mark::before,
+  .is-done .scan__mark {
+    background: CanvasText;
+  }
+  .is-done .scan__mark svg {
+    stroke: Canvas;
   }
 }
 </style>

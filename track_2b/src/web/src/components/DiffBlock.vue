@@ -41,6 +41,7 @@ async function copy() {
         <component :is="copied ? Check : Copy" :size="14" aria-hidden="true" />
         {{ copied ? t('diff.copied') : t('diff.copy') }}
       </button>
+      <span class="sr-only" role="status">{{ copied ? t('diff.copied') : '' }}</span>
     </figcaption>
     <div class="diff__body" :lang="contentLang" translate="no" :tabindex="bare ? undefined : 0" :role="bare ? undefined : 'region'" :aria-label="bare ? undefined : t('diff.label')">
       <template v-for="(l, i) in parsed.lines" :key="i">

@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { nextTick, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, START_LOCATION } from 'vue-router'
 import { t } from '@/i18n'
 import { health, modalOpen, shortcutsDialogOpen } from '@/stores/app'
 import { useShortcuts } from '@/composables/useShortcuts'
@@ -20,24 +19,46 @@ function skipToMain() {
   main?.scrollIntoView()
 }
 
-/** After navigation, move focus to the new page's heading (announced by screen readers). */
-let first = true
-watch(
-  () => route.path,
-  async () => {
-    if (first) {
-      first = false
-      return
-    }
-    await nextTick()
-    await nextTick()
-    const h1 = document.querySelector<HTMLElement>('#main h1')
-    if (h1) {
-      if (!h1.hasAttribute('tabindex')) h1.setAttribute('tabindex', '-1')
-      h1.focus({ preventScroll: true })
-    }
-  },
-)
+/**
+ * After navigation, move focus to the new page's heading (announced by screen readers).
+ * Pages swap with an out-in transition, so the new heading exists only once the new page
+ * has entered: `onPageEnter` focuses it. When the page component is reused (same key,
+ * no transition), the afterEach hook does it after the next render.
+ */
+let pending = false
+
+function focusHeading() {
+  pending = false
+  const h1 = document.querySelector<HTMLElement>('#main h1')
+  if (!h1) return
+  if (!h1.hasAttribute('tabindex')) h1.setAttribute('tabindex', '-1')
+  h1.focus({ preventScroll: true })
+}
+
+router.afterEach((to, from, failure) => {
+  // Not on first load, not for query or hash changes on the same page.
+  if (failure || from === START_LOCATION || to.path === from.path) return
+  pending = true
+  // Reused component: no enter hook will run. Two frames cover the render.
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      if (pending && !document.querySelector('#main .page-leave-active, #main .page-enter-active')) focusHeading()
+    }),
+  )
+})
+
+/**
+ * The old page has faded out. Announced so that router.ts can scroll only now, instead of
+ * jumping the outgoing page to the top while it fades (see scrollBehavior).
+ */
+function onPageLeft() {
+  window.dispatchEvent(new Event('klar:page-left'))
+}
+
+/** On insert, and once more after the enter animation for headings that render a tick late. */
+function onPageEnter() {
+  if (pending && document.querySelector('#main h1')) focusHeading()
+}
 
 useShortcuts({
   '?': (e) => {
@@ -65,7 +86,9 @@ useShortcuts({
     </div>
     <!-- Remount when the scan id changes (e.g. "Run the check again" from a scan page). -->
     <RouterView v-slot="{ Component, route: r }">
-      <component :is="Component" :key="`${String(r.name)}:${String(r.params.id ?? '')}`" />
+      <Transition name="page" mode="out-in" @after-leave="onPageLeft" @enter="onPageEnter" @after-enter="onPageEnter">
+        <component :is="Component" :key="`${String(r.name)}:${String(r.params.id ?? '')}`" />
+      </Transition>
     </RouterView>
   </main>
   <AppFooter :inert="modalOpen || undefined" />
@@ -74,9 +97,16 @@ useShortcuts({
 </template>
 
 <style>
+/* Footer stays at the bottom of short pages. */
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
 #main {
   display: block;
-  min-height: calc(100vh - var(--header-h) - 200px);
+  flex: 1 0 auto;
 }
 #main:focus {
   outline: none;

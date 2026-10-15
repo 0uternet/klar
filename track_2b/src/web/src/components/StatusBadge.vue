@@ -1,17 +1,19 @@
 <script setup lang="ts">
-import { Check, Circle, X } from '@lucide/vue'
 import type { Status } from '@/types'
 import { t } from '@/i18n'
 
-defineProps<{ status: Status }>()
+/** A person's decision: icon + word, never colour alone. The check draws itself when it appears. */
+withDefaults(defineProps<{ status: Status; compact?: boolean }>(), { compact: false })
 </script>
 
 <template>
-  <span class="status" :class="`status--${status}`">
-    <Check v-if="status === 'accepted'" :size="14" :stroke-width="3" aria-hidden="true" />
-    <X v-else-if="status === 'rejected'" :size="14" :stroke-width="3" aria-hidden="true" />
-    <Circle v-else :size="12" :stroke-width="2.5" aria-hidden="true" />
-    {{ t(`status.${status}`) }}
+  <span class="status" :class="[`status--${status}`, { 'status--compact': compact }]">
+    <svg class="status__icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
+      <path v-if="status === 'accepted'" class="m-draw" pathLength="1" d="M3.2 8.4l3.1 3.1 6.5-6.9" />
+      <path v-else-if="status === 'rejected'" class="m-draw" pathLength="1" d="M4.2 4.2l7.6 7.6M11.8 4.2l-7.6 7.6" />
+      <circle v-else cx="8" cy="8" r="5" />
+    </svg>
+    <span :class="{ 'sr-only': compact }">{{ t(`status.${status}`) }}</span>
   </span>
 </template>
 
@@ -21,15 +23,26 @@ defineProps<{ status: Status }>()
   align-items: center;
   gap: 6px;
   font-size: var(--fs-14);
-  font-weight: 500;
+  font-weight: 550;
   white-space: nowrap;
   color: var(--muted);
 }
+.status__icon {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.status--to_review .status__icon {
+  stroke-width: 1.8;
+}
 .status--accepted {
   color: var(--green);
-  font-weight: 600;
+  font-weight: 650;
 }
-.status--rejected {
-  color: var(--muted);
+.status--accepted .status__icon {
+  stroke-width: 2.8;
 }
 </style>

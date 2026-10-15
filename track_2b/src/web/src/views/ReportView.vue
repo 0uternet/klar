@@ -1,38 +1,34 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ArrowRight, ChevronDown, ExternalLink, Info, Plus, Search, X } from '@lucide/vue'
-import type { Finding, Outcome, Scan, Source, Status } from '@/types'
-import { OUTCOMES, SOURCES, STATUSES } from '@/types'
+import { ArrowRight } from '@lucide/vue'
+import type { Finding, Outcome, Scan, Status } from '@/types'
 import { api, ApiError } from '@/api'
 import { compareSections, groupFindings, reviewProgress, toReview, type FindingGroup } from '@/lib/group'
-import { formatDate, formatNumber, languageName, locale, t, tp, type MessageKey } from '@/i18n'
+import { formatNumber, locale, t, type MessageKey } from '@/i18n'
 import { CRITERIA, compareCodes, plainName } from '@/data/wcag'
 import { checkedCount, loadCriteria, needsPerson } from '@/stores/criteria'
 import { DEMO_URL, isDemoUrl } from '@/config'
-import { ensureBooted, health, lastScanId, modalOpen, unreachable } from '@/stores/app'
+import { ensureBooted, lastScanId, modalOpen, unreachable } from '@/stores/app'
 import { loadScan, scans, setStatus } from '@/stores/scans'
 import { toast } from '@/stores/toast'
-import { pageCount, prettyModel, scanTitle } from '@/lib/format'
+import { pageCount, scanTitle } from '@/lib/format'
 import { leftNetwork } from '@/lib/sovereignty'
+import { reducedMotion } from '@/lib/motion'
 import { classifyHttpStatus, classifyScanError, hostOf, renderProblem, type Problem, type ProblemAction } from '@/lib/errors'
 import { apertusAnswers, runNotes } from '@/lib/notes'
 import { rowTitle } from '@/lib/finding-text'
 import { useShortcuts } from '@/composables/useShortcuts'
 import { useDocumentTitle } from '@/composables/useDocumentTitle'
 import { useRerun } from '@/composables/useRerun'
-import VerdictChip from '@/components/VerdictChip.vue'
-import CriterionTag from '@/components/CriterionTag.vue'
 import CoverageMap from '@/components/CoverageMap.vue'
-import FindingCard from '@/components/FindingCard.vue'
 import FindingDetail from '@/components/FindingDetail.vue'
-import ExportMenu from '@/components/ExportMenu.vue'
-import SovereigntyBadge from '@/components/SovereigntyBadge.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import ErrorState from '@/components/ErrorState.vue'
-import RunNotes from '@/components/RunNotes.vue'
-import ShapeIcon from '@/components/ShapeIcon.vue'
-import KeyboardHint from '@/components/KeyboardHint.vue'
+import ReportHeader from '@/components/report/ReportHeader.vue'
+import ReportStats from '@/components/report/ReportStats.vue'
+import FindingsToolbar from '@/components/report/FindingsToolbar.vue'
+import FindingSection from '@/components/report/FindingSection.vue'
 
 const props = defineProps<{ id: string }>()
 const route = useRoute()
@@ -44,10 +40,10 @@ const loading = ref(true)
 const notFound = ref(false)
 const loadError = ref<string | null>(null)
 
-/** H1 = the page title, the URL as a linked subline (UX-11). */
+/** H1 = the page title, the URL as a linked fact under it (UX-11). */
 const head = computed(() => (scan.value ? scanTitle(scan.value) : null))
 const headTitle = computed(() => head.value?.title ?? t('report.pastedHtml'))
-/** The linked address under the H1, unless the H1 already is that address. */
+/** The address shown under the H1, unless the H1 already is that address. */
 const subUrl = computed(() => {
   const h = head.value
   if (!h?.url) return null
@@ -78,7 +74,7 @@ onMounted(async () => {
 /* ---- Derived data ---------------------------------------------------- */
 
 const findings = computed(() => scan.value?.findings ?? [])
-/** N of "pre-checks N of 50": what this scan actually checked (stats.criteria_checked). */
+/** N of "pre-check of N of 50": what this scan actually checked (stats.criteria_checked). */
 const prechecked = computed(() => checkedCount(scan.value))
 const humanCount = computed(() => CRITERIA.filter((c) => needsPerson(c.code, scan.value)).length)
 const multiPage = computed(() => pageCount(findings.value) > 1)
@@ -90,6 +86,10 @@ const counts = computed(() => {
 })
 /** UX-4: the review scope is Failed + Needs review; passed rows never need a decision. */
 const progress = computed(() => reviewProgress(findings.value))
+const remaining = computed(() => progress.value.total - progress.value.done)
+/** Who pre-checked the review scope: code (rules and patterns) or Apertus. */
+const byApertus = computed(() => findings.value.filter((f) => toReview(f) && f.source === 'apertus').length)
+const byCode = computed(() => progress.value.total - byApertus.value)
 const seconds = computed(() => {
   const s = scan.value?.stats?.seconds
   if (typeof s === 'number') return s
@@ -108,8 +108,6 @@ const tokens = computed(() => {
 /* ---- Problems and run notes (UX-2, UX-6, UX-23) ------------------------------- */
 
 const notes = computed(() => (scan.value ? runNotes(scan.value, findings.value, isDemoUrl(scan.value.url)) : []))
-const shownNotes = computed(() => notes.value.slice(0, 3))
-const moreNotes = computed(() => notes.value.slice(3))
 
 /** M30: a report of a failed check says why, and that the results are partial. */
 const failure = computed<Problem | null>(() =>
@@ -146,15 +144,19 @@ function checkDemo() {
 
 /* ---- Filters --------------------------------------------------------- */
 
-const filters = reactive({ outcome: '' as Outcome | '', criterion: '', source: '' as Source | '', status: '' as Status | '', q: '', reason: '' })
-const hasFilters = computed(() => !!(filters.outcome || filters.criterion || filters.source || filters.status || filters.q || filters.reason))
+type By = '' | 'code' | 'apertus'
+const filters = reactive({ outcome: '' as Outcome | '', criterion: '', by: '' as By, status: '' as Status | '', q: '', reason: '' })
+const hasFilters = computed(() => !!(filters.outcome || filters.criterion || filters.by || filters.status || filters.q || filters.reason))
 function resetFilters() {
-  Object.assign(filters, { outcome: '', criterion: '', source: '', status: '', q: '', reason: '' })
+  Object.assign(filters, { outcome: '', criterion: '', by: '', status: '', q: '', reason: '' })
+}
+function toFindings() {
+  void nextTick(() => document.getElementById('rep-findings')?.scrollIntoView({ block: 'start' }))
 }
 function filterReason(code: string) {
   resetFilters()
   filters.reason = code
-  void nextTick(() => document.getElementById('rep-findings')?.scrollIntoView({ block: 'start' }))
+  toFindings()
 }
 
 const criteriaPresent = computed(() => Array.from(new Set(findings.value.map((f) => f.criterion))).sort(compareCodes))
@@ -166,7 +168,7 @@ const filtered = computed(() => {
   return findings.value.filter((f) => {
     if (filters.outcome && f.outcome !== filters.outcome) return false
     if (filters.criterion && f.criterion !== filters.criterion) return false
-    if (filters.source && f.source !== filters.source) return false
+    if (filters.by && (f.source === 'apertus') !== (filters.by === 'apertus')) return false
     if (filters.status && f.status !== filters.status) return false
     if (filters.reason && f.reason_code !== filters.reason) return false
     if (q) {
@@ -181,7 +183,7 @@ const filtered = computed(() => {
 
 /**
  * Criterion sections (UX-4): most failures first. Each holds its rows to review;
- * passed and not-applicable rows collapse into "{n} checked, no problem found".
+ * passed and not-applicable rows fold into "{n} with no problem".
  */
 const showAllOk = ref(false)
 const openOk = reactive(new Set<string>())
@@ -191,6 +193,21 @@ function toggleOk(code: string) {
   if (openOk.has(code)) openOk.delete(code)
   else openOk.add(code)
 }
+
+/**
+ * Section order comes from the whole report, not from the filtered list, so sections stay
+ * put while filters change and while rows are decided (no jumps under the reviewer's eyes).
+ */
+const sectionRank = computed(() => {
+  const m = new Map<string, { failed: number; cantTell: number }>()
+  for (const f of findings.value) {
+    const r = m.get(f.criterion) ?? { failed: 0, cantTell: 0 }
+    if (f.outcome === 'failed') r.failed++
+    else if (f.outcome === 'cantTell') r.cantTell++
+    m.set(f.criterion, r)
+  }
+  return m
+})
 
 const sections = computed(() => {
   const map = new Map<string, Finding[]>()
@@ -207,8 +224,8 @@ const sections = computed(() => {
       return {
         code,
         name: items[0]!.criterion_name,
-        failed: items.filter((f) => f.outcome === 'failed').length,
-        cantTell: items.filter((f) => f.outcome === 'cantTell').length,
+        failed: sectionRank.value.get(code)?.failed ?? 0,
+        cantTell: sectionRank.value.get(code)?.cantTell ?? 0,
         reviewRows: groupFindings(review),
         okRows: groupFindings(ok),
         okCount: ok.length,
@@ -220,35 +237,36 @@ const sections = computed(() => {
 const ordered = computed<FindingGroup[]>(() => sections.value.flatMap((s) => [...s.reviewRows, ...(okVisible(s.code) ? s.okRows : [])]))
 const reviewRows = computed(() => ordered.value.filter((r) => toReview(r.lead)))
 const rowOf = (id: string | null) => (id ? (ordered.value.find((r) => r.items.some((f) => f.id === id)) ?? null) : null)
+const rowByKey = (key: string) => ordered.value.find((r) => r.key === key) ?? null
 const visibleCount = computed(() => ordered.value.reduce((n, r) => n + r.items.length, 0))
 
 function toggleOutcome(o: Outcome) {
   filters.outcome = filters.outcome === o ? '' : o
 }
+function toggleBy(b: Exclude<By, ''>) {
+  filters.by = filters.by === b ? '' : b
+}
 function selectCriterion(code: string) {
   filters.criterion = filters.criterion === code ? '' : code
-  void nextTick(() => document.getElementById('rep-findings')?.scrollIntoView({ block: 'start' }))
+  toFindings()
 }
 function showPassed() {
   showAllOk.value = true
-  void nextTick(() => document.getElementById('rep-findings')?.scrollIntoView({ block: 'start' }))
+  toFindings()
 }
 
 /* ---- Selection & detail panel ----------------------------------------- */
 
 const selectedId = ref<string | null>(typeof route.query.f === 'string' ? route.query.f : null)
 const selectedRow = computed(() => rowOf(selectedId.value))
+/** While a decision settles, the panel keeps showing the row even if a filter has just hidden it. */
+const pinned = shallowRef<FindingGroup | null>(null)
+const panelRow = computed(() => selectedRow.value ?? (pinned.value?.items.some((f) => f.id === selectedId.value) ? pinned.value : null))
 /** The finding shown in the panel: the lead of its row (a deep link may point at any item). */
-const selected = computed(() => selectedRow.value?.lead ?? findings.value.find((f) => f.id === selectedId.value) ?? null)
+const selected = computed(() => panelRow.value?.lead ?? findings.value.find((f) => f.id === selectedId.value) ?? null)
 const selectedIndex = computed(() => (selectedRow.value ? ordered.value.indexOf(selectedRow.value) : -1))
-/** "3 of 35 to review" for rows in the review scope; "{i} of {n}" for an opened passed row. */
-const positionLabel = computed(() => {
-  const row = selectedRow.value
-  if (!row || !toReview(row.lead)) return undefined
-  return t('report.toReviewPos', { i: formatNumber(reviewRows.value.indexOf(row) + 1), n: formatNumber(reviewRows.value.length) })
-})
 const busy = ref(false)
-const searchInput = ref<HTMLInputElement | null>(null)
+const toolbar = ref<InstanceType<typeof FindingsToolbar> | null>(null)
 
 const docked = ref(false)
 const mq = window.matchMedia('(min-width: 1280px)')
@@ -278,6 +296,12 @@ function rowFor(id: string): HTMLElement | null {
   return document.querySelector<HTMLElement>(`[data-finding="${CSS.escape(id)}"]`)
 }
 
+function select(f: Finding) {
+  selectedId.value = f.id
+  void nextTick(() => rowFor(f.id)?.scrollIntoView({ block: 'nearest' }))
+  void focusPanelHeading()
+}
+
 function open(f: Finding) {
   selectedId.value = f.id
   void focusPanelHeading()
@@ -286,7 +310,7 @@ function open(f: Finding) {
 function close() {
   const id = selectedId.value
   selectedId.value = null
-  if (id) void nextTick(() => rowFor(id)?.focus())
+  if (id) void nextTick(() => (rowFor(id) ?? document.getElementById('rep-findings'))?.focus())
 }
 
 function move(delta: number) {
@@ -294,51 +318,102 @@ function move(delta: number) {
   if (!list.length) return
   const i = selectedIndex.value
   const next = i < 0 ? (delta > 0 ? 0 : list.length - 1) : Math.max(0, Math.min(list.length - 1, i + delta))
-  const f = list[next]!.lead
-  selectedId.value = f.id
-  void nextTick(() => rowFor(f.id)?.scrollIntoView({ block: 'nearest' }))
-  void focusPanelHeading()
+  select(list[next]!.lead)
 }
 
-/** A decision on a row applies to every identical finding in it. */
-async function decide(status: 'accepted' | 'rejected') {
-  const row = selectedRow.value
+/** The page's primary action: open the first row in the list that still needs a decision. */
+async function startReview() {
+  let row = reviewRows.value.find((r) => r.items.some((x) => x.status === 'to_review'))
+  if (!row && hasFilters.value) {
+    resetFilters()
+    await nextTick()
+    row = reviewRows.value.find((r) => r.items.some((x) => x.status === 'to_review'))
+  }
+  if (row) select(row.lead)
+}
+const ctaLabel = computed(() => (remaining.value === 0 ? null : progress.value.done ? t('report.continue') : t('report.start')))
+
+/**
+ * Focus is never lost: when the focused row (or one of its buttons) has just left the
+ * filtered list, focus moves to the row now in its place, else to the list heading.
+ */
+function rescueFocus(at: number) {
+  const el = document.activeElement as HTMLElement | null
+  const rowEl = el?.closest<HTMLElement>('[data-row]')
+  const stale = !el || el === document.body || !el.isConnected || (!!rowEl && !rowByKey(rowEl.dataset.row ?? ''))
+  if (!stale) return
+  const list = ordered.value
+  const target = list[Math.min(Math.max(at, 0), list.length - 1)]
+  const next = target ? rowFor(target.lead.id) : null
+  ;(next ?? document.getElementById('rep-findings'))?.focus()
+}
+
+const wait = (ms: number) => new Promise<void>((r) => window.setTimeout(r, ms))
+/** Time for the check to draw itself before the panel moves on (none with reduced motion). */
+const BEAT = 280
+
+/**
+ * A decision on a row applies to every identical finding in it. From the panel, the
+ * triage flow moves on to the next row that still needs a decision; from the list, the
+ * focus stays in the list.
+ */
+async function decide(status: 'accepted' | 'rejected', row: FindingGroup | null = panelRow.value, from: 'panel' | 'list' = 'panel') {
   if (!row || busy.value) return
   busy.value = true
+  const at = ordered.value.findIndex((r) => r.key === row.key)
+  const after = [...ordered.value.slice(at + 1), ...ordered.value.slice(0, Math.max(at, 0))].filter((r) => toReview(r.lead)).map((r) => r.key)
+  if (from === 'panel') pinned.value = row
   try {
-    await Promise.all(row.items.map((f) => setStatus(f, status)))
+    const saving = Promise.all(row.items.map((f) => setStatus(f, status)))
+    await nextTick()
+    if (from === 'list') rescueFocus(at)
+    await Promise.all([saving, from === 'panel' && !reducedMotion() ? wait(BEAT) : null])
     const code = row.items.length > 1 ? `${row.lead.criterion} ×${row.items.length}` : row.lead.criterion
     toast(t(status === 'accepted' ? 'finding.accepted' : 'finding.rejected', { code }), status === 'accepted' ? 'success' : 'neutral', 3800, 'decision')
-    // Triage flow: jump to the next row in the review scope that still needs a decision.
-    const list = reviewRows.value
-    const from = list.indexOf(row)
-    const rest = from >= 0 ? [...list.slice(from + 1), ...list.slice(0, from)] : list
-    const nextOpen = rest.find((r) => r.items.some((x) => x.status === 'to_review'))
-    if (nextOpen) {
-      selectedId.value = nextOpen.lead.id
-      void nextTick(() => rowFor(nextOpen.lead.id)?.scrollIntoView({ block: 'nearest' }))
-      void focusPanelHeading()
-    } else if (allReviewed.value) {
-      selectedId.value = null
-      void nextTick(() => {
-        const h = document.getElementById('review-done')
-        h?.scrollIntoView({ block: 'center' })
-        h?.focus({ preventScroll: true })
-      })
-    }
+    if (from === 'panel') advance(row, at, after)
+    else rescueFocus(at)
   } catch {
-    toast(t('finding.saveError'), 'danger', 3800, 'decision', { label: t('toast.retry'), run: () => void decide(status) })
+    toast(t('finding.saveError'), 'danger', 3800, 'decision', { label: t('toast.retry'), run: () => void decide(status, row, from) })
   } finally {
+    pinned.value = null
     busy.value = false
   }
 }
 
-/** Per-place override inside an expanded row. */
+/** Triage flow: the next row that still needs a decision, else what comes next on the page. */
+function advance(row: FindingGroup, at: number, after: string[]) {
+  const next = after.map(rowByKey).find((r) => r?.items.some((x) => x.status === 'to_review'))
+  if (next) {
+    select(next.lead)
+  } else if (allReviewed.value) {
+    selectedId.value = null
+    void nextTick(() => {
+      const h = document.getElementById('review-done')
+      h?.scrollIntoView({ block: 'center' })
+      h?.focus({ preventScroll: true })
+    })
+  } else if (!rowByKey(row.key)) {
+    // The decided row left the filtered list and nothing else here needs a decision.
+    const list = ordered.value
+    const fallback = list[Math.min(at, list.length - 1)]
+    if (fallback) select(fallback.lead)
+    else {
+      selectedId.value = null
+      void nextTick(() => document.getElementById('rep-findings')?.focus())
+    }
+  }
+}
+
+/** Per-place override inside a grouped row (finding panel). */
 async function decideOne(f: Finding, status: 'accepted' | 'rejected') {
   if (busy.value) return
   busy.value = true
   try {
-    await setStatus(f, status)
+    const saving = setStatus(f, status)
+    await nextTick()
+    const el = document.activeElement
+    if (!el || el === document.body || !el.isConnected) void focusPanelHeading()
+    await saving
   } catch {
     toast(t('finding.saveError'), 'danger', 3800, 'decision', { label: t('toast.retry'), run: () => void decideOne(f, status) })
   } finally {
@@ -363,10 +438,26 @@ async function exportReport() {
 /**
  * WCAG 2.1.4: J, K, A, R act only while focus is in the findings list or the
  * finding panel (and never while typing; useShortcuts also lets users turn them off).
+ * A and R decide the row that has focus, else the row open in the panel.
  */
 function inFindings(): boolean {
   const el = document.activeElement
   return !!el && !!(el.closest('#findings') || el.closest('#finding-panel'))
+}
+function focusedRow(): FindingGroup | null {
+  const key = (document.activeElement as HTMLElement | null)?.closest<HTMLElement>('[data-row]')?.dataset.row
+  return key ? rowByKey(key) : null
+}
+function shortcutDecide(e: KeyboardEvent, status: 'accepted' | 'rejected') {
+  if (!inFindings()) return
+  const row = focusedRow()
+  if (row) {
+    e.preventDefault()
+    void decide(status, row, 'list')
+  } else if (selected.value) {
+    e.preventDefault()
+    void decide(status)
+  }
 }
 
 useShortcuts({
@@ -380,19 +471,11 @@ useShortcuts({
     e.preventDefault()
     move(-1)
   },
-  a: (e) => {
-    if (!selected.value || !inFindings()) return
-    e.preventDefault()
-    void decide('accepted')
-  },
-  r: (e) => {
-    if (!selected.value || !inFindings()) return
-    e.preventDefault()
-    void decide('rejected')
-  },
+  a: (e) => shortcutDecide(e, 'accepted'),
+  r: (e) => shortcutDecide(e, 'rejected'),
   '/': (e) => {
     e.preventDefault()
-    searchInput.value?.focus()
+    toolbar.value?.focusSearch()
   },
   Escape: () => {
     if (selected.value && !document.querySelector('dialog[open]')) close()
@@ -414,7 +497,7 @@ function trapTab(e: KeyboardEvent) {
   const panel = e.currentTarget as HTMLElement
   const items = Array.from(
     panel.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input, select, textarea, summary, [tabindex]:not([tabindex="-1"])'),
-  ).filter((el) => el.offsetParent !== null || el === document.activeElement)
+  ).filter((el) => (el.offsetParent !== null || el === document.activeElement) && !el.closest('[inert]'))
   if (!items.length) return
   const first = items[0]!
   const last = items[items.length - 1]!
@@ -432,7 +515,11 @@ function trapTab(e: KeyboardEvent) {
   <div class="rep" :class="{ 'rep--docked': panelOpen && docked }">
     <div class="rep__content" :inert="overlay || undefined">
       <div v-if="loading && !scan" class="container rep__loading" role="status">
-        <span class="rep__pulse" aria-hidden="true" />{{ t('report.loading') }}
+        <span class="sr-only">{{ t('report.loading') }}</span>
+        <span class="skel rep__skel rep__skel--h1" aria-hidden="true" />
+        <span class="skel rep__skel rep__skel--line" aria-hidden="true" />
+        <span class="skel rep__skel rep__skel--band" aria-hidden="true" />
+        <span v-for="i in 5" :key="i" class="skel rep__skel rep__skel--row" aria-hidden="true" />
       </div>
 
       <div v-else-if="notFound || loadError" class="container rep__state">
@@ -449,73 +536,26 @@ function trapTab(e: KeyboardEvent) {
       </div>
 
       <template v-else-if="scan && head">
-        <!-- Header: title, one line of facts, the rest under "Run details" (UX-11, UX-12) -->
-        <header class="container rep__head">
-          <div class="rep__top">
-            <div class="rep__title">
-              <p class="eyebrow">{{ t('report.eyebrow') }} · <span class="tabular">{{ formatDate(scan.created_at) }}</span></p>
-              <h1 class="h1 rep__h1" tabindex="-1">{{ headTitle }}</h1>
-              <p v-if="subUrl || head.pasted" class="rep__sub">
-                <a v-if="subUrl && head.url" :href="head.url" target="_blank" rel="noopener noreferrer" class="rep__url mono">
-                  {{ subUrl }}<ExternalLink :size="13" aria-hidden="true" /><span class="sr-only"> {{ t('finding.newTab') }}</span>
-                </a>
-                <span v-else>{{ t('report.pastedHtml') }}</span>
-              </p>
-            </div>
-            <div class="rep__actions">
-              <RouterLink class="btn btn--ghost" :to="{ name: 'home' }"><Plus :size="16" aria-hidden="true" />{{ t('report.newCheck') }}</RouterLink>
-              <ExportMenu :scan="scan" />
-            </div>
-          </div>
-
-          <p v-if="langDiffers" class="rep__lang" role="note">
-            <span>{{ t('notes.lang', { scanLang: languageName(scan.ui_lang) }) }}</span>
-            <button v-if="head.url" type="button" class="btn btn--ghost btn--sm" :disabled="rerunning" @click="rerun(scan, locale)">
-              {{ t('notes.rerunIn', { uiLang: languageName(locale) }) }}
-            </button>
-          </p>
-
-          <div class="rep__metaline">
-            <SovereigntyBadge variant="inline" :health="health" :mode="scan.mode" :model="scan.model" />
-            <span aria-hidden="true">·</span>
-            <span>{{ prettyModel(scan.model) }}</span>
-            <span aria-hidden="true">·</span>
-            <span class="tabular">{{ t('report.seconds', { n: formatNumber(seconds, { maximumFractionDigits: 1 }) }) }}</span>
-            <span aria-hidden="true">·</span>
-            <span class="tabular">{{ left === null ? t('report.leftUnknown') : tp('report.left', left) }}</span>
-          </div>
-
-          <details class="rep__details">
-            <summary>{{ t('report.runDetails') }}<ChevronDown :size="16" aria-hidden="true" class="rep__details-chev" /></summary>
-            <dl class="rep__meta">
-              <div>
-                <dt>{{ t('report.meta.answers') }}</dt>
-                <dd class="tabular">{{ answers ? t('report.answersOf', { answered: formatNumber(answers.answered), asked: formatNumber(answers.asked) }) : t('report.noneNeeded') }}</dd>
-              </div>
-              <div v-if="typeof scan.stats.guard_rejected === 'number'">
-                <dt>{{ t('report.meta.guard') }}</dt>
-                <dd class="tabular">{{ formatNumber(scan.stats.guard_rejected) }}</dd>
-              </div>
-              <div v-if="typeof scan.stats.llm_calls === 'number'">
-                <dt>{{ t('report.meta.calls') }}</dt>
-                <dd class="tabular">{{ formatNumber(scan.stats.llm_calls) }}</dd>
-              </div>
-              <div v-if="tokens">
-                <dt>{{ t('report.tokens') }}</dt>
-                <dd class="tabular">{{ tokens }}</dd>
-              </div>
-              <div>
-                <dt>{{ t('report.scanId') }}</dt>
-                <dd class="mono">{{ scan.id }}</dd>
-              </div>
-            </dl>
-            <RunNotes v-if="moreNotes.length" :notes="moreNotes" @demo="checkDemo" @rerun="rerun(scan)" @filter="filterReason" />
-          </details>
-
-          <p class="rep__disclaimer" role="note">
-            <Info :size="18" aria-hidden="true" />
-            <span>{{ prechecked !== null ? t('report.disclaimer', { n: prechecked }) : t('report.disclaimerNoN') }}</span>
-          </p>
+        <div class="container rep__top">
+          <ReportHeader
+            :scan="scan"
+            :title="headTitle"
+            :url="subUrl"
+            :href="head.url"
+            :pasted="head.pasted"
+            :prechecked="prechecked"
+            :notes="notes"
+            :answers="answers"
+            :tokens="tokens"
+            :seconds="seconds"
+            :left="left"
+            :lang-differs="langDiffers"
+            :rerunning="rerunning"
+            @demo="checkDemo"
+            @rerun="rerun(scan)"
+            @rerun-in="rerun(scan, locale)"
+            @filter="filterReason"
+          />
 
           <!-- M30: the check failed; what is shown is partial -->
           <ErrorState v-if="failure && failurePrimary" :title="problemText(failure).title" :body="`${problemText(failure).body} ${t('fail.partialNote')}`" :details="problemText(failure).details" role="none">
@@ -528,41 +568,74 @@ function trapTab(e: KeyboardEvent) {
             <button type="button" class="btn btn--ghost" @click="act('anyway')">{{ t('fail.http.anyway') }}</button>
           </ErrorState>
 
-          <RunNotes v-if="shownNotes.length" :notes="shownNotes" @demo="checkDemo" @rerun="rerun(scan)" @filter="filterReason" />
-          <p v-if="moreNotes.length" class="rep__more-notes">{{ tp('notes.more', moreNotes.length) }}</p>
-        </header>
+          <ReportStats
+            v-if="findings.length && !noFailures"
+            :remaining="remaining"
+            :done="progress.done"
+            :total="progress.total"
+            :failed="counts.failed"
+            :by-code="byCode"
+            :by-apertus="byApertus"
+            :outcome="filters.outcome"
+            :by="filters.by"
+            :cta="ctaLabel"
+            @outcome="toggleOutcome"
+            @by="toggleBy"
+            @start="startReview"
+          />
 
-        <!-- Next step: review complete (E3), or no failures (E2) -->
-        <div v-if="allReviewed || noFailures" class="container rep__next">
-          <section v-if="allReviewed" class="next" aria-labelledby="review-done">
-            <ShapeIcon shape="circle" color="var(--green)" :size="12" />
-            <div class="next__text" role="status">
-              <h2 id="review-done" class="next__title" tabindex="-1">{{ t('review.done.title') }}</h2>
-              <p>{{ t('review.done.body', { n: progress.total }) }}</p>
-            </div>
-            <div class="next__actions">
-              <button type="button" class="btn btn--primary" @click="exportReport">{{ t('review.download') }}</button>
-              <RouterLink class="btn btn--ghost" :to="{ name: 'human', query: { scan: scan.id } }">{{ t('review.continue', { m: humanCount }) }}</RouterLink>
-            </div>
-          </section>
-          <section v-else class="next next--info" aria-labelledby="nothing-found">
-            <Info :size="18" aria-hidden="true" />
-            <div class="next__text">
-              <h2 id="nothing-found" class="next__title">{{ t('clean.title', { n: prechecked ?? 0 }) }}</h2>
-              <p>{{ t('clean.body', { p: counts.passed, m: humanCount }) }}</p>
-            </div>
-            <div class="next__actions">
-              <RouterLink class="btn btn--primary" :to="{ name: 'human', query: { scan: scan.id } }">{{ t('empty.human') }}</RouterLink>
-              <button v-if="!showAllOk" type="button" class="btn btn--ghost" @click="showPassed">{{ t('clean.showPassed') }}</button>
-            </div>
-          </section>
+          <!-- Next step: review complete (E3), or no failures (E2) -->
+          <Transition name="fade-rise">
+            <section v-if="allReviewed" class="next" aria-labelledby="review-done">
+              <svg class="next__mark" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="12" r="11" />
+                <path class="m-draw" pathLength="1" d="M7 12.4l3.3 3.3L17.2 8.6" />
+              </svg>
+              <div class="next__text" role="status">
+                <h2 id="review-done" class="next__title" tabindex="-1">{{ t('review.done.title') }}</h2>
+                <p>{{ t('review.done.body', { n: formatNumber(progress.total) }) }}</p>
+              </div>
+              <div class="next__actions">
+                <button type="button" class="btn btn--primary press" @click="exportReport">{{ t('review.download') }}</button>
+                <RouterLink class="btn btn--ghost" :to="{ name: 'human', query: { scan: scan.id } }">{{ t('review.continue', { m: humanCount }) }}</RouterLink>
+              </div>
+            </section>
+            <section v-else-if="noFailures" class="next next--info" aria-labelledby="nothing-found">
+              <svg class="next__mark" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="12" r="11" />
+                <path class="m-draw" pathLength="1" d="M7 12.4l3.3 3.3L17.2 8.6" />
+              </svg>
+              <div class="next__text">
+                <h2 id="nothing-found" class="next__title">{{ t('clean.title', { n: prechecked ?? 0 }) }}</h2>
+                <p>{{ t('clean.body', { p: counts.passed, m: humanCount }) }}</p>
+              </div>
+              <div class="next__actions">
+                <RouterLink class="btn btn--primary" :to="{ name: 'human', query: { scan: scan.id } }">{{ t('empty.human') }}</RouterLink>
+                <button v-if="!showAllOk" type="button" class="btn btn--ghost" @click="showPassed">{{ t('clean.showPassed') }}</button>
+              </div>
+            </section>
+          </Transition>
         </div>
 
         <!-- Findings -->
-        <section id="findings" class="container rep__section" aria-labelledby="rep-findings">
-          <div class="rep__section-head rep__section-head--row">
+        <section id="findings" class="container rep__section m-rise" style="--i: 3" aria-labelledby="rep-findings">
+          <div class="rep__bar">
             <h2 id="rep-findings" class="rep__h2" tabindex="-1">{{ t('report.findings') }}</h2>
-            <p v-if="findings.length" class="rep__showing tabular" role="status">{{ t('report.showing', { shown: visibleCount, total: findings.length }) }}</p>
+            <FindingsToolbar
+              v-if="findings.length"
+              ref="toolbar"
+              v-model:status="filters.status"
+              v-model:q="filters.q"
+              v-model:criterion="filters.criterion"
+              class="rep__toolbar"
+              :criteria="criteriaPresent"
+              :active="hasFilters"
+              :shown="visibleCount"
+              :total="findings.length"
+              :reason="filters.reason"
+              @reset="resetFilters"
+              @clear-reason="filters.reason = ''"
+            />
           </div>
 
           <!-- E1: nothing at all to report -->
@@ -570,176 +643,49 @@ function trapTab(e: KeyboardEvent) {
             <RouterLink class="btn btn--primary" :to="{ name: 'human', query: { scan: scan.id } }">{{ t('empty.human') }}</RouterLink>
           </EmptyState>
 
-          <template v-else>
-            <!-- Summary: one row of outcome chips that filter, then the review progress (UX-4) -->
-            <div class="chips" role="group" :aria-label="t('report.summary')">
-              <button
-                v-for="o in OUTCOMES"
-                :key="o"
-                type="button"
-                class="chip"
-                :class="{ 'is-active': filters.outcome === o }"
-                :aria-pressed="filters.outcome === o"
-                :aria-label="`${t(`outcome.${o}`)} ${formatNumber(counts[o])}. ${t('report.filterChip', { outcome: t(`outcome.${o}`) })}`"
-                @click="toggleOutcome(o)"
-              >
-                <VerdictChip :outcome="o" size="sm" />
-                <span class="chip__n tabular">{{ formatNumber(counts[o]) }}</span>
-              </button>
-              <div class="chips__progress">
-                <span class="chips__label tabular">{{ t('report.reviewedScope', { done: formatNumber(progress.done), total: formatNumber(progress.total) }) }}</span>
-                <span
-                  class="chips__bar"
-                  role="progressbar"
-                  :aria-label="t('report.reviewed')"
-                  :aria-valuenow="progress.done"
-                  aria-valuemin="0"
-                  :aria-valuemax="progress.total"
-                  :aria-valuetext="t('report.reviewedScope', { done: progress.done, total: progress.total })"
-                >
-                  <span class="chips__fill" :style="{ transform: `scaleX(${progress.total ? progress.done / progress.total : 0})` }" />
-                </span>
-              </div>
-            </div>
+          <EmptyState v-else-if="!filtered.length" :title="t('report.emptyFilter.title')" :body="t('report.emptyFilter.body')" :heading-level="3">
+            <button type="button" class="btn btn--secondary" @click="resetFilters">{{ t('report.reset') }}</button>
+          </EmptyState>
 
-            <div class="toolbar" role="search" :aria-label="t('report.filters')">
-              <div class="toolbar__search">
-                <label for="rep-search" class="toolbar__label">{{ t('report.search') }}</label>
-                <div class="toolbar__search-field">
-                  <Search :size="16" aria-hidden="true" class="toolbar__search-icon" />
-                  <input
-                    id="rep-search"
-                    ref="searchInput"
-                    v-model="filters.q"
-                    type="search"
-                    class="field toolbar__input"
-                    :placeholder="t('report.searchPlaceholder')"
-                    autocomplete="off"
-                    @keydown.esc.stop="filters.q = ''"
-                  />
-                  <span class="toolbar__key"><KeyboardHint :keys="['/']" /></span>
-                </div>
-              </div>
-              <div class="toolbar__filter">
-                <label for="f-outcome" class="toolbar__label">{{ t('filter.outcome') }}</label>
-                <select id="f-outcome" v-model="filters.outcome" class="field">
-                  <option value="">{{ t('filter.all') }}</option>
-                  <option v-for="o in OUTCOMES" :key="o" :value="o">{{ t(`outcome.${o}`) }}</option>
-                </select>
-              </div>
-              <div class="toolbar__filter">
-                <label for="f-crit" class="toolbar__label">{{ t('filter.criterion') }}</label>
-                <select id="f-crit" v-model="filters.criterion" class="field">
-                  <option value="">{{ t('filter.all') }}</option>
-                  <option v-for="c in criteriaPresent" :key="c" :value="c">{{ c }} {{ plainName(c, locale) }}</option>
-                </select>
-              </div>
-              <div class="toolbar__filter">
-                <label for="f-source" class="toolbar__label">{{ t('filter.source') }}</label>
-                <select id="f-source" v-model="filters.source" class="field">
-                  <option value="">{{ t('filter.all') }}</option>
-                  <option v-for="s in SOURCES" :key="s" :value="s">{{ t(`source.${s}`) }}</option>
-                </select>
-              </div>
-              <div class="toolbar__filter">
-                <label for="f-status" class="toolbar__label">{{ t('filter.status') }}</label>
-                <select id="f-status" v-model="filters.status" class="field">
-                  <option value="">{{ t('filter.all') }}</option>
-                  <option v-for="s in STATUSES" :key="s" :value="s">{{ t(`status.${s}`) }}</option>
-                </select>
-              </div>
-              <button v-if="hasFilters" type="button" class="btn btn--ghost btn--sm toolbar__reset" @click="resetFilters">
-                <X :size="14" aria-hidden="true" />{{ t('report.reset') }}
-              </button>
-            </div>
-
-            <p v-if="filters.reason" class="reason-filter" role="status">
-              <span>{{ t('notes.filtered', { reason: t(`reason.${filters.reason}` as MessageKey) }) }}</span>
-              <button type="button" class="btn btn--ghost btn--sm" @click="filters.reason = ''">{{ t('notes.clearFilter') }}</button>
-            </p>
-
-            <EmptyState v-if="!filtered.length" :title="t('report.emptyFilter.title')" :body="t('report.emptyFilter.body')" :heading-level="3">
-              <button type="button" class="btn btn--secondary" @click="resetFilters">{{ t('report.reset') }}</button>
-            </EmptyState>
-
-            <div v-else class="groups">
-              <section v-for="g in sections" :key="g.code" class="group" :aria-labelledby="`g-${g.code}`">
-                <h3 :id="`g-${g.code}`" class="group__h">
-                  <CriterionTag :code="g.code" :name="g.name" show-level />
-                  <span class="group__n tabular">{{ tp('report.groupCount', g.reviewRows.reduce((n, r) => n + r.items.length, 0) + g.okCount) }}</span>
-                </h3>
-                <ul v-if="g.reviewRows.length || okVisible(g.code)" class="group__list" role="list">
-                  <li v-for="row in g.reviewRows" :key="row.key">
-                    <FindingCard
-                      :finding="row.lead"
-                      :items="row.items.length > 1 ? row.items : undefined"
-                      :selected="selectedRow === row"
-                      :scan-lang="scan.ui_lang"
-                      :base="scan.url"
-                      :multi-page="multiPage"
-                      :busy="busy"
-                      :panel-id="selected ? 'finding-panel' : undefined"
-                      @open="open"
-                      @decide-one="decideOne"
-                    />
-                  </li>
-                  <template v-if="okVisible(g.code)">
-                    <li v-for="row in g.okRows" :key="row.key">
-                      <FindingCard
-                        :finding="row.lead"
-                        :items="row.items.length > 1 ? row.items : undefined"
-                        :selected="selectedRow === row"
-                        :scan-lang="scan.ui_lang"
-                        :base="scan.url"
-                        :multi-page="multiPage"
-                        :busy="busy"
-                        :panel-id="selected ? 'finding-panel' : undefined"
-                        @open="open"
-                        @decide-one="decideOne"
-                      />
-                    </li>
-                  </template>
-                </ul>
-                <button
-                  v-if="g.okCount && !okForced"
-                  type="button"
-                  class="okrow"
-                  :aria-expanded="openOk.has(g.code)"
-                  @click="toggleOk(g.code)"
-                >
-                  <ShapeIcon shape="circle" color="var(--green)" :size="10" />
-                  <span>{{ t('report.okRow', { n: formatNumber(g.okCount) }) }}</span>
-                  <span class="okrow__action">
-                    {{ openOk.has(g.code) ? t('report.hide') : t('report.show') }}
-                    <ChevronDown :size="16" aria-hidden="true" class="okrow__chev" :class="{ 'is-open': openOk.has(g.code) }" />
-                  </span>
-                </button>
-              </section>
-            </div>
-          </template>
+          <TransitionGroup v-else tag="div" name="list" class="rep__groups">
+            <FindingSection
+              v-for="g in sections"
+              :key="g.code"
+              :code="g.code"
+              :name="g.name"
+              :review-rows="g.reviewRows"
+              :ok-rows="g.okRows"
+              :ok-count="g.okCount"
+              :ok-open="openOk.has(g.code)"
+              :ok-forced="okForced"
+              :selected-key="selectedRow?.key ?? null"
+              :scan-lang="scan.ui_lang"
+              :base="scan.url"
+              :multi-page="multiPage"
+              :panel-id="selected ? 'finding-panel' : undefined"
+              @open="open"
+              @decide="(row, s) => decide(s, row, 'list')"
+              @toggle-ok="toggleOk"
+            />
+          </TransitionGroup>
         </section>
 
         <!-- Coverage, below the findings (UX-4) -->
         <section class="container rep__section" aria-labelledby="rep-coverage">
-          <div class="rep__section-head">
-            <h2 id="rep-coverage" class="rep__h2">{{ t('report.coverage') }}</h2>
-            <p class="rep__section-lede">{{ t('report.coverageLede') }}</p>
-          </div>
+          <h2 id="rep-coverage" class="rep__h2 rep__h2--spaced">{{ t('report.coverage') }}</h2>
           <CoverageMap :scan="scan" :findings="findings" :selected="filters.criterion || null" interactive @select="selectCriterion" />
-          <RouterLink class="human-cta" :to="{ name: 'human', query: { scan: scan.id } }">
-            <span class="human-cta__n tabular">{{ humanCount }}</span>
-            <span class="human-cta__text">
-              <strong>{{ t('report.humanLink') }}</strong>
-              <span>{{ t('report.humanCta', { n: humanCount }) }}</span>
-            </span>
-            <ArrowRight :size="20" aria-hidden="true" />
+          <RouterLink class="human-link" :to="{ name: 'human', query: { scan: scan.id } }">
+            <span class="human-link__text">{{ t('report.humanCta', { n: humanCount }) }}</span>
+            <span class="human-link__go">{{ t('report.humanLink') }}<ArrowRight :size="16" aria-hidden="true" /></span>
           </RouterLink>
         </section>
       </template>
     </div>
 
     <!-- Detail panel: docked beside the list on wide screens, a modal dialog below 1280 px (UX-14) -->
-    <div v-if="overlay" class="rep__scrim" aria-hidden="true" @click="close" />
+    <Transition name="fade">
+      <div v-if="overlay" class="rep__scrim" aria-hidden="true" @click="close" />
+    </Transition>
     <Transition name="panel">
       <aside
         v-if="selected && scan"
@@ -752,17 +698,16 @@ function trapTab(e: KeyboardEvent) {
       >
         <FindingDetail
           :finding="selected"
-          :items="selectedRow && selectedRow.items.length > 1 ? selectedRow.items : undefined"
+          :items="panelRow && panelRow.items.length > 1 ? panelRow.items : undefined"
           :scan="scan"
           :index="selectedIndex"
           :total="ordered.length"
-          :position-label="positionLabel"
           heading-id="finding-title"
-          :busy="busy"
           @close="close"
           @prev="move(-1)"
           @next="move(1)"
           @decide="decide"
+          @decide-one="decideOne"
         />
       </aside>
     </Transition>
@@ -772,23 +717,34 @@ function trapTab(e: KeyboardEvent) {
 <style scoped>
 .rep {
   padding-top: var(--s-7);
-  transition: padding-right var(--dur-3) var(--ease);
+  padding-bottom: var(--s-8);
 }
 .rep--docked {
   padding-right: var(--drawer-w);
 }
 .rep__loading {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: var(--s-3);
-  padding-top: var(--s-8);
-  color: var(--muted);
 }
-.rep__pulse {
-  width: 12px;
-  height: 12px;
-  background: var(--klar-red);
-  animation: klar-pulse 1.2s ease-in-out infinite;
+.rep__skel {
+  display: block;
+}
+.rep__skel--h1 {
+  width: min(420px, 70%);
+  height: 40px;
+}
+.rep__skel--line {
+  width: min(560px, 90%);
+  height: 16px;
+  margin-bottom: var(--s-5);
+}
+.rep__skel--band {
+  height: 96px;
+  margin-bottom: var(--s-6);
+}
+.rep__skel--row {
+  height: 56px;
 }
 .rep__state {
   display: flex;
@@ -797,459 +753,136 @@ function trapTab(e: KeyboardEvent) {
   gap: var(--s-4);
   padding-top: var(--s-8);
 }
-.rep__head {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-5);
-}
 .rep__top {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--s-4);
-}
-.rep__title {
-  display: flex;
   flex-direction: column;
-  gap: var(--s-3);
-  min-width: 0;
+  gap: var(--s-6);
 }
-.rep__h1 {
-  overflow-wrap: anywhere;
+.rep__top > :deep(.es) {
+  max-width: none;
 }
-.rep__sub {
-  font-size: var(--fs-14);
-  color: var(--muted);
-}
-.rep__url {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--muted);
-  font-size: var(--fs-14);
-  overflow-wrap: anywhere;
-  word-break: break-all;
-}
-.rep__url:hover {
-  color: var(--ink);
-}
-.rep__lang {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--s-2) var(--s-3);
-  font-size: var(--fs-14);
-  color: var(--muted);
-}
-.rep__metaline {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--s-2) var(--s-3);
-  padding-top: var(--s-4);
-  border-top: 1px solid var(--line);
-  font-size: var(--fs-14);
-  font-weight: 600;
-}
-.rep__metaline > span[aria-hidden] {
-  color: var(--muted);
-  font-weight: 400;
-}
-.rep__details {
-  margin-top: calc(-1 * var(--s-3));
-  font-size: var(--fs-14);
-}
-.rep__details > summary {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  cursor: pointer;
-  color: var(--muted);
-  font-weight: 600;
-}
-.rep__details[open] > summary {
-  margin-bottom: var(--s-3);
-}
-.rep__details > summary::-webkit-details-marker {
-  display: none;
-}
-.rep__details-chev {
-  margin-left: 4px;
-  transition: transform var(--dur-1) var(--ease);
-}
-.rep__details[open] .rep__details-chev {
-  transform: rotate(180deg);
-}
-.rep__details > .notes {
-  margin-top: var(--s-3);
-}
-.rep__more-notes {
-  font-size: var(--fs-12);
-  color: var(--muted);
-}
-/* FE-3 (WCAG 1.4.10): the actions wrap at 320 px instead of widening the page. */
-.rep__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s-2);
-  min-width: 0;
-  max-width: 100%;
-}
-.rep__top > *,
-.rep__actions > * {
-  min-width: 0;
-  max-width: 100%;
-}
-.rep__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s-3) var(--s-6);
-  margin: 0;
-  padding: var(--s-3) var(--s-4);
-  background: var(--surface-2);
-  border-radius: var(--r-control);
-  font-size: var(--fs-14);
-}
-.rep__meta dt {
-  font-size: var(--fs-12);
-  color: var(--muted);
-}
-.rep__meta dd {
-  margin: 2px 0 0;
-  font-weight: 600;
-}
-.rep__next {
-  margin-top: var(--s-7);
-}
+
+/* Next step: review complete / nothing failed */
 .next {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   flex-wrap: wrap;
   gap: var(--s-4);
-  padding: var(--s-5);
-  background: var(--surface);
-  border: 1px solid var(--line);
+  padding: var(--s-4) var(--s-5);
+  background: var(--green-tint);
   border-radius: var(--r-card);
-  box-shadow: inset 3px 0 0 var(--green);
 }
 .next--info {
-  box-shadow: inset 3px 0 0 var(--blue);
+  background: var(--surface-2);
 }
-.next > svg,
-.next > .shape {
+.next__mark {
   flex: none;
-  margin-top: 6px;
-  color: var(--blue);
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.next__mark circle {
+  fill: var(--green);
+  stroke: none;
+}
+.next__mark path {
+  stroke: var(--on-ink);
+  stroke-width: 2.4;
 }
 .next__text {
-  flex: 1 1 320px;
+  flex: 1 1 280px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 .next__title {
   font-size: var(--fs-20);
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-weight: 680;
+  letter-spacing: -0.02em;
+}
+.next__text p {
+  color: var(--muted);
 }
 .next__actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--s-2);
-  align-self: center;
   min-width: 0;
   max-width: 100%;
 }
 .next__actions > * {
   max-width: 100%;
 }
-/* Neutral and informative: a fact about scope, not an error. */
-.rep__disclaimer {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--s-3);
-  padding: var(--s-3) var(--s-4);
-  background: var(--surface-2);
-  border-radius: var(--r-control);
-  font-size: var(--fs-16);
-  line-height: 1.45;
-}
-.rep__note {
-  padding: var(--s-3) var(--s-4);
-  background: var(--amber-tint);
-  border-radius: var(--r-control);
-  font-size: var(--fs-14);
-}
-.rep__head > :deep(.es) {
-  max-width: none;
-}
-.rep__disclaimer svg {
-  flex: none;
-  margin-top: 2px;
-  color: var(--blue);
-}
+
+/* Sections */
 .rep__section {
   margin-top: var(--s-8);
 }
-.rep__section-head {
+.rep__bar {
   display: flex;
   flex-direction: column;
-  gap: var(--s-2);
-  margin-bottom: var(--s-5);
+  gap: var(--s-4);
+  margin-bottom: var(--s-6);
 }
-.rep__section-head--row {
-  flex-direction: row;
-  align-items: baseline;
-  justify-content: space-between;
-  flex-wrap: wrap;
+.rep__toolbar {
+  min-width: 0;
 }
 .rep__h2 {
   font-size: var(--fs-24);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
-.rep__section-lede,
-.rep__showing {
-  color: var(--muted);
-  font-size: var(--fs-14);
+.rep__h2--spaced {
+  margin-bottom: var(--s-5);
 }
-.chips {
+.rep__groups {
+  position: relative;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--s-2);
-  min-height: 56px;
-  padding: var(--s-2) var(--s-3);
-  margin-bottom: var(--s-3);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-card);
+  flex-direction: column;
+  gap: var(--s-7);
 }
-.chip {
+.rep__groups > .list-leave-active {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+/* Human checks: one quiet link row */
+.human-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-4);
+  margin-top: var(--s-6);
+  padding: var(--s-4) 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+}
+.human-link__text {
+  font-size: var(--fs-16);
+  font-weight: 600;
+}
+.human-link__go {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 40px;
-  padding: 0 12px 0 8px;
-  border: 1px solid transparent;
-  border-radius: var(--r-control);
-  background: transparent;
-  color: var(--ink);
-}
-.chip:hover {
-  background: var(--surface-2);
-}
-.chip.is-active {
-  background: var(--surface-2);
-  border-color: var(--ink);
-}
-.chip__n {
-  font-size: var(--fs-20);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-.chips__progress {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-left: auto;
-  min-width: 180px;
-  padding: 0 var(--s-2);
-}
-.chips__label {
-  font-size: var(--fs-14);
-  font-weight: 600;
-}
-.chips__bar {
-  display: block;
-  width: 100%;
-  height: 4px;
-  background: var(--surface-3);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.chips__fill {
-  display: block;
-  height: 100%;
-  background: var(--green);
-  transform-origin: left;
-  transition: transform var(--dur-3) var(--ease);
-}
-.reason-filter {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--s-2) var(--s-3);
-  margin: calc(-1 * var(--s-2)) 0 var(--s-4);
-  padding: var(--s-2) var(--s-3);
-  background: var(--blue-tint);
-  border-radius: var(--r-control);
-  font-size: var(--fs-14);
-  font-weight: 600;
-}
-.okrow {
-  display: flex;
-  align-items: center;
-  gap: var(--s-3);
-  width: 100%;
-  min-height: 44px;
-  padding: 0 var(--s-4);
-  border: 0;
-  border-top: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--muted);
-  font-size: var(--fs-14);
-  text-align: left;
-}
-.okrow:hover {
-  background: var(--surface-2);
-  color: var(--ink);
-}
-.okrow__action {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-left: auto;
   color: var(--blue);
   font-weight: 600;
 }
-.okrow__chev {
-  transition: transform var(--dur-1) var(--ease);
+.human-link__go svg {
+  transition: transform var(--dur-2) var(--ease-out);
 }
-.okrow__chev.is-open {
-  transform: rotate(180deg);
+.human-link:hover .human-link__go {
+  text-decoration: underline;
 }
-.group__h + .okrow {
-  border-top: 0;
+.human-link:hover .human-link__go svg {
+  transform: translateX(3px);
 }
-.human-cta {
-  display: flex;
-  align-items: center;
-  gap: var(--s-5);
-  margin-top: var(--s-6);
-  padding: var(--s-4) var(--s-5);
-  border: 1px solid var(--line);
-  border-radius: var(--r-card);
-  background: var(--surface);
-  color: var(--ink);
-  text-decoration: none;
-  transition: border-color var(--dur-1) var(--ease);
-}
-.human-cta:hover {
-  border-color: var(--ink);
-}
-.human-cta__n {
-  display: grid;
-  place-items: center;
-  min-width: 56px;
-  height: 56px;
-  border: 1.5px solid var(--ink);
-  border-radius: 6px;
-  font-size: var(--fs-24);
-  font-weight: 700;
-}
-.human-cta__text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  font-size: var(--fs-14);
-  color: var(--muted);
-}
-.human-cta__text strong {
-  font-size: var(--fs-16);
-  color: var(--ink);
-}
-.human-cta svg {
-  margin-left: auto;
-  flex: none;
-}
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: var(--s-3);
-  padding: var(--s-4);
-  margin-bottom: var(--s-5);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-card);
-}
-.toolbar__search {
-  flex: 2 1 220px;
-  min-width: 0;
-}
-.toolbar__filter {
-  flex: 1 1 118px;
-  min-width: 0;
-}
-.toolbar__label {
-  display: block;
-  margin-bottom: 4px;
-  font-size: var(--fs-12);
-  font-weight: 600;
-  color: var(--muted);
-}
-.toolbar__search-field {
-  position: relative;
-}
-.toolbar__search-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--muted);
-  pointer-events: none;
-}
-.toolbar__input {
-  padding-left: 36px;
-  padding-right: 40px;
-}
-.toolbar__key {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.toolbar__reset {
-  --btn-h: 40px;
-}
-.groups {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-6);
-}
-.group__h {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--s-3);
-  padding-bottom: var(--s-3);
-  border-bottom: 2px solid var(--ink);
-  font-size: var(--fs-16);
-}
-.group__h :deep(.crit) {
-  font-size: var(--fs-16);
-}
-.group__h :deep(.crit__code) {
-  font-size: var(--fs-14);
-}
-.group__h :deep(.crit__name) {
-  font-weight: 650;
-}
-.group__n {
-  font-size: var(--fs-14);
-  font-weight: 500;
-  color: var(--muted);
-}
-.group__list {
-  margin: 0;
-  padding: 0;
-}
-.group__list li + li {
-  border-top: 1px solid var(--line);
-}
+
+/* Finding panel */
 .panel {
   position: fixed;
   z-index: 45;
@@ -1261,7 +894,6 @@ function trapTab(e: KeyboardEvent) {
   border-left: 1px solid var(--line);
   box-shadow: var(--shadow-overlay);
 }
-.rep--docked + .panel,
 .rep--docked .panel {
   box-shadow: none;
 }
@@ -1270,37 +902,24 @@ function trapTab(e: KeyboardEvent) {
   z-index: 44;
   inset: var(--header-h) 0 0 0;
   background: var(--scrim);
-  animation: klar-fade-in var(--dur-2) var(--ease);
 }
-.panel-enter-active,
+.panel-enter-active {
+  transition: transform var(--dur-3) var(--ease-out), opacity var(--dur-2) var(--ease-out);
+}
 .panel-leave-active {
-  transition: transform var(--dur-3) var(--ease), opacity var(--dur-2) var(--ease);
+  transition: transform var(--dur-2) var(--ease-in-out), opacity var(--dur-2) var(--ease-in-out);
 }
 .panel-enter-from,
 .panel-leave-to {
   transform: translateX(24px);
   opacity: 0;
 }
-@keyframes klar-fade-in {
-  from {
-    opacity: 0;
-  }
-}
 @media (max-width: 640px) {
-  /* One fact per line on phones: no orphaned "·" separators at line ends. */
-  .rep__metaline {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+  .rep {
+    padding-top: var(--s-6);
   }
-  .rep__metaline > span[aria-hidden] {
-    display: none;
-  }
-  .rep__actions {
-    width: 100%;
-  }
-  .human-cta {
-    gap: var(--s-3);
+  .rep__bar {
+    margin-bottom: var(--s-5);
   }
 }
 </style>

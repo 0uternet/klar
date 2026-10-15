@@ -34,7 +34,9 @@ try {
 let failures = 0
 for (const colorScheme of ['light', 'dark']) {
   for (const lang of ['en', 'de']) {
-    const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, colorScheme })
+    // Reduced motion: axe samples the settled page, not elements halfway through an entrance fade.
+    // bypassCSP: the production server's strict CSP would block the injected axe script.
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, colorScheme, reducedMotion: 'reduce', bypassCSP: true })
     await ctx.addInitScript((l) => localStorage.setItem('klar.lang', l), lang)
     const page = await ctx.newPage()
     for (const route of routes) {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ArrowRight, Check, Quote, Server, Unlock, WifiOff, X } from '@lucide/vue'
+import { ArrowRight } from '@lucide/vue'
 import { DEMO_NAME, DEMO_URL, isDemoUrl } from '@/config'
 import { api, ApiError } from '@/api'
 import { formatNumber, formatRelative, locale, t, tp, type MessageKey } from '@/i18n'
@@ -18,7 +18,6 @@ import ErrorState from '@/components/ErrorState.vue'
 import type { CheckInput, ScanSummary } from '@/types'
 import VerdictChip from '@/components/VerdictChip.vue'
 import CriterionTag from '@/components/CriterionTag.vue'
-import DiffBlock from '@/components/DiffBlock.vue'
 import ShapeIcon from '@/components/ShapeIcon.vue'
 
 const router = useRouter()
@@ -34,6 +33,10 @@ useShortcuts({
     field.value?.focus()
   },
 })
+
+/** The second headline line, with the brand's red full stop (as in the logo). */
+const BRAND = 'Klar.'
+const titleB = computed(() => t('home.titleB').split(/(Klar\.)/))
 
 const isReplay = computed(() => health.value?.mode === 'replay')
 /** UX-8 / M3: replay mode without any recorded answer. */
@@ -230,194 +233,233 @@ onMounted(async () => {
   }
   void loadRecent()
 })
-
-const specimenDiff = [
-  '@@ -42 +42 @@',
-  '-<p>Documents en français…</p>',
-  '+<p lang="fr">Documents en français…</p>',
-].join('\n')
 </script>
 
 <template>
   <div class="home">
-    <section class="container hero">
-      <div class="hero__text">
-        <p class="eyebrow eyebrow--plain">{{ t('home.eyebrow') }}</p>
-        <h1 class="display hero__title" tabindex="-1">{{ t('home.title') }}</h1>
-        <p class="lede hero__lede">{{ t('home.lede') }}</p>
+    <section class="container hero" aria-labelledby="home-title">
+      <h1 id="home-title" class="hero__title" tabindex="-1">
+        <span class="hero__line hero__line--muted m-rise" style="--i: 0">{{ t('home.titleA') }}</span>{{ ' ' }}
+        <span class="hero__line m-rise" style="--i: 1"
+          ><template v-for="(part, i) in titleB" :key="i"
+            ><span v-if="part === BRAND" class="hero__brand">Klar<span class="hero__dot">.</span></span
+            ><template v-else>{{ part }}</template></template
+          ></span
+        >
+      </h1>
 
-        <div ref="notice" class="hero__notice">
-          <ErrorState v-if="unreachable" :title="t('offline.title')" :body="t('offline.body')" :details="t('offline.detail')" role="alert">
-            <button type="button" class="btn btn--primary" :disabled="retrying" @click="retryHealth">{{ t('common.retry') }}</button>
-            <span v-if="healthRetrying" class="hero__retrying" role="status">{{ t('offline.retrying') }}</span>
-          </ErrorState>
-          <ErrorState v-else-if="startProblem && problemText" :title="problemText.title" :body="problemText.body" :details="problemText.details">
-            <button type="button" class="btn btn--primary" :disabled="busy" @click="act(startProblem.primary)">{{ t(ACTION_LABEL[startProblem.primary]) }}</button>
-            <button v-for="a in startProblem.secondary" :key="a" type="button" class="btn btn--ghost" @click="act(a)">{{ t(ACTION_LABEL[a]) }}</button>
-            <span v-if="countdown !== null" class="hero__retrying tabular" role="status">{{ t('start.busy.countdown', { s: formatNumber(countdown) }) }}</span>
-          </ErrorState>
-          <ErrorState v-else-if="replayGate" tone="info" :title="t('replay.gate.title')" :body="t('replay.gate.body', { host: replayGate.host })">
-            <button type="button" class="btn btn--primary" :disabled="busy" @click="tryDemo">
-              {{ t('home.demo.primary') }} <ArrowRight :size="18" aria-hidden="true" />
-            </button>
-            <button type="button" class="btn btn--secondary" :disabled="busy" @click="checkAnyway">{{ t('replay.gate.anyway') }}</button>
-            <RouterLink class="hero__link" :to="{ name: 'about', hash: '#connect' }">{{ t('replay.connectShort') }}</RouterLink>
-          </ErrorState>
-          <ErrorState v-else-if="llmDown" tone="info" :title="t('llm.down.title')" :body="t('llm.down.body', { host: health?.base_url_host ?? t('common.unknown') })" :details="health?.llm_error">
-            <button type="button" class="btn btn--primary" :disabled="retrying" @click="retryHealth">{{ t('common.retry') }}</button>
-            <RouterLink class="hero__link" :to="{ name: 'about', hash: '#connect' }">{{ t('notes.connect') }}</RouterLink>
-          </ErrorState>
-        </div>
+      <div class="hero__grid">
+        <div class="hero__main">
+          <p class="hero__lede m-rise" style="--i: 2">{{ t('home.lede') }}</p>
 
-        <!-- Replay mode: the demo site is the first, primary action -->
-        <div v-if="isReplay && !replayGate && !unreachable" class="demo-cta">
-          <div class="demo-cta__row">
-            <button type="button" class="btn btn--primary demo-cta__btn" :disabled="busy" @click="tryDemo">
-              {{ t('home.demo.primary') }} <ArrowRight :size="20" aria-hidden="true" />
-            </button>
-            <RouterLink v-if="demoReportId" class="btn btn--secondary demo-cta__open" :to="{ name: 'report', params: { id: demoReportId } }">
-              {{ t('home.demo.openReport') }}
-            </RouterLink>
+          <!-- Blocking problems, each with one way forward -->
+          <div ref="notice" class="hero__notice">
+            <ErrorState v-if="unreachable" :title="t('offline.title')" :body="t('offline.body')" :details="t('offline.detail')" role="alert">
+              <button type="button" class="btn btn--primary" :disabled="retrying" @click="retryHealth">{{ t('common.retry') }}</button>
+              <span v-if="healthRetrying" class="hero__retrying" role="status">{{ t('offline.retrying') }}</span>
+            </ErrorState>
+            <ErrorState v-else-if="startProblem && problemText" :title="problemText.title" :body="problemText.body" :details="problemText.details">
+              <button type="button" class="btn btn--primary" :disabled="busy" @click="act(startProblem.primary)">{{ t(ACTION_LABEL[startProblem.primary]) }}</button>
+              <button v-for="a in startProblem.secondary" :key="a" type="button" class="btn btn--ghost" @click="act(a)">{{ t(ACTION_LABEL[a]) }}</button>
+              <span v-if="countdown !== null" class="hero__retrying tabular" role="status">{{ t('start.busy.countdown', { s: formatNumber(countdown) }) }}</span>
+            </ErrorState>
+            <ErrorState v-else-if="replayGate" tone="info" :title="t('replay.gate.title')" :body="t('replay.gate.body', { host: replayGate.host })">
+              <button type="button" class="btn btn--primary" :disabled="busy" @click="tryDemo">
+                {{ t('home.demo.primary') }} <ArrowRight :size="18" aria-hidden="true" />
+              </button>
+              <button type="button" class="btn btn--secondary" :disabled="busy" @click="checkAnyway">{{ t('replay.gate.anyway') }}</button>
+              <RouterLink class="hero__link" :to="{ name: 'about', hash: '#connect' }">{{ t('replay.connectShort') }}</RouterLink>
+            </ErrorState>
           </div>
-          <p class="demo-cta__sub">{{ t('home.demo.primarySub') }}</p>
-          <ErrorState v-if="noRecordings" tone="info" :title="t('replay.empty.title')" :body="t('replay.empty.body')" :details="t('replay.empty.detail')">
-            <RouterLink class="btn btn--secondary" :to="{ name: 'about', hash: '#connect' }">{{ t('notes.connect') }}</RouterLink>
-          </ErrorState>
-        </div>
 
-        <UrlInput
-          ref="field"
-          class="hero__form"
-          :class="{ 'hero__form--secondary': isReplay }"
-          :busy="busy"
-          :secondary="isReplay || unreachable || !!startProblem || !!replayGate"
-          :label="isReplay ? t('home.form.labelReplay') : undefined"
-          @submit="onSubmit"
-        />
-        <p v-if="sendNotice" class="send-notice">
-          <ShapeIcon :shape="sendNotice.shape" :color="sendNotice.color" :size="9" />
-          <span>{{ sendNotice.text }}</span>
-          <RouterLink class="send-notice__link" :to="{ name: 'about', hash: '#connect' }">{{ t('notice.change') }}</RouterLink>
-        </p>
-
-        <!-- Live modes: the demo site is a secondary shortcut -->
-        <button v-if="!isReplay" type="button" class="example" :disabled="busy" @click="tryDemo">
-          <ShapeIcon shape="square" color="var(--klar-red)" :size="8" />
-          <span class="example__name">{{ t('home.demo.secondary') }}</span>
-          <span class="example__sub">{{ DEMO_NAME }}</span>
-          <ArrowRight :size="16" aria-hidden="true" />
-        </button>
-
-        <section v-if="recent.length" id="recent" class="recent" aria-labelledby="recent-title">
-          <h2 id="recent-title" class="recent__title">{{ t('recent.title') }}</h2>
-          <ul class="recent__list" role="list">
-            <li v-for="r in recent" :key="r.id">
-              <RouterLink class="recent__item" :to="{ name: 'report', params: { id: r.id } }">
-                <span class="recent__name">{{ r.title }}</span>
-                <span class="recent__meta">
-                  <span>{{ formatRelative(r.when) }}</span>
-                  <template v-if="r.toReview !== null">
-                    <span aria-hidden="true">·</span>
-                    <span class="tabular">{{ tp('recent.toReview', r.toReview) }}</span>
-                  </template>
-                </span>
-                <ArrowRight :size="16" aria-hidden="true" class="recent__arrow" />
+          <!-- Replay mode: the demo site is the first, primary action -->
+          <div v-if="isReplay && !replayGate && !unreachable" class="demo-cta m-rise" style="--i: 3">
+            <div class="demo-cta__row">
+              <button type="button" class="btn btn--primary demo-cta__btn" :disabled="busy" @click="tryDemo">
+                {{ t('home.demo.primary') }} <ArrowRight :size="20" aria-hidden="true" />
+              </button>
+              <RouterLink v-if="demoReportId" class="btn btn--ghost demo-cta__open" :to="{ name: 'report', params: { id: demoReportId } }">
+                {{ t('home.demo.openReport') }}
               </RouterLink>
-            </li>
-          </ul>
-        </section>
-      </div>
-
-      <!-- A static illustration, never shown as a result, and hidden while the server is unreachable. -->
-      <figure v-if="!unreachable" class="specimen" aria-hidden="true">
-        <div class="specimen__card">
-          <figcaption class="specimen__tag">{{ t('home.specimen.tag') }}</figcaption>
-          <div class="specimen__chips">
-            <VerdictChip outcome="failed" />
-            <CriterionTag code="3.1.2" />
+            </div>
+            <p class="demo-cta__sub">{{ t('home.demo.primarySub') }}</p>
           </div>
-          <p class="specimen__impact">{{ t('home.specimen.impact') }}</p>
-          <DiffBlock :diff="specimenDiff" bare />
-          <div class="specimen__actions">
-            <span class="specimen__label"><X :size="14" />{{ t('finding.reject') }}</span>
-            <span class="specimen__label"><Check :size="14" />{{ t('finding.accept') }}</span>
+
+          <UrlInput
+            ref="field"
+            class="hero__form m-rise"
+            :class="{ 'hero__form--secondary': isReplay }"
+            style="--i: 3"
+            :busy="busy"
+            :secondary="isReplay || unreachable || !!startProblem || !!replayGate"
+            :label="isReplay ? t('home.form.labelReplay') : undefined"
+            @submit="onSubmit"
+          >
+            <template v-if="!isReplay" #aside>
+              <button type="button" class="demo-link" :disabled="busy" @click="tryDemo">
+                <ShapeIcon shape="square" color="var(--klar-red)" :size="8" />
+                <span class="demo-link__name">{{ t('home.demo.secondary') }}</span>{{ ' ' }}
+                <span class="demo-link__sub">{{ DEMO_NAME }}</span>
+                <ArrowRight :size="16" aria-hidden="true" class="demo-link__arrow" />
+              </button>
+            </template>
+          </UrlInput>
+
+          <p v-if="sendNotice" class="send-notice">
+            <ShapeIcon :shape="sendNotice.shape" :color="sendNotice.color" :size="9" />
+            <span>{{ sendNotice.text }}</span>
+            <RouterLink class="send-notice__link" :to="{ name: 'about', hash: '#connect' }">{{ t('notice.change') }}</RouterLink>
+          </p>
+
+          <!-- Not blocking: checks still run. One compact line, one way forward. -->
+          <div v-if="!unreachable && (llmDown || noRecordings)" class="hint m-rise" style="--i: 4">
+            <ShapeIcon shape="diamond" color="var(--amber)" :size="10" />
+            <div class="hint__body">
+              <p v-if="llmDown">
+                <strong>{{ t('llm.down.title') }}.</strong> {{ t('llm.down.body', { host: health?.base_url_host ?? t('common.unknown') }) }}
+              </p>
+              <p v-else>
+                <strong>{{ t('replay.empty.title') }}.</strong> {{ t('replay.empty.body') }}
+              </p>
+              <div class="hint__actions">
+                <button v-if="llmDown" type="button" class="hint__btn" :disabled="retrying" @click="retryHealth">{{ t('common.retry') }}</button>
+                <RouterLink class="hint__link" :to="{ name: 'about', hash: '#connect' }">{{ t('notes.connect') }}</RouterLink>
+                <details v-if="llmDown ? health?.llm_error : true" class="hint__details">
+                  <summary>{{ t('error.details') }}</summary>
+                  <pre class="mono" translate="no">{{ llmDown ? health?.llm_error : t('replay.empty.detail') }}</pre>
+                </details>
+              </div>
+            </div>
           </div>
         </div>
-      </figure>
+
+        <!--
+          The proof of the idea, as a short story played once on load (≤ 4 s, no loop):
+          the scanner passes alt="Bild", Klar. flags the meaning, a person accepts.
+          An illustration, labelled as such; screen readers get one sentence (the figure's label).
+        -->
+        <figure v-if="!unreachable" v-reveal="3" class="story" role="img" :aria-label="t('home.story.label')">
+          <!-- inert: a picture, not controls; its text is never focused or read on its own. -->
+          <div class="story__card" inert>
+            <span class="story__tag">{{ t('home.story.tag') }}</span>
+            <div class="story__page">
+              <span class="story__chart">
+                <span v-for="(h, i) in [38, 52, 46, 68, 84]" :key="i" class="story__bar" :style="{ height: `${h}%`, '--i': i }" />
+              </span>
+              <code class="story__code" lang="de" translate="no"
+                ><span class="tk-p">&lt;</span><span class="tk-t">img</span> <span class="tk-a">src</span>=<span class="tk-v">"steuern.png"</span
+                ><br /><span class="story__indent"> </span><span class="tk-a">alt</span>=<span class="tk-v">"Bild"</span><span class="tk-p">&gt;</span></code
+              >
+            </div>
+
+            <ol class="story__rows">
+              <li class="story__row story__row--scanner">
+                <span class="story__who">{{ t('home.story.scanner') }}</span>
+                <span class="story__what">
+                  <VerdictChip outcome="passed" size="sm" />
+                  <span class="story__muted">{{ t('home.story.present') }}</span>
+                </span>
+              </li>
+              <li class="story__row story__row--klar">
+                <span class="story__who story__who--klar">Klar<span class="hero__dot">.</span></span>
+                <span class="story__what story__what--stack">
+                  <span class="story__chips">
+                    <VerdictChip outcome="failed" size="sm" />
+                    <CriterionTag code="1.1.1" />
+                  </span>
+                  <span class="story__impact">{{ t('home.story.impact') }}</span>
+                  <span class="story__diff" lang="de" translate="no">
+                    <span class="story__del"><span class="story__sign">−</span><code>alt="Bild"</code></span>
+                    <span class="story__add"><span class="story__sign">+</span><code>alt="Steuerertrag 2021–2025: steigend"</code></span>
+                  </span>
+                </span>
+              </li>
+              <li class="story__row story__row--you">
+                <span class="story__who">{{ t('home.story.you') }}</span>
+                <span class="story__what">
+                  <span class="story__accept">
+                    <span class="story__accept-bg" />
+                    <svg class="story__check" viewBox="0 0 16 16" width="16" height="16" focusable="false">
+                      <path class="m-draw" pathLength="1" d="M3.2 8.6 6.4 11.6 12.8 4.6" />
+                    </svg>
+                    <span class="story__label-a">{{ t('finding.accept') }}</span>
+                    <span class="story__label-b">{{ t('status.accepted') }}</span>
+                  </span>
+                </span>
+              </li>
+            </ol>
+          </div>
+        </figure>
+      </div>
     </section>
 
-    <section class="container how" aria-labelledby="how-title">
-      <h2 id="how-title" class="sr-only">{{ t('home.how') }}</h2>
-      <ol class="how__grid" role="list">
-        <li class="how__step">
-          <span class="how__num mono" aria-hidden="true">01</span>
-          <h3 class="how__title">{{ t('home.step1.title') }}</h3>
-          <p class="how__body">{{ t('home.step1.body') }}</p>
-          <div class="how__visual" aria-hidden="true">
-            <code class="how__code"><span class="tk-p">&lt;</span><span class="tk-t">img</span> <span class="tk-a">alt</span>=<span class="tk-v">"Bild"</span><span class="tk-p">&gt;</span></code>
-            <span class="how__ok"><Check :size="14" :stroke-width="3" />{{ t('home.step1.ok') }}</span>
-          </div>
+    <section v-if="recent.length" id="recent" class="container recent" aria-labelledby="recent-title">
+      <h2 id="recent-title" v-reveal class="recent__title">{{ t('recent.title') }}</h2>
+      <ul class="recent__list" role="list">
+        <li v-for="(r, i) in recent" :key="r.id" v-reveal="i + 1">
+          <RouterLink class="recent__item lift" :to="{ name: 'report', params: { id: r.id } }">
+            <ShapeIcon
+              :shape="r.toReview === null ? 'ring' : r.toReview > 0 ? 'diamond' : 'circle'"
+              :color="r.toReview === null ? 'var(--grey-shape)' : r.toReview > 0 ? 'var(--amber)' : 'var(--green)'"
+              :size="10"
+            />
+            <span class="recent__name">{{ r.title }}</span>{{ ' ' }}
+            <span class="recent__when">{{ formatRelative(r.when) }}</span>{{ ' ' }}
+            <span v-if="r.toReview !== null" class="recent__status tabular" :class="{ 'is-clear': r.toReview === 0 }">
+              {{ r.toReview > 0 ? tp('recent.toReview', r.toReview) : t('recent.nothing') }}
+            </span>
+            <ArrowRight :size="16" aria-hidden="true" class="recent__arrow" />
+          </RouterLink>
         </li>
-        <li class="how__step how__step--accent">
-          <span class="how__num mono" aria-hidden="true">02</span>
-          <h3 class="how__title">{{ t('home.step2.title') }}</h3>
-          <p class="how__body">{{ t('home.step2.body') }}</p>
-          <div class="how__visual" aria-hidden="true">
-            <span class="how__q">{{ t('home.step2.q') }}</span>
-            <VerdictChip outcome="failed" size="sm" />
-          </div>
-        </li>
-        <li class="how__step">
-          <span class="how__num mono" aria-hidden="true">03</span>
-          <h3 class="how__title">{{ t('home.step3.title') }}</h3>
-          <p class="how__body">{{ t('home.step3.body') }}</p>
-          <div class="how__visual" aria-hidden="true">
-            <span class="specimen__label"><X :size="14" />{{ t('finding.reject') }}</span>
-            <span class="specimen__label"><Check :size="14" />{{ t('finding.accept') }}</span>
-          </div>
-        </li>
-      </ol>
-    </section>
-
-    <section class="container trust" :aria-label="t('home.trust.label')">
-      <ul class="trust__list" role="list">
-        <li><Server :size="18" aria-hidden="true" />{{ t('home.trust.sovereign') }}</li>
-        <li><Unlock :size="18" aria-hidden="true" />{{ t('home.trust.open') }}</li>
-        <li><WifiOff :size="18" aria-hidden="true" />{{ t('home.trust.requests') }}</li>
-        <li><Quote :size="18" aria-hidden="true" />{{ t('home.trust.guard') }}</li>
       </ul>
     </section>
   </div>
 </template>
 
 <style scoped>
+/* ---- Hero ---------------------------------------------------------------- */
 .hero {
+  padding-top: clamp(40px, 7vw, 96px);
+  padding-bottom: var(--s-8);
+}
+.hero__title {
+  font-size: clamp(2.25rem, 1.1rem + 3.4vw, 3.75rem);
+  line-height: 1.04;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+.hero__line {
+  display: block;
+}
+.hero__line--muted {
+  color: var(--muted);
+}
+.hero__brand {
+  white-space: nowrap;
+}
+.hero__dot {
+  color: var(--klar-red);
+}
+.hero__grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: var(--gutter);
   align-items: start;
-  padding-top: clamp(32px, 6vw, 72px);
-  padding-bottom: var(--s-8);
+  margin-top: clamp(var(--s-6), 4vw, var(--s-7));
 }
-.hero__text {
-  grid-column: 1 / span 8;
+.hero__main {
+  grid-column: 1 / span 6;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
-.hero__title {
-  margin-top: var(--s-5);
-}
 .hero__lede {
-  margin-top: var(--s-5);
-  max-width: 58ch;
-}
-.hero__form {
-  width: 100%;
-  margin-top: var(--s-7);
-}
-.hero__form--secondary {
-  margin-top: var(--s-6);
+  max-width: 46ch;
+  font-size: var(--fs-20);
+  line-height: 1.5;
+  color: var(--muted);
+  text-wrap: pretty;
 }
 .hero__notice {
   width: 100%;
@@ -425,24 +467,11 @@ const specimenDiff = [
 .hero__notice:not(:empty) {
   margin-top: var(--s-6);
 }
-.demo-cta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--s-2);
+.hero__form {
+  margin-top: var(--s-6);
+}
+.hero__form--secondary {
   margin-top: var(--s-7);
-}
-.demo-cta__row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--s-3);
-}
-.demo-cta__open {
-  --btn-h: 56px;
-}
-.demo-cta > .es {
-  margin-top: var(--s-3);
 }
 .hero__retrying {
   align-self: center;
@@ -454,200 +483,219 @@ const specimenDiff = [
   font-size: var(--fs-14);
   font-weight: 600;
 }
-.send-notice {
+
+/* Replay mode: the demo is the primary action. */
+.demo-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-3);
+  margin-top: var(--s-6);
+}
+.demo-cta__row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px 8px;
-  margin-top: var(--s-3);
-  font-size: var(--fs-14);
-  color: var(--muted);
-}
-.send-notice__link {
-  font-weight: 600;
-}
-.recent {
-  width: 100%;
-  max-width: 760px;
-  margin-top: var(--s-7);
-}
-.recent__title {
-  margin-bottom: var(--s-3);
-  font-size: var(--fs-14);
-  font-weight: 700;
-}
-.recent__list {
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--line);
-}
-.recent__item {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px var(--s-3);
-  min-height: 48px;
-  padding: 12px 4px;
-  border-bottom: 1px solid var(--line);
-  color: var(--ink);
-  text-decoration: none;
-}
-.recent__item:hover {
-  background: var(--surface-2);
-}
-.recent__name {
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-.recent__meta {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  font-size: var(--fs-14);
-  color: var(--muted);
-}
-.recent__arrow {
-  margin-left: auto;
-  align-self: center;
-  color: var(--muted);
+  gap: var(--s-2);
 }
 .demo-cta__btn {
   --btn-h: 56px;
-  padding: 0 24px 0 28px;
-  font-size: var(--fs-20);
   gap: 12px;
+  padding: 0 24px 0 28px;
+  border-radius: 12px;
+  font-size: var(--fs-20);
+}
+.demo-cta__open {
+  --btn-h: 56px;
 }
 .demo-cta__sub {
   font-size: var(--fs-14);
   color: var(--muted);
 }
-.example {
-  margin-top: var(--s-5);
+
+/* Live modes: the demo is one quiet, obvious shortcut under the field. */
+.demo-link {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   min-height: 40px;
-  padding: 0 14px;
+  margin-left: -2px;
+  padding: 0 14px 0 13px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--r-pill);
-  font-size: var(--fs-14);
   color: var(--ink);
-  transition: border-color var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
+  font-size: var(--fs-14);
+  transition: border-color var(--dur-2) var(--ease-out), transform var(--dur-1) var(--ease-out);
 }
-.example:hover:not(:disabled) {
-  border-color: var(--ink);
+.demo-link:hover:not(:disabled) {
+  border-color: var(--control-border);
 }
-.example:active:not(:disabled) {
-  transform: translateY(1px);
+.demo-link:active:not(:disabled) {
+  transform: scale(0.98);
 }
-.example__name {
+.demo-link:disabled {
+  opacity: 0.55;
+  cursor: progress;
+}
+.demo-link__name {
   font-weight: 600;
 }
-.example__sub {
+.demo-link__sub {
   color: var(--muted);
 }
-.specimen {
-  grid-column: 9 / span 4;
-  align-self: start;
-  margin: 56px 0 0;
+.demo-link__arrow {
+  transition: transform var(--dur-2) var(--ease-out);
 }
-.specimen__tag {
-  align-self: flex-start;
-  padding: 2px 10px;
+@media (hover: hover) {
+  .demo-link:hover:not(:disabled) .demo-link__arrow {
+    transform: translateX(3px);
+  }
+}
+
+.send-notice {
+  max-width: 640px;
+  margin-top: var(--s-4);
+  font-size: var(--fs-14);
+  color: var(--muted);
+}
+.send-notice > svg {
+  margin-right: 8px;
+  vertical-align: 0;
+}
+.send-notice__link {
+  margin-left: 8px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* A compact, non-blocking notice. */
+.hint {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  width: 100%;
+  max-width: 640px;
+  margin-top: var(--s-6);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-14);
+  line-height: 1.5;
+}
+.hint > svg {
+  margin-top: 5px;
+}
+.hint__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  min-width: 0;
+  color: var(--muted);
+}
+.hint__body strong {
+  color: var(--ink);
+  font-weight: 650;
+}
+.hint__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-4);
+}
+.hint__btn {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--control-border);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--fs-14);
+  font-weight: 600;
+}
+.hint__btn:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+.hint__link {
+  font-weight: 600;
+}
+.hint__details summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+.hint__details pre {
+  margin-top: var(--s-2);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: var(--fs-12);
+}
+
+/* ---- The story (illustration) --------------------------------------------- */
+.story {
+  --t-scanner: 700ms;
+  --t-klar: 1500ms;
+  --t-mark: 2250ms;
+  --t-you: 2700ms;
+  --t-press: 3150ms;
+  --t-accept: 3300ms;
+  grid-column: 8 / span 5;
+  margin: 0;
+}
+.story__card {
+  position: relative;
+  padding: var(--s-5);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lift);
+}
+.story__tag {
+  position: absolute;
+  top: var(--s-4);
+  right: var(--s-4);
+  padding: 1px 9px;
   border: 1px dashed var(--control-border);
   border-radius: var(--r-pill);
   font-size: var(--fs-12);
   font-weight: 600;
   color: var(--muted);
 }
-/* Inert look: these are labels in a picture, not buttons. */
-.specimen__label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 30px;
-  padding: 0 10px;
-  border: 1px dashed var(--control-border);
-  border-radius: var(--r-control);
-  color: var(--muted);
-  font-size: var(--fs-14);
-  font-weight: 500;
-  cursor: default;
-  user-select: none;
-}
-.specimen__card {
+.story__page {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: var(--s-4);
-  padding: var(--s-5);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-card);
-  box-shadow: 0 1px 0 var(--line), 0 24px 48px -24px color-mix(in srgb, var(--ink) 18%, transparent);
+  padding-right: 96px;
 }
-.specimen__chips {
+.story__chart {
+  flex: none;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--s-3);
+  align-items: flex-end;
+  gap: 4px;
+  width: 76px;
+  height: 56px;
+  padding: 8px 8px 0;
+  background: var(--surface-2);
+  border-radius: 8px;
+  box-shadow: inset 0 -1px 0 var(--line);
 }
-.specimen__impact {
-  font-size: var(--fs-20);
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: -0.015em;
+.story__bar {
+  flex: 1;
+  background: var(--blue);
+  border-radius: 2px 2px 0 0;
+  transform-origin: bottom;
+  animation: story-bar var(--dur-4) var(--ease-out) both;
+  animation-delay: calc(250ms + var(--i) * var(--stagger));
 }
-.specimen__actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--s-2);
+.story__bar:last-child {
+  background: var(--ink);
 }
-.how__grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--gutter);
-  margin: 0;
-  padding: 0;
+.story__code {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  white-space: nowrap;
 }
-.how__step {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-3);
-  padding-top: var(--s-5);
-  border-top: 2px solid var(--ink);
-}
-.how__step--accent {
-  border-top-color: var(--klar-red);
-}
-.how__num {
-  font-size: var(--fs-14);
-  color: var(--muted);
-}
-.how__title {
-  font-size: var(--fs-24);
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-}
-.how__body {
-  color: var(--muted);
-  max-width: 40ch;
-}
-.how__visual {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--s-3);
-  margin-top: auto;
-  padding: var(--s-4);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-card);
-  min-height: 72px;
-}
-.how__code {
-  font-size: var(--fs-14);
+.story__indent {
+  display: inline-block;
+  width: 2ch;
 }
 .tk-p {
   color: var(--syn-punct);
@@ -662,64 +710,373 @@ const specimenDiff = [
 .tk-v {
   color: var(--syn-value);
 }
-.how__ok {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: var(--fs-14);
-  font-weight: 600;
-  color: var(--green);
+.story__rows {
+  margin: var(--s-5) 0 0;
+  padding: 0;
+  list-style: none;
 }
-.how__q {
-  font-size: var(--fs-14);
-  font-weight: 600;
-}
-.trust {
-  margin-top: var(--s-8);
-}
-.trust__list {
+.story__row {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin: 0;
-  padding: var(--s-5) 0 0;
+  grid-template-columns: 4.25rem minmax(0, 1fr);
+  gap: var(--s-3);
+  align-items: start;
+  padding: var(--s-4) 0;
   border-top: 1px solid var(--line);
-  gap: var(--gutter);
 }
-.trust__list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: var(--fs-14);
-  font-weight: 500;
+.story__row:last-child {
+  padding-bottom: 0;
 }
-.trust__list svg {
-  flex: none;
-  margin-top: 1px;
+.story__row--you {
+  align-items: center;
+}
+.story__row--you .story__who {
+  padding-top: 0;
+}
+.story__who {
+  padding-top: 2px;
+  font-size: var(--fs-12);
+  font-weight: 600;
+  letter-spacing: 0.01em;
   color: var(--muted);
 }
+.story__who--klar {
+  color: var(--ink);
+  font-weight: 700;
+}
+.story__what {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+  min-width: 0;
+}
+.story__what--stack {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--s-3);
+}
+.story__muted {
+  font-size: var(--fs-14);
+  color: var(--muted);
+}
+.story__chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+}
+.story__impact {
+  font-size: var(--fs-16);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  text-wrap: pretty;
+}
+.story__diff {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-control);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+.story__del,
+.story__add {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.75em minmax(0, 1fr);
+  padding: 3px 10px 3px 0;
+  isolation: isolate;
+}
+.story__del {
+  background: var(--diff-del);
+}
+.story__add {
+  background: var(--diff-add);
+}
+/* The fix gets marked like a highlighter: a layer that sweeps in (transform only). */
+.story__add::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--diff-add-strong);
+  transform-origin: left center;
+  animation: story-sweep var(--dur-4) var(--ease-out) both;
+  animation-delay: var(--t-mark);
+}
+.story__del code,
+.story__add code {
+  font-size: inherit;
+  overflow-wrap: anywhere;
+}
+.story__del code {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.story__sign {
+  text-align: center;
+  font-weight: 700;
+}
+.story__del .story__sign {
+  color: var(--red-text);
+}
+.story__add .story__sign {
+  color: var(--green);
+}
+
+/* Accept: pressed, the check draws itself, the label turns to "Accepted". */
+/* Two columns (check, label); "Accept" spans both so it sits centred before the check appears. */
+.story__accept {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 16px auto;
+  align-items: center;
+  column-gap: 6px;
+  height: 34px;
+  padding: 0 14px 0 11px;
+  border: 1px solid var(--control-border);
+  border-radius: var(--r-control);
+  font-size: var(--fs-14);
+  font-weight: 600;
+  isolation: isolate;
+  animation: story-press var(--dur-3) var(--ease-out) both;
+  animation-delay: var(--t-press);
+}
+.story__accept-bg {
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  background: var(--green-tint);
+  border: 1px solid var(--green);
+  border-radius: inherit;
+  animation: story-in var(--dur-3) var(--ease-out) both;
+  animation-delay: var(--t-accept);
+}
+.story__check {
+  grid-area: 1 / 1;
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.story__check .m-draw {
+  animation-delay: var(--t-accept);
+}
+.story__label-a {
+  grid-area: 1 / 1 / 2 / 3;
+  justify-self: center;
+  color: var(--ink);
+  opacity: 0;
+  animation: story-out var(--dur-2) var(--ease-out) both;
+  animation-delay: var(--t-accept);
+}
+.story__label-b {
+  grid-area: 1 / 2;
+  color: var(--green);
+  animation: story-in var(--dur-3) var(--ease-out) both;
+  animation-delay: var(--t-accept);
+}
+
+/* Rows enter in turn. The resting state is the final frame (reduced motion shows it at once). */
+.story__row--scanner {
+  animation: story-rise var(--dur-4) var(--ease-out) both;
+  animation-delay: var(--t-scanner);
+}
+.story__row--klar {
+  animation: story-slide var(--dur-4) var(--ease-out) both;
+  animation-delay: var(--t-klar);
+}
+.story__row--you {
+  animation: story-rise var(--dur-4) var(--ease-out) both;
+  animation-delay: var(--t-you);
+}
+@keyframes story-bar {
+  from {
+    transform: scaleY(0);
+  }
+}
+@keyframes story-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes story-slide {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+@keyframes story-sweep {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes story-press {
+  50% {
+    transform: scale(0.94);
+  }
+}
+@keyframes story-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes story-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+/* The story waits until it scrolls into view (v-reveal), so on phones it plays where it is seen. */
+.story[data-reveal='out'] *,
+.story[data-reveal='out'] *::before {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .story,
+  .story *,
+  .story *::before {
+    animation: none !important;
+  }
+}
+
+/* ---- Recent checks ---------------------------------------------------------- */
+/* Same columns as the hero, so the list lines up with the field above it. */
+.recent {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  padding-bottom: var(--s-8);
+}
+.recent > * {
+  grid-column: 1 / span 6;
+}
+.recent__title {
+  margin-bottom: var(--s-4);
+  font-size: var(--fs-16);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+.recent__list {
+  display: grid;
+  gap: var(--s-2);
+  margin: 0;
+  padding: 0;
+}
+.recent__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px var(--s-3);
+  min-height: 56px;
+  padding: 10px var(--s-4);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  color: var(--ink);
+  text-decoration: none;
+}
+.recent__item:hover {
+  border-color: var(--control-border);
+}
+.recent__name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.recent__when {
+  font-size: var(--fs-14);
+  color: var(--muted);
+}
+.recent__status {
+  margin-left: auto;
+  font-size: var(--fs-14);
+  font-weight: 600;
+  color: var(--amber);
+}
+.recent__status.is-clear {
+  color: var(--green);
+}
+.recent__arrow {
+  color: var(--muted);
+  transition: transform var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out);
+}
+.recent__status + .recent__arrow {
+  margin-left: var(--s-2);
+}
+.recent__when + .recent__arrow {
+  margin-left: auto;
+}
+@media (hover: hover) {
+  .recent__item:hover .recent__arrow {
+    color: var(--ink);
+    transform: translateX(3px);
+  }
+}
+
+/* ---- Responsive -------------------------------------------------------------- */
 @media (max-width: 1100px) {
-  .hero__text {
+  .hero__main,
+  .recent > * {
+    grid-column: 1 / span 7;
+  }
+  .story {
+    grid-column: 8 / span 5;
+  }
+}
+@media (max-width: 900px) {
+  .hero__main,
+  .story,
+  .recent > * {
     grid-column: 1 / -1;
   }
-  .specimen {
-    grid-column: 1 / -1;
+  .story {
     max-width: 520px;
     margin-top: var(--s-7);
   }
 }
-@media (max-width: 860px) {
-  .how__grid,
-  .trust__list {
-    grid-template-columns: 1fr 1fr;
+@media (max-width: 480px) {
+  .story__card {
+    padding: var(--s-4);
+  }
+  .story__page {
+    padding-right: 0;
+    padding-top: var(--s-6);
+  }
+  .story__row {
+    grid-template-columns: 1fr;
+    gap: var(--s-2);
+  }
+  .demo-link__sub {
+    display: none;
+  }
+  .recent__status {
+    margin-left: 0;
+  }
+  .recent__item {
+    position: relative;
+    padding-right: 44px;
+  }
+  .recent__item .recent__arrow {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: var(--s-4);
+    margin: auto 0;
   }
 }
-@media (max-width: 560px) {
-  .how__grid,
-  .trust__list {
-    grid-template-columns: 1fr;
+@media (forced-colors: active) {
+  .story__bar {
+    background: CanvasText;
   }
-  .example__sub {
-    display: none;
+  .hero__dot {
+    color: CanvasText;
   }
 }
 </style>

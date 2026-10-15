@@ -3,6 +3,8 @@
  * Light by default; dark via prefers-color-scheme unless the user forced light,
  * or via [data-theme="dark"] (manual toggle). Every text pair is ≥ 4.5:1;
  * borders of form controls and graphical fills are ≥ 3:1 (WCAG 1.4.11).
+ * --line and --line-strong are decorative hairlines only: never the sole boundary
+ * of a form field (fields use --control-border).
  */
 
 :root {
@@ -14,6 +16,7 @@
   --ink: #0f1115;
   --muted: #565b66;
   --line: #e4e2dc;
+  --line-strong: #d3d0c8;
   --klar-red: #d0021b;
   --red-text: #b00016;
   --green: #13703a;
@@ -23,11 +26,19 @@
   /* Derived neutrals */
   --surface-2: #f3f2ee;
   --surface-3: #eae8e2;
+  /* A control lifted off a --surface-2 track (segmented thumbs): lighter in both themes. */
+  --surface-raised: #ffffff;
   --ink-hover: #2a2e36;
+  --ink-press: #000000;
   --on-ink: #fafaf7;
   --control-border: #858a94;
   --fill-rule: #858a94;
   --grey-shape: #6b707a;
+  /* Focus ring: ≥ 3:1 against --bg, --surface and --surface-2. */
+  --ring: #1f4fd8;
+  /* Status shapes drawn on an --ink surface (toasts): ≥ 3:1 against --ink. */
+  --green-on-ink: #3dd47a;
+  --red-on-ink: #ff5a5c;
 
   /* Tints (backgrounds only — text on them stays ≥ 4.5:1) */
   --red-tint: #fcecee;
@@ -48,24 +59,41 @@
   --syn-value: #13703a;
   --syn-punct: #565b66;
 
-  /* Elevation: a single soft shadow, overlays only */
+  /* Elevation: hairline shadows for controls, one soft shadow for overlays. */
+  --shadow-xs: 0 1px 2px rgba(15, 17, 21, 0.06);
+  --shadow-btn: 0 1px 2px rgba(15, 17, 21, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   --shadow-overlay: 0 1px 2px rgba(15, 17, 21, 0.06), 0 16px 48px rgba(15, 17, 21, 0.14);
+  /* Translucent header once the page scrolls under it. */
+  --hdr-glass: color-mix(in srgb, var(--bg) 76%, transparent);
 
   /* Type */
   --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Menlo, Consolas, monospace;
   --fs-12: 0.75rem;
+  --fs-13: 0.8125rem;
   --fs-14: 0.875rem;
+  --fs-15: 0.9375rem;
   --fs-16: 1rem;
+  --fs-18: 1.125rem;
   --fs-20: 1.25rem;
   --fs-24: 1.5rem;
   --fs-32: 2rem;
+  --fs-40: 2.5rem;
   --fs-48: 3rem;
   --fs-64: 4rem;
   --lh-body: 1.5;
-  --lh-display: 1.1;
+  --lh-snug: 1.3;
+  --lh-heading: 1.12;
+  --lh-display: 1.04;
+  /* Tracking tightens as size grows (Inter, optical). */
+  --tr-display: -0.035em;
+  --tr-h1: -0.03em;
+  --tr-h2: -0.022em;
+  --tr-h3: -0.014em;
+  --tr-ui: -0.006em;
+  --tr-caps: 0.06em;
 
-  /* Space */
+  /* Space (4 px rhythm) */
   --s-1: 4px;
   --s-2: 8px;
   --s-3: 12px;
@@ -75,10 +103,13 @@
   --s-7: 48px;
   --s-8: 64px;
   --s-9: 96px;
+  --s-10: 128px;
 
   /* Shape */
-  --r-card: 10px;
+  --r-sm: 6px;
   --r-control: 8px;
+  --r-card: 12px;
+  --r-lg: 16px;
   --r-pill: 999px;
 
   /* Layout */
@@ -87,11 +118,12 @@
   --page-pad: 16px;
   --bar-h: 64px;
   --mock-h: 0px;
-  /* Total sticky header height (navigation bar + mock-up banner when shown). */
+  /* Total sticky header height (navigation bar + mock-up banner when shown).
+     AppHeader overwrites it with the measured height, so wrapped banners stay exact. */
   --header-h: calc(var(--bar-h) + var(--mock-h));
   --drawer-w: 560px;
 
-  /* Motion */
+  /* Motion (base durations; curves and longer durations live in motion.css) */
   --dur-1: 150ms;
   --dur-2: 200ms;
   --dur-3: 250ms;
@@ -100,12 +132,6 @@
 
 :root.is-mock {
   --mock-h: 40px;
-}
-@media (max-width: 640px) {
-  /* Two lines on small screens: the message, then the button to leave. */
-  :root.is-mock {
-    --mock-h: 76px;
-  }
 }
 
 @media (min-width: 640px) {
@@ -125,6 +151,7 @@
     --ink: #f2f1ec;
     --muted: #a3a8b3;
     --line: #2a2d35;
+    --line-strong: #363a44;
     --klar-red: #ff4d4f;
     --red-text: #ff4d4f;
     --green: #3dd47a;
@@ -132,11 +159,16 @@
     --blue: #7fa2ff;
     --surface-2: #1c1f25;
     --surface-3: #252931;
+    --surface-raised: #2c3039;
     --ink-hover: #d9d8d2;
+    --ink-press: #ffffff;
     --on-ink: #0b0c0f;
     --control-border: #6e7380;
     --fill-rule: #6e7380;
     --grey-shape: #8c919c;
+    --ring: #7fa2ff;
+    --green-on-ink: #13703a;
+    --red-on-ink: #c00019;
     --red-tint: #2a1416;
     --green-tint: #11251a;
     --amber-tint: #2a1f0f;
@@ -152,7 +184,10 @@
     --syn-attr: #f2b45b;
     --syn-value: #5fdc92;
     --syn-punct: #a3a8b3;
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-btn: 0 1px 2px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35);
     --shadow-overlay: 0 1px 2px rgba(0, 0, 0, 0.4), 0 16px 48px rgba(0, 0, 0, 0.55);
+    --hdr-glass: color-mix(in srgb, var(--bg) 72%, transparent);
   }
 }
 
@@ -163,6 +198,7 @@
   --ink: #f2f1ec;
   --muted: #a3a8b3;
   --line: #2a2d35;
+  --line-strong: #363a44;
   --klar-red: #ff4d4f;
   --red-text: #ff4d4f;
   --green: #3dd47a;
@@ -170,11 +206,16 @@
   --blue: #7fa2ff;
   --surface-2: #1c1f25;
   --surface-3: #252931;
+  --surface-raised: #2c3039;
   --ink-hover: #d9d8d2;
+  --ink-press: #ffffff;
   --on-ink: #0b0c0f;
   --control-border: #6e7380;
   --fill-rule: #6e7380;
   --grey-shape: #8c919c;
+  --ring: #7fa2ff;
+  --green-on-ink: #13703a;
+  --red-on-ink: #c00019;
   --red-tint: #2a1416;
   --green-tint: #11251a;
   --amber-tint: #2a1f0f;
@@ -190,5 +231,8 @@
   --syn-attr: #f2b45b;
   --syn-value: #5fdc92;
   --syn-punct: #a3a8b3;
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-btn: 0 1px 2px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35);
   --shadow-overlay: 0 1px 2px rgba(0, 0, 0, 0.4), 0 16px 48px rgba(0, 0, 0, 0.55);
+  --hdr-glass: color-mix(in srgb, var(--bg) 72%, transparent);
 }

@@ -120,6 +120,13 @@ function onKey(e: KeyboardEvent, i: number) {
 function indexOf(c: WcagCriterion) {
   return flat.value.indexOf(c)
 }
+
+/** Reveal order: a quick diagonal wave across the grid (stagger units, see v-reveal). */
+function wave(c: WcagCriterion): number {
+  const gi = groups.value.findIndex((g) => g.p === c.principle)
+  const col = groups.value[gi]!.items.indexOf(c)
+  return Math.round((col + gi * 2.5) * 0.3 * 100) / 100
+}
 </script>
 
 <template>
@@ -159,6 +166,7 @@ function indexOf(c: WcagCriterion) {
             v-for="c in g.items"
             :key="c.code"
             :ref="(el) => { if (el) cells[indexOf(c)] = el as HTMLButtonElement }"
+            v-reveal="wave(c)"
             type="button"
             class="cell"
             :class="{ 'is-selected': selected === c.code, 'has-findings': stats.has(c.code), 'is-planned': kind(c.code) === 'planned' }"

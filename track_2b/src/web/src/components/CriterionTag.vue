@@ -79,7 +79,11 @@ const open = ref(false)
   z-index: 30;
   left: 0;
   top: calc(100% + 8px);
-  display: none;
+  display: flex;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity var(--dur-1) var(--ease-out), transform var(--dur-1) var(--ease-out), visibility 0s linear var(--dur-1);
   flex-direction: column;
   gap: 2px;
   width: max-content;
@@ -94,7 +98,10 @@ const open = ref(false)
   line-height: 1.4;
 }
 .crit__tip.is-open {
-  display: flex;
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition-delay: 0s;
 }
 /* Invisible bridge so the pointer can move onto the tooltip (WCAG 1.4.13 hoverable). */
 .crit__tip::before {

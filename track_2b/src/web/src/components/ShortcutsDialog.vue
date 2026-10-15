@@ -16,14 +16,25 @@ watch(shortcutsDialogOpen, (open) => {
   if (!open && d.open) d.close()
 })
 
-const rows: { keys: string[]; label: MessageKey }[] = [
-  { keys: ['/'], label: 'shortcuts.focus' },
-  { keys: ['J'], label: 'shortcuts.next' },
-  { keys: ['K'], label: 'shortcuts.prev' },
-  { keys: ['A'], label: 'shortcuts.accept' },
-  { keys: ['R'], label: 'shortcuts.reject' },
-  { keys: ['Esc'], label: 'shortcuts.close' },
-  { keys: ['?'], label: 'shortcuts.help' },
+type Row = { keys: string[]; label: MessageKey }
+const groups: { title: MessageKey; rows: Row[] }[] = [
+  {
+    title: 'shortcuts.groupGlobal',
+    rows: [
+      { keys: ['/'], label: 'shortcuts.focus' },
+      { keys: ['?'], label: 'shortcuts.help' },
+    ],
+  },
+  {
+    title: 'shortcuts.groupFindings',
+    rows: [
+      { keys: ['J'], label: 'shortcuts.next' },
+      { keys: ['K'], label: 'shortcuts.prev' },
+      { keys: ['A'], label: 'shortcuts.accept' },
+      { keys: ['R'], label: 'shortcuts.reject' },
+      { keys: ['Esc'], label: 'shortcuts.close' },
+    ],
+  },
 ]
 </script>
 
@@ -32,23 +43,21 @@ const rows: { keys: string[]; label: MessageKey }[] = [
     <div class="dlg__inner">
       <div class="dlg__head">
         <h2 :id="titleId" class="h3">{{ t('shortcuts.title') }}</h2>
-        <button type="button" class="btn btn--ghost btn--icon btn--sm" :aria-label="t('common.close')" @click="shortcutsDialogOpen = false">
+        <button type="button" class="btn btn--ghost btn--icon btn--sm dlg__x" :aria-label="t('common.close')" @click="shortcutsDialogOpen = false">
           <X :size="18" aria-hidden="true" />
         </button>
       </div>
-      <table class="dlg__table">
-        <tbody>
-          <tr v-for="r in rows" :key="r.label">
-            <th scope="row"><kbd v-for="k in r.keys" :key="k">{{ k }}</kbd></th>
-            <td>{{ t(r.label) }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <p class="dlg__scope">{{ t('shortcuts.scope') }}</p>
-      <ul class="dlg__hints" role="list">
-        <li><strong>{{ t('outcome.failed') }}, {{ t('outcome.passed') }}</strong> · {{ t('decide.hint.failed') }}</li>
-        <li><strong>{{ t('outcome.cantTell') }}</strong> · {{ t('decide.hint.review') }}</li>
-      </ul>
+
+      <div v-for="g in groups" :key="g.title" class="dlg__group">
+        <h3 class="dlg__group-title">{{ t(g.title) }}</h3>
+        <dl class="dlg__rows">
+          <div v-for="r in g.rows" :key="r.label" class="dlg__row">
+            <dt>{{ t(r.label) }}</dt>
+            <dd><kbd v-for="k in r.keys" :key="k">{{ k }}</kbd></dd>
+          </div>
+        </dl>
+      </div>
+
       <div class="dlg__switch">
         <div>
           <p class="dlg__switch-label" :id="`${hintId}-l`">{{ t('shortcuts.toggle') }}</p>
@@ -73,11 +82,11 @@ const rows: { keys: string[]; label: MessageKey }[] = [
 
 <style scoped>
 .dlg {
-  width: min(520px, calc(100vw - 32px));
-  max-height: calc(100vh - 64px);
+  width: min(460px, calc(100vw - 32px));
+  max-height: calc(100dvh - 64px);
   padding: 0;
   border: 1px solid var(--line);
-  border-radius: var(--r-card);
+  border-radius: var(--r-lg);
   background: var(--surface);
   color: var(--ink);
   box-shadow: var(--shadow-overlay);
@@ -86,7 +95,21 @@ const rows: { keys: string[]; label: MessageKey }[] = [
   background: var(--scrim);
 }
 .dlg[open] {
-  animation: klar-fade-up var(--dur-2) var(--ease);
+  animation: dlg-in var(--dur-3) var(--ease-out);
+}
+.dlg[open]::backdrop {
+  animation: dlg-fade var(--dur-2) var(--ease-out);
+}
+@keyframes dlg-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+@keyframes dlg-fade {
+  from {
+    opacity: 0;
+  }
 }
 .dlg__inner {
   padding: var(--s-5);
@@ -95,37 +118,40 @@ const rows: { keys: string[]; label: MessageKey }[] = [
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--s-4);
 }
-.dlg__table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--fs-14);
+.dlg__x {
+  margin-right: -8px;
+  color: var(--muted);
 }
-.dlg__table th,
-.dlg__table td {
-  padding: 10px 0;
+.dlg__x:hover {
+  color: var(--ink);
+}
+.dlg__group {
+  margin-top: var(--s-5);
+}
+.dlg__group-title {
+  font-size: var(--fs-12);
+  font-weight: 600;
+  letter-spacing: var(--tr-caps);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.dlg__rows {
+  margin: var(--s-2) 0 0;
+}
+.dlg__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  min-height: 40px;
   border-top: 1px solid var(--line);
-  text-align: left;
-  vertical-align: middle;
-}
-.dlg__table th {
-  width: 5.5rem;
-  font-weight: 400;
-}
-.dlg__scope {
-  margin-top: var(--s-3);
   font-size: var(--fs-14);
-  color: var(--muted);
 }
-.dlg__hints {
-  margin: var(--s-3) 0 0;
-  padding-left: 1.1em;
-  font-size: var(--fs-14);
-  color: var(--muted);
-}
-.dlg__hints li + li {
-  margin-top: 4px;
+.dlg__row dd {
+  display: inline-flex;
+  gap: 4px;
+  margin: 0;
 }
 .dlg__switch {
   display: flex;
@@ -135,22 +161,26 @@ const rows: { keys: string[]; label: MessageKey }[] = [
   margin-top: var(--s-5);
   padding: var(--s-4);
   background: var(--surface-2);
-  border-radius: var(--r-control);
+  border-radius: var(--r-card);
 }
 .dlg__switch-label {
+  font-size: var(--fs-14);
   font-weight: 600;
 }
 .dlg__switch-hint {
-  font-size: var(--fs-14);
+  margin-top: 2px;
+  font-size: var(--fs-13);
   color: var(--muted);
 }
 .switch {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  flex: none;
   min-height: 44px;
   padding: 0 4px;
   border: 0;
+  border-radius: var(--r-control);
   background: transparent;
   font-size: var(--fs-14);
   font-weight: 600;
@@ -162,7 +192,7 @@ const rows: { keys: string[]; label: MessageKey }[] = [
   border-radius: 12px;
   background: var(--surface);
   border: 1.5px solid var(--control-border);
-  transition: background-color var(--dur-1) var(--ease);
+  transition: background-color var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out);
 }
 .switch__thumb {
   position: absolute;
@@ -172,7 +202,7 @@ const rows: { keys: string[]; label: MessageKey }[] = [
   height: 17px;
   border-radius: 50%;
   background: var(--muted);
-  transition: transform var(--dur-1) var(--ease), background-color var(--dur-1) var(--ease);
+  transition: transform var(--dur-3) var(--ease-spring), background-color var(--dur-2) var(--ease-out);
 }
 .switch[aria-checked='true'] .switch__track {
   background: var(--ink);
@@ -185,5 +215,19 @@ const rows: { keys: string[]; label: MessageKey }[] = [
 .switch__text {
   min-width: 5.5em;
   text-align: left;
+}
+@media (max-width: 420px) {
+  .dlg__switch {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+@media (forced-colors: active) {
+  .switch__thumb {
+    background: CanvasText;
+  }
+  .switch[aria-checked='true'] .switch__track {
+    background: Highlight;
+  }
 }
 </style>
