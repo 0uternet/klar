@@ -43,7 +43,7 @@ export const de: Record<MessageKey, string> = {
   'footer.requests': 'Die Oberfläche lädt nichts von Dritten: kein CDN, keine Webfonts, keine Telemetrie.',
   'footer.shortcuts': 'Tastenkürzel anzeigen',
   'footer.version': 'Version {v}',
-  'footer.a11y': 'Gebaut nach WCAG 2.2 AA',
+  'footer.a11y': 'In der CI mit axe-core geprüft',
 
   'home.docTitle': 'Klar. – Sinnprüfung für ein barrierefreies Schweizer Web',
   'home.eyebrow': 'WCAG 2.1 AA · eCH-0059 · Apertus',

@@ -43,7 +43,7 @@ export const fr: Record<MessageKey, string> = {
   'footer.requests': 'L’interface ne charge rien chez des tiers : ni CDN, ni polices web, ni télémétrie.',
   'footer.shortcuts': 'Afficher les raccourcis clavier',
   'footer.version': 'Version {v}',
-  'footer.a11y': 'Conçu selon les WCAG 2.2 AA',
+  'footer.a11y': 'Vérifié avec axe-core en CI',
 
   'home.docTitle': 'Klar. – Le contrôle du sens pour un web suisse accessible',
   'home.eyebrow': 'WCAG 2.1 AA · eCH-0059 · Apertus',

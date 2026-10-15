@@ -1,10 +1,10 @@
-# Klar. labelling protocol (v1)
+# Klar. labelling protocol (v1.4)
 
 | | |
 |---|---|
-| **Status** | Written before any model run. The labels are frozen by the git tag `labels-v1`, which the project lead sets **after** the founder's review of the 50-case sample and **before** the first test-split model call. The data engineer does not set the tag. |
+| **Status** | Written before any model run. The labels are frozen by the git tag `labels-v1`, which the founder sets **after** reviewing the 50-case sample and **before** the first test-split model call. |
 | **Date** | 14 October 2026 |
-| **Annotator** | One annotator (Klar. data & evaluation engineer). A blind second-annotator check on a stratified sample of 50 test cases is pending (`review_sample.csv`). |
+| **Annotator** | Labels by construction: the seeded generator applies this protocol's decision rules, and no model labels any case. Human check: the founder blind-labels a stratified sample of 50 test cases (`review_sample.csv`, Cohen's κ). |
 | **Scope** | The 26 WCAG 2.1 AA success criteria that Klar. pre-checks with Apertus or with rules (§ 10). |
 | **Applies to** | `data/testset/generated/**` (labels by construction), `data/testset/act/**` (W3C labels, § 8) and the demo-site answer keys `data/demo-truth/ISSUES.md` and `issues.jsonl`. |
 
@@ -163,7 +163,7 @@ Two classes matter most for Klar.'s design: **2.4.4 heading-only link context** 
 1. **Construction checks.** `scripts/validate_testset.py` must report no errors. It checks paths, that each selector matches exactly one element, well-formedness, leakage, local references and sizes.
 2. **Second annotator.** `scripts/sample_for_review.py` draws 50 stratified `test` cases into `review_sample.csv`. The file is blind: it holds no labels, rule ids or notes. A second annotator who did not write the generator labels them using only this protocol. `--score` then reports observed agreement and Cohen's κ, both 4-way and binary (failed / not failed). Disagreements are adjudicated, and each outcome is logged in § 11: label fixed, protocol rule clarified, or case discarded.
 3. **Leakage.** `python -I scripts/check_leakage.py` must print `0 overlaps` (D3). It is run in CI and before the freeze.
-4. **Freeze.** The project lead tags `labels-v1` after the founder's review of `review_sample.csv` and before any test-split model call. `STATS.md` records the sha256 of `manifest.jsonl`, and the eval runner compares it with the tagged manifest. Any later label change is logged in § 11 with its reason. Results are then reported on both label versions.
+4. **Freeze.** The founder tags `labels-v1` after the review of `review_sample.csv` and before any test-split model call. `STATS.md` records the sha256 of `manifest.jsonl`, and the eval runner compares it with the tagged manifest. Any later label change is logged in § 11 with its reason. Results are then reported on both label versions.
 
 ## 10. Decision rules per criterion
 

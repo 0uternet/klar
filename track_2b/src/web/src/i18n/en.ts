@@ -44,7 +44,7 @@ export const en = {
   'footer.requests': 'The interface loads nothing from third parties: no CDN, no web fonts, no telemetry.',
   'footer.shortcuts': 'Show keyboard shortcuts',
   'footer.version': 'Version {v}',
-  'footer.a11y': 'Built to WCAG 2.2 AA',
+  'footer.a11y': 'Checked with axe-core in CI',
 
   // Home
   'home.docTitle': 'Klar. – Meaning checks for an accessible Swiss web',

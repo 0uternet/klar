@@ -9,9 +9,9 @@ size_categories: [n<1K]
 tags: [accessibility, wcag, a11y, evaluation, act-rules, switzerland, multilingual]
 ---
 
-# Klar. evaluation set: WCAG 2.1 AA criteria that need judgement (draft dataset card)
+# Klar. evaluation set: WCAG 2.1 AA criteria that need judgement
 
-> **Status:** draft dataset card. Labels are frozen by the git tag `labels-v1`, which is set after the human review of the 50-case sample and before any test-split model call.
+> **Status:** labels are frozen by the git tag `labels-v1`, which the founder sets after the blind review of the 50-case sample and before any test-split model call.
 > Counts are in [`STATS.md`](STATS.md), which `scripts/build_manifest.py` regenerates. `STATS.md` also records the sha256 of `manifest.jsonl`.
 
 ## 1. Purpose
