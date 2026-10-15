@@ -8,7 +8,7 @@
 #   make run-gpu        + Apertus 1.5 8B on the local NVIDIA GPU (official swiss-ai vLLM image)
 #   make run-cpu        + Apertus 1.5 8B text-only GGUF on CPU (llama.cpp), downloaded + verified
 #   make eval           evaluation on data/testset -> eval/results/ (test split: git fetch --tags first)
-#                       [SPLIT=test|dev] [SYSTEMS=axe,baseline,ours,...] [OUT=eval/results/<name>]
+#                       [SPLIT=test|dev] [SYSTEMS=axe,baseline,ours,...] [OUT=eval/results/<name>] [LIMIT=N]
 #   make record         record the demo replay from a live Apertus endpoint into data/replay/ [KEEP=1]
 #   make test           pytest + web type-check, inside Docker
 #   make airgap-check   proof of offline operation (internal-only Docker network)
@@ -46,6 +46,7 @@ AIRGAP_LLM  ?= replay
 SPLIT       ?= test
 SYSTEMS     ?=
 OUT         ?= eval/results
+LIMIT       ?=
 KEEP        ?= 0
 BUNDLE      ?= cpu
 MODEL       := swiss-ai/Apertus-v1.5-8B
@@ -68,7 +69,7 @@ override KLAR_ALLOWED_HOSTS := $(if $(strip $(KLAR_ALLOWED_HOSTS)),$(KLAR_ALLOWE
 export KLAR_ALLOWED_HOSTS
 endif
 DC           = $(COMPOSE)
-EVAL_ARGS    = --split $(SPLIT) --out /app/eval/run$(if $(strip $(SYSTEMS)), --systems $(SYSTEMS))
+EVAL_ARGS    = --split $(SPLIT) --out /app/eval/run$(if $(strip $(SYSTEMS)), --systems $(SYSTEMS))$(if $(strip $(LIMIT)), --limit $(LIMIT))
 
 # The app container runs as the host user, so files in ./var stay yours.
 # As root (or without `id`) it keeps the image's own non-root user (10001).
@@ -156,7 +157,7 @@ help:
 	@echo "  make run-gpu        + Apertus 1.5 8B on the local NVIDIA GPU (vLLM, driver >= 580, HF_TOKEN once)"
 	@echo "  make run-cpu        + Apertus 1.5 8B text-only GGUF on CPU (llama.cpp, 5 GB download once)"
 	@echo "  make eval           evaluation on data/testset -> eval/results/ (test split: needs the tag labels-v1, git fetch --tags)"
-	@echo "                      SPLIT=test|dev  SYSTEMS=axe,baseline,ours,ours_no_guard,ours_no_context  OUT=eval/results/<name>"
+	@echo "                      SPLIT=test|dev  SYSTEMS=axe,baseline,ours,ours_no_guard,ours_no_context  OUT=eval/results/<name>  LIMIT=N (first N cases)"
 	@echo "  make record         record the demo replay from the live endpoint into data/replay/ (old files -> var/; KEEP=1 appends)"
 	@echo "  make test           pytest + web type-check in Docker"
 	@echo "  make airgap-check   prove offline operation [AIRGAP_LLM=replay|cpu|gpu]"
@@ -174,8 +175,8 @@ preflight-gpu:
 
 # Create the bind-mount sources ourselves: if Docker creates them they belong to root.
 dirs:
-	@mkdir -p var eval/results models/huggingface
-	@if [ "$(HOST_UID)" = 0 ]; then chmod 0777 var eval/results; fi
+	@mkdir -p var eval/results models/huggingface data/replay
+	@if [ "$(HOST_UID)" = 0 ]; then chmod 0777 var eval/results data/replay; fi
 
 run: preflight dirs
 	@sh deploy/endpoint.sh run "$(KLAR_REPLAY)" "$(LLM_BASE_URL)" "$(LLM_NAME)" ./var "$(CFG_SRC)"
@@ -218,6 +219,8 @@ download-model: dirs
 # llm-gpu / llm-cpu, start that server first (make run-gpu / run-cpu).
 # The container has no .git: the host passes the provenance the evaluation needs, i.e. the sha256
 # of data/testset/manifest.jsonl at tag labels-v1 (empty if the tag is missing) and the commit.
+# ./data/replay is mounted read-write: a live run appends the model's answers there (commit them),
+# and a replay run (no endpoint) reads them back, so it reproduces the live results offline.
 eval: preflight dirs
 	@sh deploy/endpoint.sh eval "$(KLAR_REPLAY)" "$(LLM_BASE_URL)" "$(LLM_NAME)" ./var "$(CFG_SRC)"
 	$(if $(filter 1,$(BUILD)),$(DC) build app)
@@ -234,7 +237,8 @@ eval: preflight dirs
 	echo "$(DC) run --rm --no-deps ... app klar eval $(EVAL_ARGS)   (results -> $(OUT))"; \
 	KLAR_LABELS_MANIFEST_SHA256="$$sha" KLAR_GIT_COMMIT="$$commit" \
 	  $(DC) run --rm --no-deps -e KLAR_LABELS_MANIFEST_SHA256 -e KLAR_GIT_COMMIT \
-	  -v "$(CURDIR)/data/testset:/app/data/testset:ro,z" -v "$(abspath $(OUT)):/app/eval/run:z" \
+	  -v "$(CURDIR)/data/testset:/app/data/testset:ro,z" -v "$(CURDIR)/data/replay:/app/data/replay:z" \
+	  -v "$(abspath $(OUT)):/app/eval/run:z" \
 	  app klar eval $(EVAL_ARGS)
 	@echo; echo "==> Evaluation results: ./$(OUT)/"; ls -1 "$(OUT)" 2>/dev/null || true
 

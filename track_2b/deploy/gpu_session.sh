@@ -7,7 +7,8 @@
 #   steps: preflight start probe record eval hardware summary
 #   Idempotent and resumable: finished steps are remembered in var/gpu_session.done and skipped
 #   when the script is run again (preflight and summary always run). Log: var/gpu_session.log.
-# knobs: OUT (eval/results/apertus-8b-gpu), SYSTEMS (all five), ALLOW_NO_VISION=1, MIN_FREE_GB (60)
+# knobs: OUT (eval/results/apertus-8b-gpu), SYSTEMS (all five), ALLOW_NO_VISION=1, MIN_FREE_GB (60),
+#        RECORD_CONCURRENCY (1)
 # Not for CI. On Windows run it inside WSL2 (Ubuntu) with Docker Desktop's WSL integration.
 set -u
 script="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
@@ -30,6 +31,8 @@ GPU_URL=http://llm-gpu:8000/v1
 OUT=${OUT:-eval/results/apertus-8b-gpu}
 SYSTEMS=${SYSTEMS:-axe,baseline,ours,ours_no_guard,ours_no_context}
 MIN_FREE_GB=${MIN_FREE_GB:-60}
+# One question at a time while recording, so the demo timings are sequential (as the eval).
+RECORD_CONCURRENCY=${RECORD_CONCURRENCY:-1}
 LLM_VARS="LLM_BASE_URL=$GPU_URL LLM_NAME=$MODEL LLM_API_KEY=local KLAR_REPLAY=0"
 DC="docker compose --profile gpu"
 
@@ -43,7 +46,9 @@ mark()  { done_step "$1" || echo "$1" >> "$DONE"; }
 from=""
 while [ $# -gt 0 ]; do
   case $1 in
-    --redo) shift; [ $# -gt 0 ] && { grep -vx "$1" "$DONE" > "$DONE.tmp" 2>/dev/null; mv "$DONE.tmp" "$DONE" 2>/dev/null; } ;;
+    --redo) shift; [ $# -gt 0 ] && { grep -vx "$1" "$DONE" > "$DONE.tmp" 2>/dev/null; mv "$DONE.tmp" "$DONE" 2>/dev/null; }
+            # A new recording moves the eval's answers (same data/replay files) to var/: redo the eval too.
+            [ "${1:-}" = record ] && { grep -vx eval "$DONE" > "$DONE.tmp" 2>/dev/null; mv "$DONE.tmp" "$DONE" 2>/dev/null; } ;;
     --from) shift; from=${1:-} ;;
     -h|--help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$script"; exit 0 ;;
     *) die "unknown argument: $1" ;;
@@ -117,7 +122,7 @@ mark probe
 CUR=record; step_title "$CUR" "make record (demo replay -> data/replay/)"
 if should_run record; then
   # shellcheck disable=SC2086
-  make record BUILD=0 $LLM_VARS || die "make record failed (previous files are in var/replay-backup-*)"
+  KLAR_LLM_CONCURRENCY=$RECORD_CONCURRENCY make record BUILD=0 $LLM_VARS || die "make record failed (previous files are in var/replay-backup-*)"
   mark record
 fi
 
@@ -152,13 +157,27 @@ if should_run hardware; then
   [ -n "$cpu" ] || cpu=$(sysctl -n machdep.cpu.brand_string 2>/dev/null || uname -p)
   threads=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo "")
   ram_kb=$(sed -n 's/^MemTotal:[[:space:]]*\([0-9]*\) kB/\1/p' /proc/meminfo 2>/dev/null)
-  ram_gb=""; [ -n "$ram_kb" ] && ram_gb=$((ram_kb / 1024 / 1024))
+  ram_gb=""; [ -n "$ram_kb" ] && ram_gb=$(( (ram_kb + 524288) / 1048576 ))   # rounded GiB, not truncated
+  # Under WSL2 /proc/meminfo is the VM's share (half the host by default): record the host RAM too.
+  ram_host_gb=""
+  if grep -qi microsoft /proc/version 2>/dev/null && command -v powershell.exe >/dev/null 2>&1; then
+    b=$(powershell.exe -NoProfile -Command "(Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory" 2>/dev/null | tr -d '\r')
+    [ -n "$b" ] && ram_host_gb=$(( (b + 536870912) / 1073741824 ))
+  fi
   docker_v=$(docker version --format '{{.Server.Version}}' 2>/dev/null)
   compose_v=$(docker compose version --short 2>/dev/null)
   os=$(sed -n 's/^PRETTY_NAME="\{0,1\}\([^"]*\)"\{0,1\}/\1/p' /etc/os-release 2>/dev/null | head -n 1)
   [ -n "$os" ] || os=$(uname -sr)
   kernel=$(uname -r)
   vllm_image=$($DC config --images 2>/dev/null | grep vllm | head -n 1)
+  # what actually ran: the pulled image's digest, its CUDA, the vLLM version the server reports
+  vllm_digest=$(docker image inspect --format '{{index .RepoDigests 0}}' "$vllm_image" 2>/dev/null)
+  vllm_cuda=$(docker image inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$vllm_image" 2>/dev/null | sed -n 's/^CUDA_VERSION=//p' | head -n 1)
+  vllm_version=$($DC exec -T app python3 -c 'import json, urllib.request; print(json.load(urllib.request.urlopen("http://llm-gpu:8000/version", timeout=10)).get("version", ""))' 2>/dev/null | tr -d '\r')
+  # per-page facts of the GPU demo recording (var/ is not committed): report §5 cost and scale
+  demo_record=$($DC exec -T app python3 -c 'import glob, json
+s = [json.load(open(f, encoding="utf-8"))["stats"] for f in glob.glob("/app/var/reports/record-*.json") if not f.endswith(("-summary.json", "-latest.json"))]
+print(json.dumps({"pages": len(s), **{k: round(sum(float(x.get(k) or 0) for x in s), 2) for k in ("seconds", "to_review", "failed", "cantTell", "passed", "asked_apertus", "llm_calls", "tokens_in", "tokens_out")}}))' 2>/dev/null | tr -d '\r')
   commit=$(git rev-parse HEAD 2>/dev/null)
   rev=$(sed -n 's/.*"revision": *"\([^"]*\)".*/\1/p' data/replay/RECORDING.json 2>/dev/null | head -n 1)
   split=$(cat var/gpu_session.split 2>/dev/null || echo "")
@@ -173,11 +192,17 @@ if should_run hardware; then
   "cpu": "$(jq_esc "$cpu")",
   "cpu_threads": "$(jq_esc "$threads")",
   "ram_gb": "$(jq_esc "$ram_gb")",
+  "ram_host_gb": "$(jq_esc "$ram_host_gb")",
   "os": "$(jq_esc "$os")",
   "kernel": "$(jq_esc "$kernel")",
   "docker": "$(jq_esc "$docker_v")",
   "docker_compose": "$(jq_esc "$compose_v")",
   "vllm_image": "$(jq_esc "$vllm_image")",
+  "vllm_image_digest": "$(jq_esc "$vllm_digest")",
+  "vllm_image_cuda": "$(jq_esc "$vllm_cuda")",
+  "vllm_version": "$(jq_esc "$vllm_version")",
+  "record_llm_concurrency": "$RECORD_CONCURRENCY",
+  "demo_record": ${demo_record:-null},
   "model": "$MODEL",
   "model_revision": "$(jq_esc "$rev")",
   "vllm_args": "--max-model-len ${VLLM_MAX_MODEL_LEN:-32768} --gpu-memory-utilization ${VLLM_GPU_MEMORY_UTILIZATION:-0.85} --chat-template-content-format string --seed 0",

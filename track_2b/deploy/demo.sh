@@ -35,21 +35,27 @@ fi
 rm -f "$stamp"
 
 # Counters of THIS scan, read inside the container (no python needed on the host).
-summary=$($DC exec -T app python3 -c '
+# Line 1: the counters. Line 2: who decided (code / Apertus, live or replayed), see klar.cli.decision_line.
+out=$($DC exec -T app python3 -c '
 import json, os, sys
 path = os.path.join(os.environ.get("KLAR_DATA_DIR", "/app/var"), "reports", "demo-latest.json")
 try:
     d = json.load(open(path, encoding="utf-8"))
 except Exception:
     sys.exit(0)
+sys.stdout.reconfigure(encoding="utf-8")     # as klar itself (the line below uses "·")
 s = d.get("stats") or d                      # demo summary (top-level counts) or a single Scan
-ai = s.get("ai_requests", s.get("external_ai_requests"))
-if isinstance(ai, dict):
-    ai = ai.get("swiss_cloud", 0) + ai.get("external", 0)
-print("mode=%s pages=%s failed=%s review=%s not_recorded=%s llm_errors=%s ai_requests_leaving=%s" % (
+print("mode=%s pages=%s failed=%s review=%s not_recorded=%s llm_errors=%s" % (
     d.get("mode"), s.get("pages", 1), s.get("failed"), s.get("cantTell"), s.get("not_recorded"),
-    s.get("llm_errors"), ai))
+    s.get("llm_errors")))
+try:
+    from klar.cli import decision_line
+    print(decision_line(s, d.get("mode")))
+except Exception:
+    pass
 ' 2>/dev/null || true)
+summary=$(printf '%s\n' "$out" | sed -n 1p)
+decided=$(printf '%s\n' "$out" | sed -n 2p)
 
 echo
 echo "==> Klar. is running"
@@ -61,6 +67,7 @@ else
   echo "    Demo report      : none found under ./var"
 fi
 [ -z "$summary" ] || echo "    Demo scan        : $summary"
+[ -z "$decided" ] || echo "    Decided by       : $decided"
 echo "    Data             : ./var (scans, SQLite, reports)"
 echo "    Stop / logs      : make stop  |  make logs"
 echo

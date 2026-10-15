@@ -180,7 +180,8 @@ def _api_base(settings: Settings) -> str | None:
 
 def _summary(scans: list, pages: list[str], settings: Settings, model: str, via: str) -> dict:
     keys = ("failed", "cantTell", "passed", "inapplicable", "not_recorded", "llm_errors", "replay_loose_hits",
-            "llm_calls", "guard_rejected", "injection_flagged", "tokens_in", "tokens_out")
+            "llm_calls", "guard_rejected", "injection_flagged", "tokens_in", "tokens_out",
+            "decided_deterministically", "asked_apertus")
     totals = {k: sum(int(s.stats.get(k, 0) or 0) for s in scans) for k in keys}
     ai = {"local": 0, "swiss_cloud": 0, "external": 0}
     per_criterion: dict[str, dict[str, int]] = {}
@@ -274,7 +275,35 @@ def _summary_line(tag: str, s: dict, ok: bool | None = None) -> str:
     head = f"{tag}: {'OK' if ok else 'FAIL'} · " if ok is not None else f"{tag}: "
     return (head + f"mode={s['mode']} · model={s['model']} · pages={s['pages']} · errors={s['errors']} · "
             f"failed={s['failed']} · review={s['cantTell']} · passed={s['passed']} · not_recorded={s['not_recorded']} · "
-            f"llm_errors={s['llm_errors']} · loose_hits={s['replay_loose_hits']} · ai_requests={s['ai_requests']}")
+            f"llm_errors={s['llm_errors']} · loose_hits={s['replay_loose_hits']} · ai_requests={_ai_requests(s['ai_requests'])}")
+
+
+def _ai_requests(ai) -> str:
+    """{"local": 0, "swiss_cloud": 0, "external": 0} -> "local 0, swiss_cloud 0, external 0"."""
+    return ", ".join(f"{k} {v}" for k, v in ai.items()) if isinstance(ai, dict) else str(ai)
+
+
+def decision_line(s: dict, mode: str | None) -> str:
+    """Who decided, for the console: code, Apertus (live or replayed), and the AI requests that
+    left your infrastructure. `s` is a demo summary or a Scan's stats; "" for older reports."""
+    if "asked_apertus" not in s:
+        return ""
+
+    def n(key: str) -> int:
+        return int(s.get(key) or 0)
+
+    asked, missing, errors = n("asked_apertus"), n("not_recorded"), n("llm_errors")
+    replay = mode == "replay"
+    notes = [f"{n('guard_rejected')} rejected by the evidence guard"]
+    if missing:
+        notes.append(f"{missing} not recorded")
+    if errors:
+        notes.append(f"{errors} model errors")
+    ai = s.get("ai_requests") or {}
+    leaving = ai.get("swiss_cloud", 0) + ai.get("external", 0) if isinstance(ai, dict) else 0
+    return (f"code {n('decided_deterministically')} · Apertus {asked - missing - errors}{' replayed' if replay else ''}"
+            f" (of {asked} questions; {'; '.join(notes)}) · "
+            + ("no model call (replay)" if replay else f"AI requests that left your infrastructure: {leaving}"))
 
 
 def cmd_demo(args: argparse.Namespace) -> int:

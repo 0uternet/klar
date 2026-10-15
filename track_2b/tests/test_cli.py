@@ -7,7 +7,7 @@ import time
 
 import pytest
 
-from klar.cli import build_parser, demo_pages, main
+from klar.cli import build_parser, decision_line, demo_pages, main
 
 PAGE_OK = '<html lang="de"><body><p><a href="b.html">Steuererklärung online einreichen</a></p></body></html>'
 PAGE_ASK = '<html lang="de"><body><p>Den Abfallkalender finden Sie <a href="a.html">hier</a>.</p></body></html>'
@@ -47,6 +47,19 @@ def test_serve_defaults_to_localhost():
     assert build_parser().parse_args(["serve"]).host == "127.0.0.1"
 
 
+def test_decision_line_says_who_decided_and_what_left():
+    live = {"decided_deterministically": 812, "asked_apertus": 360, "not_recorded": 0, "llm_errors": 2,
+            "guard_rejected": 12, "ai_requests": {"local": 0, "swiss_cloud": 350, "external": 8}}
+    assert decision_line(live, "swiss_cloud") == (
+        "code 812 · Apertus 358 (of 360 questions; 12 rejected by the evidence guard; 2 model errors) · "
+        "AI requests that left your infrastructure: 358")
+    replay = {"decided_deterministically": 5, "asked_apertus": 4, "not_recorded": 1, "ai_requests": {}}
+    assert decision_line(replay, "replay") == (
+        "code 5 · Apertus 3 replayed (of 4 questions; 0 rejected by the evidence guard; 1 not recorded) · "
+        "no model call (replay)")
+    assert decision_line({"failed": 1}, "replay") == ""  # a report from before these counters
+
+
 @pytest.mark.browser
 def test_demo_in_process_then_replay_check(demo_env, chromium, capsys):
     assert main(["demo", "--in-process", "-q", "--criteria", "2.4.4"]) == 0
@@ -54,6 +67,7 @@ def test_demo_in_process_then_replay_check(demo_env, chromium, capsys):
     assert out.startswith("demo: mode=replay") and "pages=2" in out
     summary = json.loads((demo_env / "var" / "reports" / "demo-latest.json").read_text(encoding="utf-8"))
     assert summary["via"] == "in-process" and summary["not_recorded"] == 0 and summary["errors"] == 0
+    assert decision_line(summary, summary["mode"]).endswith("no model call (replay)")
     assert (demo_env / "var" / "reports" / "demo-latest.html").is_file()
     assert main(["replay-check"]) == 0
     assert capsys.readouterr().out.startswith("replay-check (demo-latest.json): OK")
