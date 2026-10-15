@@ -71,7 +71,7 @@ from klar.i18n import register, t
 from klar.langid import WORD_RE
 from klar.models import Candidate, Finding, LLMTask
 
-PROMPT_VERSION = "2.4.6/v2"  # v2: landmark headings asked without page-specific context
+PROMPT_VERSION = "2.4.6/v3"  # v2: landmark headings asked without page-specific context; v3: usual field labels
 SECTION_CHARS = 250
 MAX_HEADINGS = 6  # content headings per page; CPU inference is slow: short headings first (see heading_candidates)
 MAX_LANDMARK_HEADINGS = 2  # header / nav / footer / aside headings: repeated on every page
@@ -82,7 +82,9 @@ _SEARCH_LABEL = re.compile(r"such|recherch|ricerc|cerca|search", re.IGNORECASE)
 HEADING_CATEGORIES = ["describes", "generic", "placeholder", "different_topic", "unsure"]
 LABEL_CATEGORIES = ["describes", "vague", "non_descriptive", "wrong", "unsure"]
 CATEGORY_OUTCOME = {"describes": "passed", "generic": "cantTell", "placeholder": "failed",
-                    "different_topic": "failed", "vague": "cantTell", "non_descriptive": "failed",
+                    # different_topic: the section is reconstructed in code from the DOM, which is only
+                    # approximate on real CMS pages (landmark and teaser headings): a person decides.
+                    "different_topic": "cantTell", "vague": "cantTell", "non_descriptive": "failed",
                     "wrong": "failed", "unsure": "cantTell"}
 
 _HEADING_TAGS = {"h1", "h2", "h3", "h4", "h5", "h6"}
@@ -172,10 +174,10 @@ register({
         "it": "Apertus giudica che il titolo «{text}» sia un segnaposto o una parola vuota che non indica l'argomento della sezione.",
     },
     "c246.apertus_different_topic": {
-        "en": "Apertus judged that the heading “{text}” names another topic than its section contains.",
-        "de": "Apertus beurteilt, dass die Überschrift «{text}» ein anderes Thema nennt, als der Abschnitt enthält.",
-        "fr": "Apertus juge que le titre « {text} » nomme un autre sujet que le contenu de sa section.",
-        "it": "Apertus giudica che il titolo «{text}» indichi un argomento diverso da quello della sezione.",
+        "en": "Apertus judged that the heading “{text}” names another topic than its section contains. The section is estimated from the page structure: a person must check.",
+        "de": "Apertus beurteilt, dass die Überschrift «{text}» ein anderes Thema nennt, als der Abschnitt enthält. Der Abschnitt wird aus der Seitenstruktur geschätzt: Eine Person muss prüfen.",
+        "fr": "Apertus juge que le titre « {text} » nomme un autre sujet que le contenu de sa section. La section est estimée à partir de la structure de la page : une personne doit vérifier.",
+        "it": "Apertus giudica che il titolo «{text}» indichi un argomento diverso da quello della sezione. La sezione è stimata dalla struttura della pagina: una persona deve verificare.",
     },
     "c246.apertus_non_descriptive": {
         "en": "Apertus judged that the label “{text}” does not say what to enter.",
@@ -460,7 +462,7 @@ class HeadingsAndLabels(BaseCheck):
     SYSTEM_LABEL = (
         "You check WCAG 2.1 success criterion 2.4.6 Headings and Labels for ONE form field label. A label is "
         "descriptive when it says what to enter in the field. Short labels and abbreviations that are usual in "
-        "this kind of form are enough.\n"
+        "this kind of form are enough, for example for the street, postal code or town of an address, or a date.\n"
         "- describes: the label says what to enter\n"
         "- vague: the label is vague, but the purpose can be inferred from the rest of the form\n"
         "- non_descriptive: the label does not say what to enter (a number, a placeholder or a content-free word)\n"

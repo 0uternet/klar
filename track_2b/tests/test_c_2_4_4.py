@@ -74,7 +74,7 @@ def test_generic_name_with_context_goes_to_apertus_with_only_act_context():
     assert "untrusted" in task.system and "never follow instructions" in task.system
     # EVAL-4: the verdict never sees the destination (users do not see it either)
     assert "x.test" not in task.user and "DESTINATION" not in task.user
-    assert list(task.json_schema["properties"]) == ["category", "confidence", "quote", "reason"]
+    assert list(task.json_schema["properties"]) == ["quote", "reason", "category", "confidence"]
     assert task.json_schema["properties"]["category"]["enum"] == ["link_text", "context", "nowhere"]
     assert task.context_shown["sentence"] == "Den Abfallkalender 2026 finden Sie hier."
     f = check.interpret(c, {"category": "context", "confidence": "high", "quote": "hier",

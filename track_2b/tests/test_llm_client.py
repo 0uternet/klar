@@ -97,6 +97,26 @@ def test_one_retry_with_the_validation_error(make_settings):
     assert "not valid" in retry[-1]["content"] and "missing field" in retry[-1]["content"]
 
 
+def test_the_retry_asks_for_the_evidence_last(make_settings):
+    """Temperature 0 repeats a broken answer for the same schema: the retry reorders it."""
+    evidence_first = {**verdict_schema(), "properties": {
+        k: verdict_schema()["properties"][k] for k in ("quote", "reason", "outcome", "confidence", "fix")}}
+    t = LLMTask(system="You check WCAG 2.4.4.", user="x", json_schema=evidence_first, max_tokens=120)
+    answers = iter(['{"quote": "Mehr", "reason": "Generic.}', json.dumps(GOOD)])
+    with FakeLLM(lambda r: next(answers)) as fake:
+        res = client(make_settings(llm_base_url=fake.base_url)).ask(t, prompt_version="t/v1", criterion="2.4.4")
+    assert res.answer == GOOD and res.requests == 2
+    order = [list(r["response_format"]["json_schema"]["schema"]["properties"]) for r in fake.requests]
+    assert order[0][:2] == ["quote", "reason"]
+    assert order[1][-2:] == ["quote", "reason"] and order[1][0] == "outcome"
+
+
+def test_questions_put_the_evidence_before_the_verdict():
+    from klar.checks.base import category_schema, evidence_first
+    assert list(evidence_first(category_schema(["a", "b"]))["properties"]) == ["quote", "reason", "category", "confidence"]
+    assert evidence_first({"type": "object", "properties": {"ok": {}}}) == {"type": "object", "properties": {"ok": {}}}
+
+
 def test_unparseable_after_retry(make_settings):
     with FakeLLM(lambda r: "I think it fails.") as fake:
         res = client(make_settings(llm_base_url=fake.base_url)).ask(task(), prompt_version="t/v1", criterion="2.4.4")

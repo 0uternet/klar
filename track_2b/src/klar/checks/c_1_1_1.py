@@ -24,16 +24,18 @@ Cascade
 
 from __future__ import annotations
 
+import posixpath
 import re
 import unicodedata
+from urllib.parse import urlsplit
 
 from klar.capture.page import CapturedPage
 from klar.checks.base import BaseCheck, set_attr, unified_diff, useful_fix, verdict_schema
 from klar.i18n import t
 from klar.models import Candidate, Finding, LLMTask
 
-# v2: page data block, English reason, explanations from i18n.
-PROMPT_VERSION = "1.1.1/v2"
+# v2: page data block, English reason, explanations from i18n. v3: icons are judged by meaning.
+PROMPT_VERSION = "1.1.1/v3"
 
 FILENAME = re.compile(
     r"^\S+\.(?:jpe?g|png|gif|webp|svg|bmp|tiff?|avif|heic)$"
@@ -94,8 +96,9 @@ class NonTextContent(BaseCheck):
                 kind = "ask"
             shot = None
             cand = self.candidate(page, selector=img["selector"], html=img.get("html", ""), text=name,
-                                  accessible_name=name, context=self._context(ctx), lang=img.get("lang"),
+                                  accessible_name=name, context=self._context(ctx, page.url), lang=img.get("lang"),
                                   kind=kind, decorative=decorative, tag=img.get("tag"), role=img.get("role"),
+                                  sole_link_content=bool(img.get("in_link")) and not ctx.get("link_text"),
                                   src=img.get("src", ""))
             if kind == "ask" and self.vision:
                 shot = page.screenshot(img["selector"], cand.id)
@@ -105,13 +108,13 @@ class NonTextContent(BaseCheck):
         return out
 
     @staticmethod
-    def _context(ctx: dict[str, str]) -> dict[str, str]:
+    def _context(ctx: dict[str, str], page_url: str = "") -> dict[str, str]:
         """Minimal context: caption, link destination, surrounding text, title."""
         out = {}
         if ctx.get("caption"):
             out["caption"] = ctx["caption"][:300]
         if ctx.get("link_href"):
-            out["link_destination"] = ctx["link_href"][:200]
+            out["link_destination"] = relative_destination(ctx["link_href"], page_url)[:200]
         if ctx.get("link_text"):
             out["link_text"] = ctx["link_text"][:200]
         if ctx.get("surrounding_text"):
@@ -148,7 +151,11 @@ class NonTextContent(BaseCheck):
         "You check WCAG 2.1 success criterion 1.1.1 Non-text Content for ONE image (attached crop).\n"
         "image_type: decorative = adds no information; informative = photo or illustration with content; "
         "functional = inside a link or button, its alternative must say where it goes or what it does; "
-        "complex = chart, map or diagram that needs a long description; text = image of text.\n"
+        "complex = chart, map or diagram that needs a long description; text = image of text. "
+        "For an icon or symbol, the alternative must give its meaning (a state, an action, a destination), "
+        "not describe its shape or colour. If the image is the only content of a link, it is functional: its "
+        "alternative must name the destination or purpose, not the picture (for a logo that links to a home page, "
+        "the organisation's name is enough).\n"
         "outcome: failed = the current alternative is missing, wrong or not equivalent, or an informative "
         "image is hidden as decorative; passed = the alternative conveys the same information (or the image "
         "is decorative and hidden); cantTell = unsure.\n"
@@ -161,6 +168,7 @@ class NonTextContent(BaseCheck):
         return self.task(
             system=self.system_prompt(self.SYSTEM, c, fix=True),
             element={"current_alternative": c.accessible_name or "", "marked_decorative": str(bool(c.extra.get("decorative"))).lower(),
+                     "only_content_of_a_link": str(bool(c.extra.get("sole_link_content"))).lower(),
                      "html": self.prompt_html(c)},
             context=c.context,
             images=[c.screenshot] if c.screenshot else [],
@@ -218,6 +226,21 @@ class NonTextContent(BaseCheck):
         if attr == "alt" and alt and c.extra.get("decorative"):
             after = re.sub(r'\s(?:role="(?:presentation|none)"|aria-hidden="true")', "", after, count=2)
         return unified_diff(c.html, after, c.selector)
+
+
+def relative_destination(href: str, page_url: str) -> str:
+    """A same-origin link destination relative to the page ("index.html", "../fr/index.html").
+
+    The question then does not depend on where the site is served (host, port, mount path):
+    the same page asks the same question when it is recorded on a local test server and
+    replayed under http://localhost:8080/demo/. Other origins keep the full URL."""
+    u, p = urlsplit(href), urlsplit(page_url or "")
+    if not p.scheme or (u.scheme, u.netloc) != (p.scheme, p.netloc):
+        return href
+    rel = posixpath.relpath(u.path or "/", posixpath.dirname(p.path or "/") or "/")
+    if (u.path or "/").endswith("/"):
+        rel = "./" if rel == "." else rel + "/"
+    return rel + (f"?{u.query}" if u.query else "") + (f"#{u.fragment}" if u.fragment else "")
 
 
 def _with_type_first() -> dict:

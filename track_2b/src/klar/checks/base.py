@@ -21,10 +21,11 @@ Prompt rules
     klar.i18n templates. Identical page → identical prompt → identical cache key.
   * No examples from the test set or the demo site in prompts: categories are
     described generically (tests/test_leakage.py enforces it).
-  * Learned on Apertus v1.5 8B (CPU llama.cpp, ~3 tok/s generation): short
-    prompts, tiny outputs (`quote` ≤ 80 chars, `reason` ≤ 160), schema field order
-    = generation order (category/outcome first), CATEGORICAL questions mapped to
-    outcomes in code, long unambiguous cases decided in code.
+  * Learned on Apertus v1.5 8B: short prompts, tiny outputs (`quote` ≤ 80 chars,
+    `reason` ≤ 160), CATEGORICAL questions mapped to outcomes in code, long
+    unambiguous cases decided in code. Schema field order = generation order, and the
+    evidence comes first (`quote`, `reason`, then the category): on the dev split with
+    vLLM BF16, category-first answers contradicted their own reason (see evidence_first).
 """
 
 from __future__ import annotations
@@ -54,6 +55,21 @@ QUOTE = {"type": "string", "maxLength": 80,
 REASON = {"type": "string", "maxLength": 160, "description": "one short sentence in English"}
 FIX = {"type": "string", "maxLength": 120, "default": "", "description": "suggested replacement text, or empty"}
 CONFIDENCE = {"type": "string", "enum": ["high", "medium", "low"]}
+
+
+def evidence_first(schema: dict) -> dict:
+    """Same schema with `quote` and `reason` generated BEFORE the category / outcome.
+
+    Constrained decoding writes the fields in schema order. With the category first, the 8B
+    model committed to a category and then wrote a reason that contradicted it (dev split:
+    heading "Bloc de texte", reason "a placeholder that does not describe", category "describes").
+    Quoting and reasoning first lets it recognise before it decides."""
+    props = schema.get("properties") or {}
+    if "reason" not in props:
+        return schema
+    head = {k: props[k] for k in ("quote", "reason") if k in props}
+    ordered = {**head, **{k: v for k, v in props.items() if k not in head}}
+    return {**schema, "properties": ordered, "required": list(ordered)}
 
 
 def verdict_schema(*, extra: dict[str, dict] | None = None, fix: dict | None = None) -> dict:
@@ -326,7 +342,7 @@ class BaseCheck:
         shown = {**{k: str(v) for k, v in element.items()}, **(context or {})}
         if images:
             shown["image"] = images[0]
-        return LLMTask(system=system, user=user, images=list(images or []), json_schema=schema,
+        return LLMTask(system=system, user=user, images=list(images or []), json_schema=evidence_first(schema),
                        max_tokens=max_tokens, context_shown=shown)
 
     def prompt_html(self, c: Candidate) -> str:

@@ -59,7 +59,7 @@ def test_question_is_vision_with_minimal_context():
     c.screenshot = "crops/a.png"
     task = check.question(c, "it")
     assert task.images == ["crops/a.png"]
-    assert list(task.json_schema["properties"])[:2] == ["image_type", "outcome"]
+    assert list(task.json_schema["properties"])[:4] == ["quote", "reason", "image_type", "outcome"]
     assert '"current_alternative": "Rathaus Musterwil"' in task.user
     assert '"caption": "Das Rathaus"' in task.user and '"link_destination": "https://x.test/r"' in task.user
     assert "Write `fix` in German." in task.system and "in English" in task.system
@@ -102,3 +102,14 @@ def test_guard_ignores_numbers_read_from_the_image():
 def test_filename_pattern_is_anchored():
     _, cands = run([img("Foto 2024 vom Fest"), img("Bild 1: Gemeindehaus"), img("DSC_0157"), img("foto3_def.png")])
     assert [c.extra["kind"] for c in cands] == ["ask", "ask", "filename", "filename"]
+
+
+def test_link_destination_is_relative_to_the_page():
+    """Same question wherever the site is served (test server port, /demo/ mount)."""
+    from klar.checks.c_1_1_1 import relative_destination as rel
+    assert rel("http://127.0.0.1:45765/fr/index.html", "http://127.0.0.1:45765/fr/horaires.html") == "index.html"
+    assert rel("http://localhost:8080/demo/fr/index.html", "http://localhost:8080/demo/fr/horaires.html") == "index.html"
+    assert rel("http://localhost:8080/demo/index.html", "http://localhost:8080/demo/fr/x.html") == "../index.html"
+    assert rel("http://h/a/?q=1#top", "http://h/a/b.html") == "./?q=1#top"
+    assert rel("https://www.example.org/x", "http://localhost:8080/demo/index.html") == "https://www.example.org/x"
+    assert rel("http://h/a.html", "") == "http://h/a.html"

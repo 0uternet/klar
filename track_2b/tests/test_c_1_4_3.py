@@ -157,7 +157,7 @@ def test_logo_signal_goes_to_the_model_and_mapping():
     check.vision = True
     c.screenshot = "crops/x.png"
     task = check.question(c, "fr")
-    assert task.images == ["crops/x.png"] and list(task.json_schema["properties"])[0] == "category"
+    assert task.images == ["crops/x.png"] and list(task.json_schema["properties"])[:3] == ["quote", "reason", "category"]
     assert '"measured_contrast": "4.48:1"' in task.user and task.wire() == check.question(c, "de").wire()
     ok = check.interpret(c, {"category": "logotype", "confidence": "high", "quote": "Stadtwerke Beispielau", "reason": "A logo."})
     assert ok.outcome == "passed" and guard.check(ok, c, {}, check_numbers=check.guard_numbers).ok

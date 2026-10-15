@@ -77,7 +77,7 @@ def test_question_and_category_mapping():
     check.vision = True
     c.screenshot = "crops/i.png"
     task = check.question(c, "fr")
-    assert task.images == ["crops/i.png"] and list(task.json_schema["properties"])[0] == "category"
+    assert task.images == ["crops/i.png"] and list(task.json_schema["properties"])[:3] == ["quote", "reason", "category"]
     assert '"alternative": "Sommerfest am Seeufer"' in task.user and "does not change the answer" in task.system
     assert task.wire() == check.question(c, "de").wire()
     expected = {"text_only": "failed", "logotype": "passed", "text_in_picture": "passed", "specimen": "passed",
@@ -153,6 +153,19 @@ def test_live_without_vision(make_settings, chromium):
     assert fs["#bg"].reason_code == "vision_required"  # CSS background image found too
     assert "#dot" not in fs  # icon-sized: skipped
     assert requests == []
+
+
+@pytest.mark.browser
+def test_background_behind_visible_html_text_is_not_asked(make_settings, chromium):
+    """A teaser photo behind real HTML text: its crop shows that text, which is not image text."""
+    src = _png_data_uri()
+    page = (f'<html lang="de"><body><h1>Kurse</h1><a id="teaser" href="#k" style="display:block;width:320px;height:90px;'
+            f'background-image:url({src})">Programm der Abendkurse ansehen</a>'
+            f'<button id="next" style="width:60px;height:60px"><svg aria-hidden="true" width="60" height="60">'
+            f'<path d="M5 5 L55 30 L5 55"/></svg></button></body></html>')
+    scan, requests, _ = _scan(make_settings, page, vision=False)
+    sel = {f.selector for f in scan.findings if f.criterion == "1.4.5"}
+    assert "#teaser" not in sel and not any(s.startswith("#next") for s in sel) and requests == []
 
 
 @pytest.mark.browser

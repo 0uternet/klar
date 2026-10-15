@@ -4,7 +4,9 @@ no text) is the closest rule.
 Found in CODE (capture/js/c_1_4_5_images.js): <img>, <input type="image">,
 role="img", <canvas>, inline <svg> without <text> (SVG text is real text) and
 elements painted with a CSS background image (url()), of a meaningful size
-(≥ 40×16 px rendered and ≥ 2000 px², icon-sized squares ≤ 48 px skipped). Facts kept
+(≥ 40×16 px rendered and ≥ 2000 px², icon-sized squares ≤ 48 px skipped; a background image
+behind visible HTML text and an aria-hidden SVG icon inside a control are skipped too: the
+first crop would show real text as if it were in the image). Facts kept
 for the decision and the prompt: the text alternative, whether the graphic is the
 content of a link or button (and that control's visible text), logo signals, and
 whether HTML text inside a background-image element is visually hidden (CSS image
@@ -48,7 +50,7 @@ from klar.checks.base import BaseCheck, category_schema
 from klar.i18n import register, t
 from klar.models import Candidate, Finding, LLMTask
 
-PROMPT_VERSION = "1.4.5/v1"
+PROMPT_VERSION = "1.4.5/v2"  # v2: organisation names set as a logo
 VISION_CAP = 6
 LOGO_MAX_H = 120  # px: a site logo is small; a taller header image may be a banner of text
 LOGO_MAX_W = 400  # px, unless the aspect ratio stays within LOGO_MAX_ASPECT
@@ -164,6 +166,8 @@ class ImagesOfText(BaseCheck):
     def candidates(self, page: CapturedPage) -> list[Candidate]:
         out: list[Candidate] = []
         for rec in C.records(page, "c145_images", "c_1_4_5_images.js")[: self.max_candidates]:
+            if rec.get("kind") == "background" and rec.get("visible_text") and not rec.get("hidden_text"):
+                continue  # real HTML text over a picture: its crop would show that text as if it were in the image
             alt = rec.get("alt")
             name = " ".join((alt if alt is not None else (rec.get("label") or "")).split())
             brand = list(rec.get("brand") or [])
@@ -238,7 +242,7 @@ class ImagesOfText(BaseCheck):
         "is text rendered as a picture although it could be real text styled with CSS. A correct text alternative "
         "does not change the answer.\n"
         "category: text_only = the image is essentially text (a heading, a button or link label, an announcement or "
-        "banner, a price list or timetable); logotype = a logo or brand name; text_in_picture = the text is part of "
+        "banner, a price list or timetable); logotype = a logo or brand name, including the name of an organisation set in its logo design; text_in_picture = the text is part of "
         "a chart, diagram, map, screenshot or photo with significant other visual content; specimen = the particular "
         "look of the text is the information (a font sample, what a printed item or a sign looks like); "
         "document_facsimile = a scan or facsimile of a signed or stamped document; illustration_with_text = a large "

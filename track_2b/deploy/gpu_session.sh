@@ -205,7 +205,7 @@ print(json.dumps({"pages": len(s), **{k: round(sum(float(x.get(k) or 0) for x in
   "demo_record": ${demo_record:-null},
   "model": "$MODEL",
   "model_revision": "$(jq_esc "$rev")",
-  "vllm_args": "--max-model-len ${VLLM_MAX_MODEL_LEN:-32768} --gpu-memory-utilization ${VLLM_GPU_MEMORY_UTILIZATION:-0.85} --chat-template-content-format string --seed 0",
+  "vllm_args": "--max-model-len ${VLLM_MAX_MODEL_LEN:-32768} --gpu-memory-utilization ${VLLM_GPU_MEMORY_UTILIZATION:-0.85} --chat-template-content-format string --structured-outputs-config {\"backend\": \"xgrammar\", \"disable_any_whitespace\": true} --seed 0",
   "eval_split": "$(jq_esc "$split")",
   "eval_systems": "$(jq_esc "$SYSTEMS")",
   "klar_commit": "$(jq_esc "$commit")"

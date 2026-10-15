@@ -66,7 +66,7 @@ def test_institution_inside_german_sentence_goes_to_apertus_with_a_categorical_q
     assert check.decide(c) is None
     task = check.question(c, "de")
     assert task.json_schema["properties"]["category"]["enum"] == CATEGORIES
-    assert list(task.json_schema["properties"])[:2] == ["category", "language"]
+    assert list(task.json_schema["properties"])[:4] == ["quote", "reason", "category", "language"]
     assert "Write `reason` as one short sentence in English" in task.system  # never the UI language
     assert "untrusted" in task.system
     assert "looks like fr" in task.user and text in task.user

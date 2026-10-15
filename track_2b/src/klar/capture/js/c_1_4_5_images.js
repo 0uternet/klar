@@ -28,6 +28,30 @@
     return '';
   }
 
+  // Text that is really painted over the element's box (not moved out by text-indent, not
+  // transparent, not clipped away): HTML text over a background picture, not text in it.
+  function shownText(el) {
+    const er = el.getBoundingClientRect();
+    const parts = [];
+    const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    let n;
+    while ((n = tw.nextNode()) && parts.length < 20) {
+      const t = K.norm(n.nodeValue);
+      if (!t || !K.LETTER.test(t)) continue;
+      const p = n.parentElement;
+      if (!p || !K.visible(p)) continue;
+      const st = K.cs(p);
+      if (parseFloat(st.fontSize) < 2 || K.transparent(st.color)) continue;
+      const rg = document.createRange();
+      rg.selectNodeContents(n);
+      const r = rg.getBoundingClientRect();
+      if (r.width < 1 || r.height < 1) continue;
+      if (r.right <= er.left || r.left >= er.right || r.bottom <= er.top || r.top >= er.bottom) continue;
+      parts.push(t);
+    }
+    return parts.join(' ').slice(0, 200);
+  }
+
   function push(el, kind, extra) {
     if (seen.has(el) || out.length >= 80) return;
     seen.add(el);
@@ -45,6 +69,9 @@
     if (el.localName === 'svg' && (el.parentElement && el.parentElement.closest('svg'))) continue;
     if (!K.visible(el) || !sized(el)) continue;
     if (el.localName === 'svg' && el.querySelector('text')) continue;  // SVG text is real text
+    // An icon hidden from assistive technology inside a link or button (arrows, chevrons).
+    if (el.localName === 'svg' && el.getAttribute('aria-hidden') === 'true' &&
+        el.closest('a[href], button, [role="button"], [role="link"]')) continue;
     push(el, el.localName === 'svg' ? 'svg' : 'img');
   }
 
@@ -56,7 +83,7 @@
     if (!st.backgroundImage || !/url\(/.test(st.backgroundImage)) continue;
     if (!K.visible(el) || !sized(el)) continue;
     push(el, 'background', { background: st.backgroundImage.slice(0, 200), hidden_text: hiddenText(el),
-                             visible_text: K.norm(el.innerText || '').slice(0, 200) });
+                             visible_text: shownText(el) });
   }
   return out;
 }

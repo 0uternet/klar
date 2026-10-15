@@ -111,7 +111,7 @@ def test_label_question_carries_field_facts():
 
 
 @pytest.mark.parametrize("category, outcome", [("describes", "passed"), ("generic", "cantTell"),
-                                               ("different_topic", "failed"), ("unsure", "cantTell"),
+                                               ("different_topic", "cantTell"), ("unsure", "cantTell"),
                                                ("vague", "cantTell")])  # a label category on a heading → unsure
 def test_heading_category_mapping(category, outcome):
     check, cands = run()

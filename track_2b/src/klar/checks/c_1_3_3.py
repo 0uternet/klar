@@ -48,7 +48,7 @@ from klar.i18n import register, t
 from klar.langid import word_count
 from klar.models import Candidate, Finding, LLMTask
 
-PROMPT_VERSION = "1.3.3/v1"
+PROMPT_VERSION = "1.3.3/v2"  # v2: screen positions are sensory
 MIN_WORDS, MAX_WORDS = 4, 120
 MAX_CONTROLS = 8
 MAX_INSTRUCTIONS = 12
@@ -157,6 +157,12 @@ register({
         "fr": "Apertus juge que les indications sensorielles décrivent le monde physique ou la décoration, pas l'utilisation de la page.",
         "it": "Apertus giudica che le caratteristiche sensoriali descrivano il mondo fisico o la decorazione, non l'uso della pagina.",
     },
+    "c133.apertus_visible_ungrounded": {
+        "en": "Apertus says the instruction names the item by its visible text, but it contains none of the visible texts of the nearby controls. A person must check whether it relies on shape, colour or position only.",
+        "de": "Apertus meint, die Anleitung nenne das Element über seinen sichtbaren Text, doch sie enthält keinen sichtbaren Text der Bedienelemente in der Nähe. Eine Person muss prüfen, ob sie sich nur auf Form, Farbe oder Position stützt.",
+        "fr": "Apertus estime que la consigne nomme l'élément par son texte visible, mais elle ne contient aucun texte visible des commandes voisines. Une personne doit vérifier si elle repose uniquement sur la forme, la couleur ou la position.",
+        "it": "Apertus ritiene che l'istruzione nomini l'elemento con il suo testo visibile, ma non contiene alcun testo visibile dei comandi vicini. Una persona deve verificare se si basa solo su forma, colore o posizione.",
+    },
     "c133.apertus_unsure": {
         "en": "Apertus could not decide how this instruction identifies the item. A person must check.",
         "de": "Apertus konnte nicht entscheiden, wie diese Anleitung das Element bestimmt. Eine Person muss prüfen.",
@@ -262,6 +268,20 @@ def control_summary(scope: Node, limit: int = MAX_CONTROLS) -> str:
     return "; ".join(out)
 
 
+def control_texts(scope: Node, limit: int = MAX_CONTROLS) -> list[str]:
+    """Visible texts of the controls in `scope` (the ones control_summary shows the model)."""
+    out = []
+    for n in scope.iter():
+        if len(out) >= limit:
+            break
+        if n.hidden():
+            continue
+        if n.tag in ("button", "a") or n.role in ("button", "link") or \
+                (n.tag == "input" and n.attrs.get("type", "").lower() in ("submit", "button", "image", "reset")):
+            out.append(n.text(visible=True) if n.tag != "input" else (n.attrs.get("value") or ""))
+    return out
+
+
 def next_item(n: Node) -> str:
     sib = None
     p = n
@@ -313,18 +333,22 @@ class SensoryCharacteristics(BaseCheck):
                 kind = "asterisk"
             node = find_node(doc, p["selector"], index)
             context: dict[str, str] = {}
+            names_control: bool | None = None  # does the instruction contain a nearby control's visible text?
             if node is not None:
                 scope = node.closest(lambda a: a.tag in ("form", "section", "article", "main", "fieldset")
                                      or a.role in ("main", "region")) or doc.body
                 ctrl = control_summary(scope)
                 if ctrl:
                     context["controls_nearby"] = ctrl
+                texts = [_key(v) for v in control_texts(scope) if len(_key(v)) >= 2]
+                if texts:
+                    names_control = any(f" {v} " in f" {_key(text)} " for v in texts)
                 nxt = next_item(node)
                 if nxt:
                     context["next_element"] = nxt
             out.append(self.candidate(page, selector=p["selector"], html=p.get("html", ""), text=text,
                                       lang=p.get("lang") or page.lang, context=context, kind=kind, name=name,
-                                      sensory=hits))
+                                      sensory=hits, names_control=names_control))
             if len(out) >= self.max_candidates:
                 break
         return out
@@ -366,7 +390,8 @@ class SensoryCharacteristics(BaseCheck):
         "name; `next_element` is what follows the instruction in reading order.\n"
         "How does the instruction identify the item it refers to?\n"
         "- visible_text: it also names the item by text that is visible on screen (label, heading, caption)\n"
-        "- reading_order: it says 'below' or 'above' and means the single next or previous item in reading order\n"
+        "- reading_order: it says 'below' or 'above' and means the single next or previous item in reading order "
+        "(a place on the screen, such as left, right, top, bottom or a corner, is sensory_only)\n"
         "- text_symbol: the cue is a visible text character, such as an asterisk in the labels\n"
         "- sensory_only: only by shape, colour, size, position or sound, with no visible text name\n"
         "- hidden_name: by a name that exists only as an accessible name, not as visible text\n"
@@ -391,6 +416,12 @@ class SensoryCharacteristics(BaseCheck):
         category = answer.get("category", "unsure")
         outcome = CATEGORY_OUTCOME.get(category, "cantTell")
         quote = (answer.get("quote") or "").strip()
+        if category == "visible_text" and c.extra.get("names_control") is False:
+            # Checked in code: the instruction contains none of the visible texts of the
+            # controls shown to the model, so "named by its visible text" is not grounded.
+            return self.finding(c, outcome="cantTell", source="apertus", confidence="low", excerpt=quote or c.text[:300],
+                                explanation=t("c133.apertus_visible_ungrounded", ui), user_impact=t("impact.review", ui),
+                                reason=answer.get("reason"), reason_code="apertus_visible_ungrounded")
         if outcome == "passed":
             explanation = t("c133.apertus_passed", ui, how=t(f"c133.how.{category}", ui))
             impact = t("c133.impact_ok", ui)

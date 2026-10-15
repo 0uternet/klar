@@ -94,8 +94,11 @@ and vLLM usage statistics and Hugging Face telemetry are switched off in `docker
 vLLM command (the model card's arguments, adapted to one 32 GB GPU, with no function-calling flags
 because Klar. never uses them):
 `vllm serve swiss-ai/Apertus-v1.5-8B --served-model-name swiss-ai/Apertus-v1.5-8B --max-model-len 32768
---gpu-memory-utilization 0.85 --chat-template-content-format string --seed 0`.
-Thinking mode stays off: Klar. asks closed questions with a JSON schema.
+--gpu-memory-utilization 0.85 --chat-template-content-format string
+--structured-outputs-config '{"backend": "xgrammar", "disable_any_whitespace": true}' --seed 0`.
+Thinking mode stays off: Klar. asks closed questions with a JSON schema. Without
+`disable_any_whitespace`, schema-guided decoding lets Apertus emit newlines between JSON fields
+until `max_tokens` runs out; on the dev split this truncated 7 of 182 answers.
 
 Memory budget (RTX 5090, 32 GB): the 8B model has 8.61 B BF16 + 0.29 B F32 parameters, i.e.
 **≈ 18.4 GB of weights**. `0.85 × 32 GB ≈ 27 GB` leaves about 8.5 GB for activations, CUDA graphs
@@ -231,11 +234,15 @@ For operators who do not run Docker. The same variables apply; nothing else chan
    - Serve (keep the Hugging Face cache on the WSL file system, not under `/mnt/c`; set `HF_TOKEN`
      for the first download only, then `HF_HUB_OFFLINE=1`):
      ```bash
-     HF_HUB_DISABLE_TELEMETRY=1 VLLM_NO_USAGE_STATS=1 DO_NOT_TRACK=1 \
+     export CUDA_HOME=/usr/local/cuda PATH="$VIRTUAL_ENV/bin:/usr/local/cuda/bin:$PATH"  # ninja + nvcc for JIT kernels
+     HF_HUB_DISABLE_TELEMETRY=1 VLLM_NO_USAGE_STATS=1 DO_NOT_TRACK=1 VLLM_USE_V2_MODEL_RUNNER=0 \
      vllm serve swiss-ai/Apertus-v1.5-8B --served-model-name swiss-ai/Apertus-v1.5-8B \
        --host 0.0.0.0 --port 8000 --max-model-len 32768 --gpu-memory-utilization 0.85 \
-       --chat-template-content-format string --seed 0
+       --chat-template-content-format string \
+       --structured-outputs-config '{"backend": "xgrammar", "disable_any_whitespace": true}' --seed 0
      ```
+     `VLLM_USE_V2_MODEL_RUNNER=0` is needed under WSL only: vLLM disables pinned memory there and
+     its v2 model runner then stops with "UVA is not available".
      With WSL's default NAT networking, port 8000 is forwarded to Windows `localhost` only. Point
      Klar. at it with `LLM_BASE_URL=http://127.0.0.1:8000/v1`.
 4. **Offline native install.** On a connected machine with the same OS and Python version:

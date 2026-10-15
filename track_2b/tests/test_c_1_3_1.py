@@ -67,7 +67,7 @@ def test_larger_text_without_a_matching_heading_style_goes_to_apertus_text_first
     check, (c,) = run(facts(visual_headings=[vh()]))
     assert c.extra["kind"] == "ask_heading" and check.decide(c) is None
     task = check.question(c, "de")
-    assert task.images == [] and list(task.json_schema["properties"])[0] == "category"
+    assert task.images == [] and list(task.json_schema["properties"])[:3] == ["quote", "reason", "category"]
     assert task.json_schema["properties"]["category"]["enum"] == ["heading", "lead_in", "label", "emphasis", "other"]
     assert '"next_text": "Residents can apply online' in task.user and "<page_data>" in task.user
     assert task.wire() == check.question(c, "fr").wire()

@@ -162,14 +162,16 @@ class LLMClient:
             text, usage = self._complete(task, image_root, result)
             answer, errors = parse_and_validate(text, task.json_schema)
             if answer is None:
-                # ONE retry, telling the model what was wrong.
+                # ONE retry, telling the model what was wrong. With temperature 0 the same schema
+                # gives the same broken answer, so the retry asks for the evidence fields last.
                 log.info("invalid answer for %s (%s); retrying once", criterion, "; ".join(errors[:3]))
                 fix = [
                     {"role": "assistant", "content": text or ""},
                     {"role": "user", "content": "Your answer was not valid: " + "; ".join(errors[:3])
                      + ". Reply again with ONLY the corrected JSON object."},
                 ]
-                text, usage2 = self._complete(task, image_root, result, extra=fix)
+                text, usage2 = self._complete(task, image_root, result, extra=fix,
+                                              schema=evidence_last(task.json_schema))
                 usage = (usage[0] + usage2[0], usage[1] + usage2[1])
                 answer, errors = parse_and_validate(text, task.json_schema)
             result.raw = text
@@ -201,7 +203,7 @@ class LLMClient:
 
     # -- internals -------------------------------------------------------------------
     def _complete(self, task: LLMTask, image_root: Path | None, result: LLMResult,
-                  extra: list[dict] | None = None) -> tuple[str | None, tuple[int, int]]:
+                  extra: list[dict] | None = None, schema: dict | None = None) -> tuple[str | None, tuple[int, int]]:
         json_schema, thinking_flag = self.flags()
         kwargs: dict = {
             "model": self.model,
@@ -213,7 +215,8 @@ class LLMClient:
         if json_schema:
             kwargs["response_format"] = {
                 "type": "json_schema",
-                "json_schema": {"name": "klar_answer", "schema": strip_for_wire(task.json_schema), "strict": True},
+                "json_schema": {"name": "klar_answer", "schema": strip_for_wire(schema or task.json_schema),
+                                "strict": True},
             }
         if thinking_flag:
             kwargs["extra_body"] = NO_THINKING
@@ -234,6 +237,17 @@ class LLMClient:
             text = choice.message.content if choice and choice.message else None
             usage = resp.usage
             return text, ((usage.prompt_tokens or 0) if usage else 0, (usage.completion_tokens or 0) if usage else 0)
+
+
+def evidence_last(schema: dict) -> dict:
+    """The retry schema: `quote` and `reason` moved to the end. In evidence-first order the 8B
+    model sometimes takes `reason` for the last field, writes `.}` inside the string and stops."""
+    props = schema.get("properties") or {}
+    tail = {k: props[k] for k in ("quote", "reason") if k in props}
+    if not tail:
+        return schema
+    ordered = {**{k: v for k, v in props.items() if k not in tail}, **tail}
+    return {**schema, "properties": ordered, "required": list(ordered)}
 
 
 def _short_error(exc: Exception) -> str:

@@ -79,6 +79,9 @@ services:
       - --max-model-len=${VLLM_MAX_MODEL_LEN:-32768}
       - --gpu-memory-utilization=${VLLM_GPU_MEMORY_UTILIZATION:-0.85}
       - --chat-template-content-format=string     # as in the model card
+      # JSON-schema answers without free whitespace: otherwise Apertus can spend its whole
+      # max_tokens on newlines between fields and return truncated JSON (seen on the dev split).
+      - '--structured-outputs-config={"backend": "xgrammar", "disable_any_whitespace": true}'
       - --seed=0
       # No function-calling flags: Klar. never asks the model to call functions (least privilege).
     environment:

@@ -96,7 +96,7 @@
     "url": "https://www.w3.org/WAI/WCAG21/Understanding/meaningful-sequence.html"
   },
   {
-    "act_rule": null,
+    "act_rule": "9bd38c",
     "criterion": "1.3.3",
     "en301549": "9.1.3.3",
     "evaluated": false,
@@ -180,7 +180,7 @@
     "url": "https://www.w3.org/WAI/WCAG21/Understanding/resize-text.html"
   },
   {
-    "act_rule": null,
+    "act_rule": "0va7u6",
     "criterion": "1.4.5",
     "en301549": "9.1.4.5",
     "evaluated": false,
@@ -192,7 +192,7 @@
     "url": "https://www.w3.org/WAI/WCAG21/Understanding/images-of-text.html"
   },
   {
-    "act_rule": "59br37",
+    "act_rule": "b4f0c3",
     "criterion": "1.4.10",
     "en301549": "9.1.4.10",
     "evaluated": false,
@@ -288,7 +288,7 @@
     "url": "https://www.w3.org/WAI/WCAG21/Understanding/timing-adjustable.html"
   },
   {
-    "act_rule": null,
+    "act_rule": "efbfc7",
     "criterion": "2.2.2",
     "en301549": "9.2.2.2",
     "evaluated": false,
