@@ -275,8 +275,10 @@ def run_eval(settings: Settings, *, split: str = "test", criteria: list[str] | N
     def collect(case_id: str, system: str):
         return lambda records: responses.extend({"case_id": case_id, "system": system, **r} for r in records)
 
+    # Cost of the "ours" pass only; the −context ablation's second pass is counted apart.
     totals = {"tokens_in": 0, "tokens_out": 0, "llm_calls": 0, "not_recorded": 0, "llm_errors": 0,
               "seconds": 0.0, "asked": 0}
+    totals_nc = {"tokens_in": 0, "tokens_out": 0, "llm_calls": 0, "not_recorded": 0, "llm_errors": 0}
     started = time.monotonic()
     try:
         with Browser() as browser:
@@ -285,6 +287,7 @@ def run_eval(settings: Settings, *, split: str = "test", criteria: list[str] | N
                 eval_settings = settings.with_(max_llm_calls=0) if dry_run else settings
                 fs, stats, glog = _scan_case(case, eval_settings, llm, vision, counter, browser, servers,
                                              on_responses=collect(case["case_id"], "ours"))
+                totals["seconds"] += time.monotonic() - t0
                 row = {
                     "case_id": case["case_id"], "criterion": case["criterion"], "source": case.get("source"),
                     "lang": case.get("page_lang"), "trap": bool(case.get("trap")), "expected": case["expected"],
@@ -304,12 +307,11 @@ def run_eval(settings: Settings, *, split: str = "test", criteria: list[str] | N
                                                     counter, browser, servers,
                                                     on_responses=collect(case["case_id"], "ours_no_context"))
                     row["ours_no_context"] = aggregate([f.outcome for f in fs_nc])
-                    for k in ("tokens_in", "tokens_out", "llm_calls", "not_recorded", "llm_errors"):
-                        totals[k] += stats_nc.get(k, 0)
+                    for k in totals_nc:
+                        totals_nc[k] += stats_nc.get(k, 0)
                 for k in ("tokens_in", "tokens_out", "llm_calls", "not_recorded", "llm_errors"):
                     totals[k] += stats.get(k, 0)
                 totals["asked"] += stats.get("asked_apertus", 0)
-                totals["seconds"] += time.monotonic() - t0
                 results.append(row)
                 if progress and (i % 25 == 0 or i == len(cases)):
                     progress(f"  {i}/{len(cases)} cases · {time.monotonic() - started:.0f} s")
@@ -324,8 +326,8 @@ def run_eval(settings: Settings, *, split: str = "test", criteria: list[str] | N
 
     report = build_report(results, systems=systems, settings=settings, llm=llm, caps=caps.get(), split=split,
                           source=source, manifest_sha=manifest_sha, tag_sha=tag_sha, tag_source=tag_source,
-                          act_rules=act_rules,
-                          totals=totals, seconds=time.monotonic() - started, counter=counter)
+                          act_rules=act_rules, totals=totals, totals_nc=totals_nc if llm_nc is not None else None,
+                          seconds=time.monotonic() - started, counter=counter, vision=vision)
     out = out_dir or (root / "eval" / "results")
     out.mkdir(parents=True, exist_ok=True)
     (out / "results.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -366,8 +368,8 @@ def _group_block(rows: list[dict], systems: tuple[str, ...]) -> dict:
 
 def build_report(results: list[dict], *, systems, settings: Settings, llm, caps, split: str, source: str,
                  manifest_sha: str, tag_sha: str | None, tag_source: str, act_rules: dict, totals: dict,
-                 seconds: float,
-                 counter: RequestCounter) -> dict:
+                 seconds: float, counter: RequestCounter, totals_nc: dict | None = None,
+                 vision: bool | None = None) -> dict:
     from urllib.parse import urlparse
 
     by: dict[str, dict[str, list]] = {k: defaultdict(list) for k in ("source", "criterion", "lang", "trap", "injection")}
@@ -378,13 +380,20 @@ def build_report(results: list[dict], *, systems, settings: Settings, llm, caps,
         by["trap"][f"{r['source']}:{'trap' if r['trap'] else 'regular'}"].append(r)
         if r.get("injection"):
             by["injection"][r["source"]].append(r)
-    tiers: dict[str, dict] = {}
-    for tier in ("rule", "heuristic", "apertus", "none"):
-        rows = [r for r in results if r["tier"] == tier]
-        failed_pred = [r for r in rows if r["ours"] == "failed"]
-        tiers[tier] = {"n": len(rows), "failed_predictions": len(failed_pred),
-                       "failed_precision": (round(sum(r["expected"] == "failed" for r in failed_pred) / len(failed_pred), 4)
-                                            if failed_pred else None)}
+    def tiers_of(rows_all: list[dict]) -> dict[str, dict]:
+        # Precision as in summarize(): gold-cantTell cases are left out.
+        out = {}
+        for tier in ("rule", "heuristic", "apertus", "none"):
+            rows = [r for r in rows_all if r["tier"] == tier]
+            failed_pred = [r for r in rows if r["ours"] == "failed" and r["expected"] != "cantTell"]
+            out[tier] = {"n": len(rows), "failed_predictions": len(failed_pred),
+                         "failed_precision": (round(sum(r["expected"] == "failed" for r in failed_pred) / len(failed_pred), 4)
+                                              if failed_pred else None)}
+        return out
+
+    # Generated and ACT cases are never pooled: tiers and the share sent to the model are per source.
+    tiers = {k: tiers_of(v) for k, v in sorted(by["source"].items())}
+    share_to_llm = {k: round(sum(r["to_llm"] for r in v) / len(v), 4) for k, v in sorted(by["source"].items())}
     n = len(results) or 1
     run = {
         "id": datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"), "klar_version": __version__,
@@ -396,7 +405,7 @@ def build_report(results: list[dict], *, systems, settings: Settings, llm, caps,
         "mode": settings.mode, "model": llm.model,
         "endpoint_host": urlparse(settings.llm_base_url or "").hostname if settings.mode != "replay" else None,
         "replay_models": getattr(llm, "recorded_models", None), "seconds": round(seconds, 1),
-        "ai_requests": counter.by_class,
+        "ai_requests": counter.by_class, "vision": vision,
     }
     system_params = [{"system": s, "model": llm.model if s.startswith("ours") else None,
                       "endpoint_host": run["endpoint_host"] if s.startswith("ours") else None, "mode": settings.mode,
@@ -412,11 +421,12 @@ def build_report(results: list[dict], *, systems, settings: Settings, llm, caps,
         # Prompt-injection cases (manifest tag "injection"), reported on their own (SEC-1).
         "injection": {k: _group_block(v, systems) for k, v in sorted(by["injection"].items())},
         "tiers": tiers,
-        "share_to_llm": round(sum(r["to_llm"] for r in results) / n, 4),
+        "share_to_llm": share_to_llm,
+        # System "ours" only (one scan per case); the −context ablation's own pass is in ablation_no_context.
         "cost": {"llm_calls": totals["llm_calls"], "tokens_in": totals["tokens_in"], "tokens_out": totals["tokens_out"],
                  "tokens_per_page": round((totals["tokens_in"] + totals["tokens_out"]) / n, 1),
                  "seconds_per_page": round(totals["seconds"] / n, 2), "not_recorded": totals["not_recorded"],
-                 "llm_errors": totals["llm_errors"]},
+                 "llm_errors": totals["llm_errors"], "ablation_no_context": totals_nc},
         "cases": results,
     }
 
@@ -440,8 +450,8 @@ def to_markdown(report: dict) -> str:
         f"Run {run['id']} · commit `{run['commit']}` · labels `{run['labels_tag']}` · manifest sha256 "
         f"`{run['manifest_sha256'][:12]}…` · mode `{run['mode']}` · model `{run['model']}` · {run['cases']} cases "
         f"({run['act_cases_excluded']} ACT cases excluded) · "
-        f"tokens/page {report['cost']['tokens_per_page']} · s/page {report['cost']['seconds_per_page']} · "
-        f"not recorded {report['cost']['not_recorded']} · model errors {report['cost']['llm_errors']}",
+        f"tokens/page {report['cost']['tokens_per_page']} · s/page {report['cost']['seconds_per_page']} (Ours) · "
+        f"not recorded {_not_recorded(report)} · model errors {_llm_errors(report)}",
         "",
         "Positive class = failed. Rates with Wilson 95 % intervals; p = exact McNemar vs Baseline on "
         "decision correctness (failed / review / no failure). Generated and W3C ACT cases are never pooled.",
@@ -466,11 +476,21 @@ def to_markdown(report: dict) -> str:
                              f"{_fmt(m['false_pass'])} | {_fmt(m['flagged_recall'])} | {_fmt(m['deferral_rate'])} | "
                              f"{p if p is not None else '–'} |")
         lines.append("")
-    t = report["tiers"]
-    lines += ["## Tiers (Ours)", "",
-              "| Tier | Cases decided | Failed predictions | Precision of failed |", "|---|---|---|---|"]
-    lines += [f"| {k} | {v['n']} | {v['failed_predictions']} | {v['failed_precision'] if v['failed_precision'] is not None else '–'} |"
-              for k, v in t.items()]
-    lines += ["", f"Share of cases that reached the LLM: {report['share_to_llm'] * 100:.1f} %", "",
-              "Klar. pre-checks WCAG 2.1 AA criteria. These numbers do not certify conformance.", ""]
+    for src, t in report["tiers"].items():
+        lines += [f"## Tiers (Ours, {src} cases)", "",
+                  "| Tier | Cases decided | Failed predictions | Precision of failed |", "|---|---|---|---|"]
+        lines += [f"| {k} | {v['n']} | {v['failed_predictions']} | {v['failed_precision'] if v['failed_precision'] is not None else '–'} |"
+                  for k, v in t.items()]
+        lines += ["", f"Share of {src} cases that reached the LLM: {report['share_to_llm'][src] * 100:.1f} %", ""]
+    lines += ["Klar. pre-checks WCAG 2.1 AA criteria. These numbers do not certify conformance.", ""]
     return "\n".join(lines)
+
+
+def _not_recorded(report: dict) -> int:
+    c = report["cost"]
+    return c["not_recorded"] + ((c.get("ablation_no_context") or {}).get("not_recorded") or 0)
+
+
+def _llm_errors(report: dict) -> int:
+    c = report["cost"]
+    return c["llm_errors"] + ((c.get("ablation_no_context") or {}).get("llm_errors") or 0)

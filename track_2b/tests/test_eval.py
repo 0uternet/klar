@@ -159,9 +159,15 @@ def test_eval_writes_the_model_response_dataset(make_settings, tmp_path, chromiu
 
     with FakeLLM(klar_responder) as fake:
         settings = make_settings(project_root=root, llm_base_url=fake.base_url)
-        run_eval(settings, split="dev", out_dir=tmp_path / "r1", progress=None, systems=systems)
+        report = run_eval(settings, split="dev", out_dir=tmp_path / "r1", progress=None, systems=systems)
         run_eval(settings, split="dev", out_dir=tmp_path / "r2", progress=None, systems=systems)  # all cached
     first, again = read(tmp_path / "r1" / "responses.jsonl"), read(tmp_path / "r2" / "responses.jsonl")
+    # cost covers system "ours" only; the −context ablation's second pass is counted apart
+    n_ours = sum(r["system"] == "ours" for r in first)
+    assert report["cost"]["tokens_in"] == 100 * n_ours
+    assert report["cost"]["ablation_no_context"]["tokens_in"] == 100 * sum(r["system"] == "ours_no_context" for r in first)
+    assert set(report["tiers"]) == set(report["share_to_llm"]) == {"generated"}  # per source, never pooled
+    assert "vision" in report["run"]
     assert first and all(tuple(r) == RESPONSE_FIELDS for r in first)
     assert [(r["case_id"], r["candidate_id"], r["system"]) for r in first] == sorted(
         (r["case_id"], r["candidate_id"], r["system"]) for r in first)
