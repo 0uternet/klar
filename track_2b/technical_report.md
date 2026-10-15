@@ -6,7 +6,7 @@
 - **Event:** Online
 - **Team:** Klar — Mehdi Taleb (solo founder)
 - **Demo:** [video URL]
-- **Code:** [repo URL] (Apache-2.0) · **Dataset:** [HF dataset URL] (CDLA-Permissive-2.0; ACT cases under the W3C licence) · **Model:** Apertus v1.5 8B + 70B <!-- VERIFY: keep "+ 70B" only if the Phoeniqs run is reported in §5. -->
+- **Code:** [repo URL] (Apache-2.0) · **Dataset:** `track_2b/data/testset` in the repo (CDLA-Permissive-2.0; ACT cases under the W3C licence) · **Model:** Apertus v1.5 8B + 70B <!-- VERIFY: keep "+ 70B" only if the Phoeniqs run is reported in §5. -->
 
 ## 1. Summary
 
