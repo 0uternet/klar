@@ -125,13 +125,13 @@ def _scan(make_settings, html, answer=None, vision=True):
 
 
 PAGE = """<html lang="de"><head><style>
-#k:focus-visible{outline:2px solid #bfdbfe} #m:focus{outline:3px solid #1d4ed8} #n:focus{box-shadow:0 0 0 3px orange}
+#k:focus-visible{outline:2px solid #bfdbfe} #m:focus{outline:3px solid #1d4ed8} #n:focus{box-shadow:0 0 0 3px orange} #w:focus{box-shadow:0 0 0 2px #fff, 0 0 0 4px #000}
 </style></head><body style="background:#fff;font:16px Arial">
 <label for="q">Suche</label><input id="q" type="search" style="border:1px solid #cfd8dc;background:#fff">
 <label for="r">Name</label><input id="r" style="border:1px solid #6b7280;background:#fff">
 <label for="d">Alt</label><input id="d" disabled style="border:1px solid #e0e0e0;background:#fff">
 <button id="print" aria-label="Drucken" style="background:#fff;border:0"><svg width="28" height="28" viewBox="0 0 24 24"><path d="M4 4h16v16H4z" fill="none" stroke="#a3c4dc" stroke-width="2"/></svg></button>
-<a id="k" href="/k">Kontakt</a> <a id="m" href="/m">Medien</a> <a id="n" href="/n">Archiv</a>
+<a id="k" href="/k">Kontakt</a> <a id="m" href="/m">Medien</a> <a id="n" href="/n">Archiv</a> <a id="w" href="/w">Wahlen</a>
 <p>Die Fläche verteilt sich auf Wald und Wiesen.</p>
 <svg id="chart" width="300" height="160" role="img" aria-label="Flächenanteile"><rect x="0" y="0" width="300" height="160" fill="#fff"/><rect x="10" y="40" width="120" height="100" fill="#dbeafe"/><rect x="150" y="10" width="120" height="130" fill="#1f2937"/></svg>
 </body></html>"""
@@ -143,6 +143,7 @@ def test_live_without_vision(make_settings, chromium):
     fs = {f.selector: f for f in scan.findings if f.criterion == "1.4.11"}
     assert fs["#q"].outcome == "failed" and fs["#q"].reason_code == "input_fail"
     assert fs["#r"].outcome == "passed"
+    assert fs["#w"].outcome == "passed"  # double ring: the black layer is visible on white
     assert fs["#d"].outcome == "passed" and fs["#d"].reason_code == "inactive"
     assert fs["#print"].outcome == "failed" and fs["#print"].reason_code == "icon_fail"
     assert fs["#k"].outcome == "failed" and fs["#k"].reason_code == "focus_fail"
@@ -169,3 +170,23 @@ def test_injection_never_reaches_the_model(make_settings, chromium):
     f = next(f for f in scan.findings if f.criterion == "1.4.11" and f.selector == "#chart")
     assert f.outcome == "cantTell" and f.reason_code == "suspicious"
     assert all("Ignore all previous" not in user_text(r) for r in requests)
+
+
+def test_double_focus_ring_counts_its_best_layer():
+    """'0 0 0 2px #fff, 0 0 0 4px #000' on white: the black ring is what users see."""
+    from klar.checks.c_1_4_11 import NonTextContrast
+    ring = {**focus("rgb(255, 255, 255) 0px 0px 0px 2px, rgb(0, 0, 0) 0px 0px 0px 4px"), "indicator": "box_shadow"}
+    assert NonTextContrast.measure_focus(ring)["kind"] == "focus_pass"
+    both = {**focus("rgb(255, 255, 255) rgb(0, 0, 0) 0px 0px 0px 3px"), "indicator": "outline"}
+    assert NonTextContrast.measure_focus(both)["kind"] == "focus_pass"
+    assert NonTextContrast.measure_focus(focus("rgb(255, 255, 255)"))["kind"] == "focus_fail"
+
+
+def test_focus_colours_from_variables_or_transparent_prove_nothing():
+    """Utility-CSS rings set their colour variable only while focused; a transparent outline draws nothing."""
+    from klar.checks.c_1_4_11 import NonTextContrast
+    ring = {**focus("rgb(255, 255, 255) 0px 0px 0px 2px, rgba(0, 0, 0, 0) 0px 0px 0px 4px"), "indicator": "outline",
+            "uses_var": True}
+    assert NonTextContrast.measure_focus(ring) is None
+    assert NonTextContrast.measure_focus({**focus("rgba(0, 0, 0, 0)"), "indicator": "outline"}) is None
+    assert NonTextContrast.measure_focus({**focus("rgb(255, 255, 255)"), "uses_var": False})["kind"] == "focus_fail"

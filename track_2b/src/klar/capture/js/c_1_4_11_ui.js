@@ -148,15 +148,23 @@
       const r = resolveVar(v, el);
       return /^currentcolor$/i.test(r.trim()) ? st.color : (K.firstColour(r) || (/currentcolor/i.test(r) ? st.color : ''));
     };
-    let indicator = null, colour = '';
+    // Every colour the indicator draws: an outline, ALL box-shadow layers (a double ring such as
+    // "0 0 0 2px #fff, 0 0 0 4px #000"), a border. The check keeps the best contrast of them.
+    const resAll = (v) => resolveVar(v, el).split(/,(?![^(]*\))/).map(res).filter(Boolean).join(' ');
+    let indicator = null;
+    const parts = [];
     const ow = parseFloat(resolveVar(props.ow, el)) || (props.os && props.os !== 'none' ? 2 : 0);
-    if (props.os && props.os !== 'none' && props.os !== 'auto' && ow > 0) { indicator = 'outline'; colour = res(props.oc || 'currentcolor'); }
-    else if (props.bs && props.bs !== 'none') { indicator = 'box_shadow'; colour = res(props.bs); }
-    else if (props.bc) { indicator = 'border'; colour = res(props.bc); }
-    else if (props.os === 'none' || props.ow === '0px') { indicator = 'removed'; }
+    if (props.os && props.os !== 'none' && props.os !== 'auto' && ow > 0) { indicator = 'outline'; parts.push(res(props.oc || 'currentcolor')); }
+    if (props.bs && props.bs !== 'none') { indicator = indicator || 'box_shadow'; parts.push(resAll(props.bs)); }
+    if (props.bc) { indicator = indicator || 'border'; parts.push(res(props.bc)); }
+    if (!indicator && (props.os === 'none' || props.ow === '0px')) indicator = 'removed';
     if (!indicator) continue;
+    const colour = parts.filter(Boolean).join(' ');
     out.focus.push({
       selector: K.path(el), html: K.outer(el), rule, indicator, colour, outside: K.layersAround(el, true).layers,
+      // Colours from CSS variables are resolved outside the focus state (nothing is focused):
+      // utility-CSS rings set their colour variable only while focused, so a low value proves nothing.
+      uses_var: /var\(/i.test([props.oc, props.bs, props.bc].filter(Boolean).join(' ')),
       own: K.layers(el, null).layers, lang: K.lang(el), text: K.norm(el.innerText || el.value || '').slice(0, 120),
     });
   }

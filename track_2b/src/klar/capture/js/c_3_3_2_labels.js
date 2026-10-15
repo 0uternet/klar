@@ -37,6 +37,25 @@
     return w;
   }
 
+  // G167: the first visible button after the field in its wrapper (or in a one-field form).
+  function adjacentButton(el, form) {
+    const single = form && form.querySelectorAll(FIELD).length === 1;
+    const scope = single ? form : (el.parentElement && el.parentElement.parentElement) || el.parentElement;
+    if (!scope) return null;
+    const b = Array.from(scope.querySelectorAll('button, input[type="submit"], input[type="button"], input[type="image"], [role="button"]'))
+      .find((x) => (el.compareDocumentPosition(x) & Node.DOCUMENT_POSITION_FOLLOWING) && reallyVisible(x));
+    if (!b) return null;
+    const text = b.localName === 'input' && b.type !== 'image' ? norm(b.value || '') : vtext(b);
+    const icon = !text && (b.type === 'image' || !!b.querySelector('svg, img, i, [class*="icon"]'));
+    return { text: text.slice(0, 80), icon };
+  }
+
+  function searchLike(el) {
+    const id = `${el.name || ''} ${el.id || ''}`.toLowerCase();
+    return el.type === 'search' || el.getAttribute('role') === 'searchbox' || !!el.closest('[role="search"], search') ||
+      /search|such|recherch|cerca|query|^q\b/.test(id);
+  }
+
   function info(el) {
     const form = el.form || el.closest('form');
     const labels = Array.from(el.labels || []);
@@ -59,6 +78,7 @@
       visible_label: visLabel, hidden_label: hidLabel, label_image_only: imgOnly, label_image_alt: imgAlt,
       legend: legend ? vtext(legend) : '', hint: norm(refs(el, 'aria-describedby').map(vtext).join(' ')),
       wrapper_text: norm(wrapText).slice(0, 300), form: form ? K.cssPath(form) : null,
+      adjacent_button: adjacentButton(el, form), search_like: searchLike(el),
       html: (el.outerHTML || '').slice(0, 600), lang: K.inheritedLang(el),
     };
   }

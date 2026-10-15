@@ -12,6 +12,9 @@ Decided in code
     most 160 px high) and holds no native link, button or field          → failed (F59/F15)
     - the same inside an aria-hidden subtree and not focusable (a mouse-only duplicate) → passed
     - pointer/touch/key listeners on a container (map, slider) that is not control-like → ignored
+    - a listener on an element inside a web component (custom element or shadow DOM) with no
+      pointer cursor, no keyboard focus and no onclick → ignored (component frameworks attach
+      handlers to inert parts; nothing presents it as a control)
     - every other clickable (a card around a link, a large area, a control-like element with
       only pointer listeners) → Apertus, see below (max 5 per page, then cantTell)
   * role=checkbox/switch/radio/menuitemcheckbox without aria-checked  → failed (ACT 4e8ab6)
@@ -86,6 +89,10 @@ def clickable_kind(rec: dict) -> str | None:
     types = set(rec.get("types") or [])
     if rec.get("aria_hidden") and not rec.get("focusable"):
         return "hidden_duplicate"
+    if rec.get("in_component") and not (rec.get("pointer") or rec.get("focusable") or rec.get("onclick")):
+        # Inside a web component, with no pointer cursor, no keyboard focus and no inline handler:
+        # component frameworks attach click handlers to inert parts (a non-interactive tag in a card).
+        return None
     strong = bool(rec.get("onclick") or "click" in types or (types & KEY_EVENTS and rec.get("focusable")))
     control_like = (0 < (rec.get("chars") or 0) <= CONTROL_MAX_CHARS and (rec.get("words") or 0) <= CONTROL_MAX_WORDS
                     and (rec.get("height") or 0) <= CONTROL_MAX_H)

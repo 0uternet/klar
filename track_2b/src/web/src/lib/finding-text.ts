@@ -26,12 +26,26 @@ export const GENERIC_IMPACT: readonly string[] = [
   'Una persona deve decidere se questo elemento è una barriera.',
 ]
 
-/** The first sentence of a text: up to the first . ; : ! or ? followed by a capital letter, else all of it. */
-function firstSentence(s: string): string {
+/** Opening quote → its closing quote (French, English, German, straight). */
+const QUOTES: Record<string, string> = { '«': '»', '‹': '›', '“': '”', '„': '“', '"': '"' }
+
+/**
+ * The first sentence of a text: up to the first . ; : ! or ? followed by a capital letter, else all
+ * of it. Punctuation inside a quotation does not end the sentence: a quoted heading such as
+ * « Willkommen in Biel. Bienvenue à Bienne. » stays whole.
+ */
+export function firstSentence(s: string): string {
   const x = s.replace(/\s+/g, ' ').trim()
-  const m = x.match(/^(.+?[.;:!?])\s(?=[A-ZÀ-ÖØ-Ý«“"])/)
-  const out = (m ? m[1]! : x).replace(/[;:]$/, '.')
-  return out
+  const open: string[] = []
+  for (let i = 0; i < x.length; i++) {
+    const c = x[i]!
+    if (open.length && c === open[open.length - 1]) open.pop()
+    else if (c in QUOTES) open.push(QUOTES[c]!)
+    else if (!open.length && '.;:!?'.includes(c) && x[i + 1] === ' ' && /[A-ZÀ-ÖØ-Ý«“"„]/.test(x[i + 2] ?? '')) {
+      return x.slice(0, i + 1).replace(/[;:]$/, '.')
+    }
+  }
+  return x
 }
 
 export function rowTitle(f: Finding, scanLang: UiLang): RowTitle {

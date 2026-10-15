@@ -31,6 +31,9 @@ def test_registered_and_markers():
 @pytest.mark.parametrize("field, expected", [
     (f("#a", "Name"), "ok"),
     (f("#b", placeholder="Your name"), "placeholder_only"),
+    (f("#b2", placeholder="Suchbegriff", adjacent_button={"text": "Suchen", "icon": False}), "adjacent_button"),
+    (f("#b3", placeholder="Rechercher", search_like=True, adjacent_button={"text": "", "icon": True}), "adjacent_icon"),
+    (f("#b4", placeholder="E-Mail", adjacent_button={"text": "Abonnieren", "icon": False}), "placeholder_only"),
     (f("#c"), "no_label"),
     (f("#d", label_image_only=True), "pictogram"),
     (f("#e", legend="Date of birth", hidden_label="Day"), "group_legend"),
@@ -159,3 +162,17 @@ def test_address_format_passes():
     c = check.candidate(static_page([]), selector="#m1", html="<input id=m1>", text="Contact", accessible_name="Contact",
                         kind="format_address", label="Contact", pattern="[^@]+@.+", placeholder="")
     assert check.decide(c).outcome == "passed"
+
+
+@pytest.mark.browser
+def test_live_adjacent_search_button(render_html):
+    """G167: a search field labelled by the visible "Suchen" button after it; an icon-only button
+    is left to a person; a "Senden" button does not label a field."""
+    page = render_html("""<html lang="de"><body><header><form id="s1" role="search" action="/suche">
+<input id="q1" name="q" placeholder="Suchbegriff"><button>Suchen</button></form>
+<form id="s2" action="/suche"><input id="q2" type="search" placeholder="Suche"><button aria-label="Suche">
+<svg width="16" height="16"><circle cx="7" cy="7" r="5"/></svg></button></form></header><main>
+<form id="n" action="/nl"><input id="m" type="email" placeholder="E-Mail-Adresse"><button>Senden</button></form>
+</main></body></html>""")
+    kinds = {c.selector: c.extra["kind"] for c in LabelsOrInstructions("de", Settings()).candidates(page)}
+    assert kinds["#q1"] == "adjacent_button" and kinds["#q2"] == "adjacent_icon" and kinds["#m"] == "placeholder_only"

@@ -348,13 +348,17 @@ class NonTextContrast(BaseCheck):
     def measure_focus(rec: dict) -> dict | None:
         if rec.get("indicator") in (None, "removed"):
             return None
-        colours = C.colours_in(rec.get("colour")) if rec.get("indicator") == "box_shadow" else \
-            [c for c in [C.parse_color(rec.get("colour"))] if c]
+        # All colours the indicator draws (outline, every shadow layer, border): the best one counts.
+        # A transparent colour draws nothing (e.g. "outline: 2px solid transparent" kept for forced colours).
+        colours = C.colours_in(rec.get("colour")) or [c for c in [C.parse_color(rec.get("colour"))] if c]
+        colours = [c for c in colours if c[3] >= 0.1]
         outside = _stack(rec.get("outside"))
         if not colours or outside is None:
             return None
-        col = C.over(colours[0], outside)
+        col = max((C.over(c, outside) for c in colours), key=lambda c: C.contrast(c, outside))
         ratio = C.contrast(col, outside)
+        if ratio < C.NON_TEXT_MIN and rec.get("uses_var"):
+            return None  # the variables were read unfocused: the focused colour is unknown, no verdict
         return dict(kind="focus_pass" if ratio >= C.NON_TEXT_MIN else "focus_fail", ratio=round(ratio, 4),
                     fg=C.hex_of(col), bg=C.hex_of(outside), fg_rgb=list(C.rgb(col)), bg_rgb=list(C.rgb(outside)),
                     indicator=rec.get("indicator"))

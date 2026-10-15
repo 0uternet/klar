@@ -172,7 +172,8 @@ const filtered = computed(() => {
     if (filters.status && f.status !== filters.status) return false
     if (filters.reason && f.reason_code !== filters.reason) return false
     if (q) {
-      const hay = [f.criterion, f.criterion_name, plainName(f.criterion, locale.value), rowTitle(f, scan.value?.ui_lang ?? 'en').text, f.user_impact, f.explanation, f.excerpt, f.selector, f.page_url]
+      // Not the page URL: a report covers one page, so it would match every finding.
+      const hay = [f.criterion, f.criterion_name, plainName(f.criterion, locale.value), rowTitle(f, scan.value?.ui_lang ?? 'en').text, f.user_impact, f.explanation, f.excerpt, f.selector]
         .join(' ')
         .toLowerCase()
       if (!hay.includes(q)) return false

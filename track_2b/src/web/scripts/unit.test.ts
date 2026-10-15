@@ -7,7 +7,7 @@ import { aiCounterText, leftNetwork, leftNetworkLabel } from '../src/lib/soverei
 import { setLocale } from '../src/i18n'
 import { classifyHttpStatus, classifyScanError, classifyStartError, renderProblem } from '../src/lib/errors'
 import { compareSections, groupFindings, reviewProgress } from '../src/lib/group'
-import { rowTitle } from '../src/lib/finding-text'
+import { firstSentence, rowTitle } from '../src/lib/finding-text'
 import { apertusAnswers, runNotes } from '../src/lib/notes'
 import { scanTitle } from '../src/lib/format'
 import { guideFor } from '../src/data/human-guides'
@@ -140,6 +140,10 @@ const g245 = rowTitle(
   'en',
 )
 check('generic impact → first sentence of the specific explanation', g245.text === 'Multiple ways concern a set of pages; pasted HTML has no site around it.', g245.text)
+const quoted = firstSentence('Apertus juge que le titre « Willkommen in Biel. Bienvenue à Bienne. » nomme un autre sujet. La section est estimée.')
+check('a full stop inside « » does not end the title', quoted === 'Apertus juge que le titre « Willkommen in Biel. Bienvenue à Bienne. » nomme un autre sujet.', quoted)
+const de = firstSentence('Die Überschrift „Start. Willkommen.“ nennt ein anderes Thema. Eine Person muss prüfen.')
+check('a full stop inside „ “ does not end the title', de === 'Die Überschrift „Start. Willkommen.“ nennt ein anderes Thema.', de)
 const tm = renderProblem(classifyScanError({ error_code: 'scan_timeout', error: 'scan exceeded KLAR_SCAN_TIMEOUT (12 s)' } as never, 'x', 3, 'a'))
 check('timeout limit in words (12 seconds)', /after 12 seconds\./.test(tm.body), tm.body)
 check('timeout limit in words (15 minutes)', /after 15 minutes\./.test(renderProblem(classifyScanError({ error_code: 'scan_timeout', error: '(900 s)' } as never, 'x', 3, 'a')).body))

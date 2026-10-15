@@ -26,6 +26,12 @@
   const INTERACTIVE = 'a[href], button, input:not([type="hidden"]), select, textarea, summary, ' +
     WIDGET_ROLES.map((r) => '[role="' + r + '"]').join(', ');
 
+  /** Inside a web component: a custom element (name with a hyphen) or a shadow root. */
+  function inComponent(el) {
+    for (let n = el; n; n = n.parentElement) if (n.localName && n.localName.includes('-')) return true;
+    return typeof ShadowRoot !== 'undefined' && el.getRootNode() instanceof ShadowRoot;
+  }
+
   /** listenerMap: selector → event types registered on that element (DevTools protocol). */
   function collect(listenerMap) {
     const L = new Map();
@@ -50,7 +56,8 @@
             onclick: el.hasAttribute('onclick'), focusable: focusable(el), aria_hidden: hiddenAnc(el),
             has_interactive: !!el.querySelector(INTERACTIVE), words: text ? text.split(' ').length : 0,
             chars: text.length, width: Math.round(r.width), height: Math.round(r.height),
-            pointer: getComputedStyle(el).cursor === 'pointer', html: (el.outerHTML || '').slice(0, 600) });
+            pointer: getComputedStyle(el).cursor === 'pointer', in_component: inComponent(el),
+            html: (el.outerHTML || '').slice(0, 600) });
         }
       }
       if (!native && WIDGET_ROLES.includes(role) && K.isVisible(el)) {

@@ -149,3 +149,25 @@ def test_prompts_do_not_depend_on_the_ui_language(render_html):
         if c.extra["kind"] in ("ask_clickable", "ask_icon"):
             wires = [NameRoleValue(ui, Settings()).question(c, ui).wire() for ui in ("en", "de", "fr", "it")]
             assert all(w == wires[0] for w in wires)
+
+
+def test_inert_element_with_a_framework_listener_is_ignored():
+    """A click handler on a part that nothing presents as a control (no pointer, no focus)."""
+    from klar.checks.c_4_1_2 import clickable_kind
+    tag = {"types": ["click"], "chars": 8, "words": 1, "height": 24, "has_interactive": False, "in_component": True}
+    assert clickable_kind({**tag, "pointer": False, "focusable": False}) is None
+    assert clickable_kind({**tag, "pointer": False, "focusable": False, "in_component": False}) == "clickable"
+    assert clickable_kind({**tag, "pointer": True, "focusable": False}) == "clickable"
+    assert clickable_kind({**tag, "pointer": False, "focusable": True}) == "clickable"
+    assert clickable_kind({**tag, "pointer": False, "focusable": False, "onclick": True}) == "clickable"
+
+
+@pytest.mark.browser
+def test_live_inert_part_of_a_web_component_is_ignored(render_html):
+    page = render_html("""<html lang="en"><body><main><article><a href="/news/1">Four arrests</a>
+<card-tag><div id="tag">Media release</div></card-tag></article>
+<div id="btn" style="cursor:pointer">Open</div></main>
+<script>for (const id of ['tag', 'btn']) document.getElementById(id).addEventListener('click', () => {});</script>
+</body></html>""")
+    kinds = {c.selector: c.extra.get("kind") for c in NameRoleValue("en", Settings()).candidates(page)}
+    assert "#tag" not in kinds and kinds["#btn"] == "clickable"

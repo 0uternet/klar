@@ -11,6 +11,9 @@ Radio buttons of one name are judged as one group.
 Decided in code (one finding per control, the first problem wins)
   * label is only a pictogram                                        → cantTell (Understanding: images
                                                                         only if widely understood)
+  * no visible label, but the visible button right after it is a search button ("Suchen",
+    "Rechercher", "Cerca", "Search")                                  → passed (G167)
+  * search field without a visible label next to an icon-only button  → cantTell (icon clear enough?)
   * no visible label, only a placeholder                              → failed (G131 not met)
   * no visible label and no visible text next to the field            → failed
   * part of a group with a visible legend, own label visually hidden  → passed (low)
@@ -101,6 +104,15 @@ def address_pattern(pattern: str, autocomplete: str) -> bool:
 PHONE_STEMS = ("telefon", "téléphone", "telephone", "phone", "natel")
 
 
+# G167: words of a button that labels the field before it (search). DE · FR · IT · EN.
+SEARCH_STEMS = ("such", "recherch", "cherch", "cerca", "ricerc", "search", "find", "trouv", "trova")
+
+
+def search_button(text: str) -> bool:
+    ws = _WORD.findall(unicodedata.normalize("NFKC", text or "").casefold())
+    return any(w.startswith(SEARCH_STEMS) for w in ws)
+
+
 def phone_label(label: str) -> bool:
     ws = _WORD.findall(unicodedata.normalize("NFKC", label or "").casefold())
     return any(w.startswith(PHONE_STEMS) or w == "tel" for w in ws)
@@ -139,6 +151,18 @@ register({
         "de": "Das Feld hat die sichtbare Beschriftung «{label}».",
         "fr": "Le champ a l'étiquette visible « {label} ».",
         "it": "Il campo ha l'etichetta visibile «{label}».",
+    },
+    "c332.adjacent_button": {
+        "en": "The field has no label of its own, but the visible button “{button}” right after it says what it is for (G167).",
+        "de": "Das Feld hat keine eigene Beschriftung, aber die sichtbare Schaltfläche «{button}» direkt danach sagt, wofür es dient (G167).",
+        "fr": "Le champ n'a pas d'étiquette propre, mais le bouton visible « {button} » juste après indique à quoi il sert (G167).",
+        "it": "Il campo non ha un'etichetta propria, ma il pulsante visibile «{button}» subito dopo dice a cosa serve (G167).",
+    },
+    "c332.adjacent_icon": {
+        "en": "A search field without a visible label, next to a button that shows only an icon. Whether the icon makes the purpose clear enough must be decided by a person.",
+        "de": "Ein Suchfeld ohne sichtbare Beschriftung neben einer Schaltfläche, die nur ein Symbol zeigt. Ob das Symbol den Zweck klar genug macht, muss eine Person entscheiden.",
+        "fr": "Un champ de recherche sans étiquette visible, à côté d'un bouton qui n'affiche qu'une icône. Une personne doit décider si l'icône rend le but assez clair.",
+        "it": "Un campo di ricerca senza etichetta visibile, accanto a un pulsante che mostra solo un'icona. Una persona deve decidere se l'icona rende lo scopo abbastanza chiaro.",
     },
     "c332.placeholder_only": {
         "en": "The only visible cue is the placeholder “{placeholder}”, which disappears as soon as the user types.",
@@ -338,6 +362,11 @@ class LabelsOrInstructions(BaseCheck):
                 return "group_legend", {}
             if f.get("wrapper_text") and not f.get("placeholder"):
                 return "nearby_text", {"nearby": f["wrapper_text"]}
+            btn = f.get("adjacent_button") or {}
+            if search_button(btn.get("text", "")):
+                return "adjacent_button", {"button": btn["text"]}  # G167
+            if f.get("search_like") and btn.get("icon"):
+                return "adjacent_icon", {}
             if f.get("placeholder"):
                 return "placeholder_only", {}
             return "no_label", {}
@@ -399,6 +428,11 @@ class LabelsOrInstructions(BaseCheck):
             return ok("c332.format_address")
         if kind == "group_ok":
             return ok("c332.group_ok")
+        if kind == "adjacent_button":
+            kw["button"] = c.extra.get("button", "")[:80]
+            return ok("c332.adjacent_button", "low")
+        if kind == "adjacent_icon":
+            return review("c332.adjacent_icon")
         if kind == "placeholder_only":
             return bad("c332.placeholder_only")
         if kind == "no_label":
