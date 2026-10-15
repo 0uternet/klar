@@ -123,7 +123,8 @@
       const sel = rule.selectorText || '';
       if (!/:focus(?!-within)/.test(sel)) continue;
       const s = rule.style;
-      const props = { os: s.outlineStyle, ow: s.outlineWidth, oc: s.outlineColor, bs: s.boxShadow, bc: s.borderColor || s.borderBottomColor };
+      const props = { os: s.outlineStyle, ow: s.outlineWidth, oc: s.outlineColor, bs: s.boxShadow, bc: s.borderColor || s.borderBottomColor,
+                      bst: s.borderStyle || s.borderBottomStyle, bw: s.borderWidth || s.borderBottomWidth, b: s.border };
       if (!props.os && !props.oc && !props.bs && !props.bc && !s.outline) continue;
       for (const part of sel.split(',')) {
         if (!/:focus(?!-within)/.test(part)) continue;
@@ -150,13 +151,28 @@
     };
     // Every colour the indicator draws: an outline, ALL box-shadow layers (a double ring such as
     // "0 0 0 2px #fff, 0 0 0 4px #000"), a border. The check keeps the best contrast of them.
-    const resAll = (v) => resolveVar(v, el).split(/,(?![^(]*\))/).map(res).filter(Boolean).join(' ');
+    // A box-shadow layer is a ring when its spread (4th length) is > 0; a soft drop shadow is not
+    // an indicator next to an outline. Only rings count, unless the shadow is the whole indicator.
+    const layersOf = (v) => resolveVar(v, el).split(/,(?![^(]*\))/);
+    const isRing = (layer) => {
+      const lens = layer.replace(/[a-z-]+\([^)]*\)|#[0-9a-f]+/gi, ' ').match(/-?\d*\.?\d+(px|em|rem)?/g) || [];
+      return lens.length >= 4 && parseFloat(lens[3]) > 0;
+    };
+    const resAll = (v, ringsOnly) => layersOf(v).filter((l) => !ringsOnly || isRing(l)).map(res).filter(Boolean).join(' ');
+    // A border counts only when the focus rule draws one ("border: 0" reads as currentcolor).
+    const ruleKillsBorder = /^(none|hidden)$/.test((props.bst || '').trim()) || /^0(px)?$/.test((props.bw || '').trim()) ||
+      /(^|\s)(0|0px|none)(\s|$)/.test(props.b || '');
+    const elHasBorder = !/^(none|hidden)$/.test(st.borderBottomStyle) && parseFloat(st.borderBottomWidth) > 0;
+    const drawsBorder = !!props.bc && !ruleKillsBorder && (!!(props.bst && props.bw) || elHasBorder);
     let indicator = null;
     const parts = [];
     const ow = parseFloat(resolveVar(props.ow, el)) || (props.os && props.os !== 'none' ? 2 : 0);
     if (props.os && props.os !== 'none' && props.os !== 'auto' && ow > 0) { indicator = 'outline'; parts.push(res(props.oc || 'currentcolor')); }
-    if (props.bs && props.bs !== 'none') { indicator = indicator || 'box_shadow'; parts.push(resAll(props.bs)); }
-    if (props.bc) { indicator = indicator || 'border'; parts.push(res(props.bc)); }
+    if (props.bs && props.bs !== 'none') {
+      parts.push(resAll(props.bs, !!indicator));   // next to an outline: rings only
+      indicator = indicator || 'box_shadow';
+    }
+    if (drawsBorder) { indicator = indicator || 'border'; parts.push(res(props.bc)); }
     if (!indicator && (props.os === 'none' || props.ow === '0px')) indicator = 'removed';
     if (!indicator) continue;
     const colour = parts.filter(Boolean).join(' ');

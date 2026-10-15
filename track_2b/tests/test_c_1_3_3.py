@@ -89,7 +89,8 @@ def test_shape_and_position_only_goes_to_apertus_and_fails_via_fake_llm(make_set
 
 
 @pytest.mark.parametrize("category, outcome", [
-    ("visible_text", "passed"), ("reading_order", "passed"), ("text_symbol", "passed"), ("sensory_only", "failed"),
+    # visible_text is checked against the page: this instruction names no visible text → a person decides
+    ("visible_text", "cantTell"), ("reading_order", "passed"), ("text_symbol", "passed"), ("sensory_only", "failed"),
     ("hidden_name", "cantTell"), ("purpose_only", "cantTell"), ("not_instruction", "inapplicable"),
     ("unsure", "cantTell"),
 ])
@@ -98,6 +99,13 @@ def test_category_mapping(category, outcome):
     f = check.interpret(cands[0], {"category": category, "confidence": "medium", "quote": "oben rechts",
                                    "reason": "r"})
     assert f.outcome == outcome
+
+
+def test_visible_text_answer_passes_when_the_instruction_names_a_visible_text():
+    check, cands = run(make_page("Geben Sie die Anzahl ein und klicken Sie auf den runden Knopf oben rechts."))
+    f = check.interpret(cands[0], {"category": "visible_text", "confidence": "medium", "quote": "Anzahl",
+                                   "reason": "r"})
+    assert cands[0].extra["names_control"] is True and f.outcome == "passed"
 
 
 def test_reading_order_context_names_the_next_element():

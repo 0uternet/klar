@@ -42,10 +42,19 @@
     const single = form && form.querySelectorAll(FIELD).length === 1;
     const scope = single ? form : (el.parentElement && el.parentElement.parentElement) || el.parentElement;
     if (!scope) return null;
+    const after = (a, b) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
     const b = Array.from(scope.querySelectorAll('button, input[type="submit"], input[type="button"], input[type="image"], [role="button"]'))
-      .find((x) => (el.compareDocumentPosition(x) & Node.DOCUMENT_POSITION_FOLLOWING) && reallyVisible(x));
+      .find((x) => after(el, x) && reallyVisible(x));
     if (!b) return null;
-    const text = b.localName === 'input' && b.type !== 'image' ? norm(b.value || '') : vtext(b);
+    // The button labels only the field right before it: no other field in between ("Von", "Nach", [Suchen]).
+    if (Array.from(scope.querySelectorAll(FIELD)).some((f) => f !== el && after(el, f) && after(f, b))) return null;
+    // Only text that is really shown counts (an sr-only "Suchen" inside an icon button does not).
+    const shown = [];
+    const tw = document.createTreeWalker(b, NodeFilter.SHOW_TEXT);
+    for (let n = tw.nextNode(); n; n = tw.nextNode()) {
+      if (norm(n.nodeValue) && n.parentElement && reallyVisible(n.parentElement)) shown.push(norm(n.nodeValue));
+    }
+    const text = b.localName === 'input' && b.type !== 'image' ? norm(b.value || '') : norm(shown.join(' '));
     const icon = !text && (b.type === 'image' || !!b.querySelector('svg, img, i, [class*="icon"]'));
     return { text: text.slice(0, 80), icon };
   }

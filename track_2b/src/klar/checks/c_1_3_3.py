@@ -340,7 +340,11 @@ class SensoryCharacteristics(BaseCheck):
                 ctrl = control_summary(scope)
                 if ctrl:
                     context["controls_nearby"] = ctrl
-                texts = [_key(v) for v in control_texts(scope) if len(_key(v)) >= 2]
+                # Visible texts that may name the item: nearby controls, labels, headings, captions
+                # (≥ 3 characters: "DE"/"FR" language links would match almost any sentence).
+                named = control_texts(scope) + [n.text(visible=True) for n in scope.iter() if not n.hidden() and n.tag in
+                                                ("label", "legend", "caption", "figcaption", "h1", "h2", "h3", "h4", "h5", "h6")]
+                texts = [k for k in (" ".join(_key(v).replace("*", " ").split()) for v in named) if len(k) >= 3]
                 if texts:
                     names_control = any(f" {v} " in f" {_key(text)} " for v in texts)
                 nxt = next_item(node)

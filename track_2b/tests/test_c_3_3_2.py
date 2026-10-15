@@ -176,3 +176,16 @@ def test_live_adjacent_search_button(render_html):
 </main></body></html>""")
     kinds = {c.selector: c.extra["kind"] for c in LabelsOrInstructions("de", Settings()).candidates(page)}
     assert kinds["#q1"] == "adjacent_button" and kinds["#q2"] == "adjacent_icon" and kinds["#m"] == "placeholder_only"
+
+
+@pytest.mark.browser
+def test_live_g167_needs_the_button_right_after_the_field(render_html):
+    """Review findings: a button after two fields labels neither; hidden text in an icon button is not visible."""
+    page = render_html("""<html lang="de"><body><main><form id="t" action="/fahrplan">
+<input id="von" placeholder="Von"><input id="nach" placeholder="Nach"><button>Verbindung suchen</button></form>
+<form id="s" role="search" action="/suche"><input id="q" type="search" placeholder="Suche"><button>
+<svg width="16" height="16"><circle cx="7" cy="7" r="5"/></svg><span style="position:absolute;width:1px;height:1px;
+overflow:hidden;clip:rect(0 0 0 0)">Suchen</span></button></form></main></body></html>""")
+    kinds = {c.selector: c.extra["kind"] for c in LabelsOrInstructions("de", Settings()).candidates(page)}
+    assert kinds["#von"] == "placeholder_only" and kinds["#q"] == "adjacent_icon"
+    assert kinds["#nach"] == "adjacent_button"  # the button is right after "Nach"

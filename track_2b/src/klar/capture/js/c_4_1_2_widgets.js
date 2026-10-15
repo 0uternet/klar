@@ -26,9 +26,14 @@
   const INTERACTIVE = 'a[href], button, input:not([type="hidden"]), select, textarea, summary, ' +
     WIDGET_ROLES.map((r) => '[role="' + r + '"]').join(', ');
 
-  /** Inside a web component: a custom element (name with a hyphen) or a shadow root. */
+  /** Part of a small web component: a custom element (name with a hyphen) at most 3 levels up that
+   *  holds no page landmark (an app wrapper such as <app-root> around <main> does not count), or a
+   *  shadow root. */
   function inComponent(el) {
-    for (let n = el; n; n = n.parentElement) if (n.localName && n.localName.includes('-')) return true;
+    let n = el;
+    for (let i = 0; n && i <= 3; i++, n = n.parentElement) {
+      if (n.localName && n.localName.includes('-') && !n.querySelector('main, header, nav, footer, form, [role="main"]')) return true;
+    }
     return typeof ShadowRoot !== 'undefined' && el.getRootNode() instanceof ShadowRoot;
   }
 

@@ -185,3 +185,15 @@ def test_injection_alt_never_reaches_the_model(make_settings, chromium):
     f = next(f for f in scan.findings if f.criterion == "1.4.5" and f.selector == "#banner")
     assert f.outcome == "cantTell" and f.reason_code == "suspicious"
     assert all("Ignore all previous" not in user_text(r) for r in requests)
+
+
+@pytest.mark.browser
+def test_sr_only_text_or_a_small_button_does_not_hide_a_banner(make_settings, chromium):
+    """Review findings: CSS image replacement with an sr-only span, and a hero with a small link, stay candidates."""
+    src = _png_data_uri()
+    page = (f'<html lang="de"><body><h1 id="banner" style="width:400px;height:120px;background-image:url({src})">'
+            f'<span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Sommerfest am Seeufer</span></h1>'
+            f'<div id="hero" style="width:600px;height:300px;background-image:url({src})"><a href="#m">Mehr</a></div></body></html>')
+    scan, _, _ = _scan(make_settings, page, vision=False)
+    sel = {f.selector for f in scan.findings if f.criterion == "1.4.5"}
+    assert "#banner" in sel and "#hero" in sel

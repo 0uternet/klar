@@ -163,6 +163,7 @@ const criteriaPresent = computed(() => Array.from(new Set(findings.value.map((f)
 const OUTCOME_RANK: Record<Outcome, number> = { failed: 0, cantTell: 1, passed: 2, inapplicable: 3 }
 const CONF_RANK = { high: 0, medium: 1, low: 2 }
 
+const multiPageSearch = computed(() => new Set(findings.value.map((f) => f.page_url)).size > 1)
 const filtered = computed(() => {
   const q = filters.q.trim().toLowerCase()
   return findings.value.filter((f) => {
@@ -172,8 +173,8 @@ const filtered = computed(() => {
     if (filters.status && f.status !== filters.status) return false
     if (filters.reason && f.reason_code !== filters.reason) return false
     if (q) {
-      // Not the page URL: a report covers one page, so it would match every finding.
-      const hay = [f.criterion, f.criterion_name, plainName(f.criterion, locale.value), rowTitle(f, scan.value?.ui_lang ?? 'en').text, f.user_impact, f.explanation, f.excerpt, f.selector]
+      // The page URL only in a multi-page report: on one page it would match every finding.
+      const hay = [f.criterion, f.criterion_name, plainName(f.criterion, locale.value), rowTitle(f, scan.value?.ui_lang ?? 'en').text, f.user_impact, f.explanation, f.excerpt, f.selector, multiPageSearch.value ? f.page_url : '']
         .join(' ')
         .toLowerCase()
       if (!hay.includes(q)) return false

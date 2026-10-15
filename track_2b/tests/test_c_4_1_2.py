@@ -171,3 +171,11 @@ def test_live_inert_part_of_a_web_component_is_ignored(render_html):
 </body></html>""")
     kinds = {c.selector: c.extra.get("kind") for c in NameRoleValue("en", Settings()).candidates(page)}
     assert "#tag" not in kinds and kinds["#btn"] == "clickable"
+
+
+@pytest.mark.browser
+def test_live_an_app_wrapper_is_not_a_web_component(render_html):
+    page = render_html("""<html lang="en"><body><app-root><main><div id="fake">Delete</div></main></app-root>
+<script>document.getElementById('fake').addEventListener('click', () => {});</script></body></html>""")
+    kinds = {c.selector: c.extra.get("kind") for c in NameRoleValue("en", Settings()).candidates(page)}
+    assert kinds["#fake"] == "clickable"

@@ -154,6 +154,11 @@ register({
 })
 
 
+# Real HTML text must cover at least this share of a background picture's box for the crop to be
+# skipped (a heading or teaser over a photo); a small button over a hero picture keeps it.
+MIN_TEXT_SHARE = 0.1
+
+
 class ImagesOfText(BaseCheck):
     criterion = "1.4.5"
     prompt_version = PROMPT_VERSION
@@ -166,7 +171,8 @@ class ImagesOfText(BaseCheck):
     def candidates(self, page: CapturedPage) -> list[Candidate]:
         out: list[Candidate] = []
         for rec in C.records(page, "c145_images", "c_1_4_5_images.js")[: self.max_candidates]:
-            if rec.get("kind") == "background" and rec.get("visible_text") and not rec.get("hidden_text"):
+            if (rec.get("kind") == "background" and rec.get("visible_text") and not rec.get("hidden_text")
+                    and (rec.get("text_share") or 0) >= MIN_TEXT_SHARE):
                 continue  # real HTML text over a picture: its crop would show that text as if it were in the image
             alt = rec.get("alt")
             name = " ".join((alt if alt is not None else (rec.get("label") or "")).split())

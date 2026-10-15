@@ -30,16 +30,30 @@
 
   // Text that is really painted over the element's box (not moved out by text-indent, not
   // transparent, not clipped away): HTML text over a background picture, not text in it.
+  function clippedAway(p, el) {  // sr-only patterns between the text and the graphic
+    for (let a = p; a && a !== el.parentElement; a = a.parentElement) {
+      const cs = K.cs(a);
+      const r = a.getBoundingClientRect();
+      if ((r.width <= 2 || r.height <= 2) && cs.overflow !== 'visible') return true;
+      if (/rect\(0(px)?,? 0(px)?,? 0(px)?,? 0(px)?\)/.test(cs.clip)) return true;
+      if (cs.clipPath && /inset\(50%/.test(cs.clipPath)) return true;
+    }
+    return false;
+  }
+
+  // Share of the element's box covered by that text (0..1): a small "Mehr" over a hero picture is not
+  // what the crop is about; a heading or a teaser text over a photo is.
   function shownText(el) {
     const er = el.getBoundingClientRect();
     const parts = [];
+    let area = 0;
     const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
     let n;
     while ((n = tw.nextNode()) && parts.length < 20) {
       const t = K.norm(n.nodeValue);
       if (!t || !K.LETTER.test(t)) continue;
       const p = n.parentElement;
-      if (!p || !K.visible(p)) continue;
+      if (!p || !K.visible(p) || clippedAway(p, el)) continue;
       const st = K.cs(p);
       if (parseFloat(st.fontSize) < 2 || K.transparent(st.color)) continue;
       const rg = document.createRange();
@@ -48,8 +62,9 @@
       if (r.width < 1 || r.height < 1) continue;
       if (r.right <= er.left || r.left >= er.right || r.bottom <= er.top || r.top >= er.bottom) continue;
       parts.push(t);
+      area += (Math.min(r.right, er.right) - Math.max(r.left, er.left)) * (Math.min(r.bottom, er.bottom) - Math.max(r.top, er.top));
     }
-    return parts.join(' ').slice(0, 200);
+    return { text: parts.join(' ').slice(0, 200), share: er.width * er.height > 0 ? area / (er.width * er.height) : 0 };
   }
 
   function push(el, kind, extra) {
@@ -83,7 +98,7 @@
     if (!st.backgroundImage || !/url\(/.test(st.backgroundImage)) continue;
     if (!K.visible(el) || !sized(el)) continue;
     push(el, 'background', { background: st.backgroundImage.slice(0, 200), hidden_text: hiddenText(el),
-                             visible_text: shownText(el) });
+                             ...(() => { const sh = shownText(el); return { visible_text: sh.text, text_share: Math.round(sh.share * 100) / 100 }; })() });
   }
   return out;
 }

@@ -144,6 +144,8 @@ const quoted = firstSentence('Apertus juge que le titre « Willkommen in Biel. B
 check('a full stop inside « » does not end the title', quoted === 'Apertus juge que le titre « Willkommen in Biel. Bienvenue à Bienne. » nomme un autre sujet.', quoted)
 const de = firstSentence('Die Überschrift „Start. Willkommen.“ nennt ein anderes Thema. Eine Person muss prüfen.')
 check('a full stop inside „ “ does not end the title', de === 'Die Überschrift „Start. Willkommen.“ nennt ein anderes Thema.', de)
+const inch = firstSentence('Bildschirm 24" Zoll. Ein zweiter Satz folgt.')
+check('an unmatched quote does not swallow the text', inch === 'Bildschirm 24" Zoll.', inch)
 const tm = renderProblem(classifyScanError({ error_code: 'scan_timeout', error: 'scan exceeded KLAR_SCAN_TIMEOUT (12 s)' } as never, 'x', 3, 'a'))
 check('timeout limit in words (12 seconds)', /after 12 seconds\./.test(tm.body), tm.body)
 check('timeout limit in words (15 minutes)', /after 15 minutes\./.test(renderProblem(classifyScanError({ error_code: 'scan_timeout', error: '(900 s)' } as never, 'x', 3, 'a')).body))

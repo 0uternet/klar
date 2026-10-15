@@ -45,6 +45,11 @@ export function firstSentence(s: string): string {
       return x.slice(0, i + 1).replace(/[;:]$/, '.')
     }
   }
+  // An unmatched quote (an inch mark, a lone «) must not swallow the whole text: plain split instead.
+  if (open.length) {
+    const m = x.match(/^(.+?[.;:!?])\s(?=[A-ZÀ-ÖØ-Ý«“"])/)
+    return (m ? m[1]! : x).replace(/[;:]$/, '.')
+  }
   return x
 }
 

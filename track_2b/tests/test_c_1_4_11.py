@@ -190,3 +190,18 @@ def test_focus_colours_from_variables_or_transparent_prove_nothing():
     assert NonTextContrast.measure_focus(ring) is None
     assert NonTextContrast.measure_focus({**focus("rgba(0, 0, 0, 0)"), "indicator": "outline"}) is None
     assert NonTextContrast.measure_focus({**focus("rgb(255, 255, 255)"), "uses_var": False})["kind"] == "focus_fail"
+
+
+@pytest.mark.browser
+def test_live_border_reset_and_drop_shadow_do_not_rescue_a_weak_outline(make_settings, chromium):
+    """Review findings: `border:0` reads as currentcolor (the text colour) and a soft drop shadow is
+    not a ring; neither may turn a 1.4:1 outline into a pass. A ring next to it does count."""
+    page = """<html lang="de"><head><style>
+#a:focus{outline:2px solid #ddd;border:0} #b:focus{outline:2px solid #ddd;box-shadow:0 2px 4px rgba(0,0,0,.5)}
+#c:focus{outline:2px solid #ddd;box-shadow:0 0 0 3px #1f2937} #d{border:2px solid #9ca3af} #d:focus{border-color:#1d4ed8}
+</style></head><body style="background:#fff;font:16px Arial;color:#000">
+<a id="a" href="/a">Amt</a> <a id="b" href="/b">Bau</a> <a id="c" href="/c">Chor</a>
+<label for="d">Name</label><input id="d"></body></html>"""
+    scan, _ = _scan(make_settings, page, vision=False)
+    fs = {f.selector: f.reason_code for f in scan.findings if f.criterion == "1.4.11"}
+    assert fs["#a"] == "focus_fail" and fs["#b"] == "focus_fail" and fs["#c"] == "focus_pass"
