@@ -4,12 +4,12 @@ import { useRoute, useRouter } from 'vue-router'
 import { ArrowRight } from '@lucide/vue'
 import { DEMO_NAME, DEMO_URL, isDemoUrl } from '@/config'
 import { api, ApiError } from '@/api'
-import { formatNumber, formatRelative, locale, t, tp, type MessageKey } from '@/i18n'
+import { formatDate, formatNumber, formatRelative, locale, t, tp, type MessageKey } from '@/i18n'
 import { ensureBooted, health, healthRetrying, lastScanId, prefill, refreshHealth, unreachable } from '@/stores/app'
 import { scans } from '@/stores/scans'
 import { toast } from '@/stores/toast'
 import { classifyStartError, hostOf, type Problem, type ProblemAction } from '@/lib/errors'
-import { isPasted, providerName, scanTitle } from '@/lib/format'
+import { isPasted, scanTitle } from '@/lib/format'
 import { toReview } from '@/lib/group'
 import { useShortcuts } from '@/composables/useShortcuts'
 import { useDocumentTitle } from '@/composables/useDocumentTitle'
@@ -19,6 +19,11 @@ import type { CheckInput, ScanSummary } from '@/types'
 import VerdictChip from '@/components/VerdictChip.vue'
 import CriterionTag from '@/components/CriterionTag.vue'
 import ShapeIcon from '@/components/ShapeIcon.vue'
+import SwissBadge from '@/components/SwissBadge.vue'
+import SourceLink from '@/components/SourceLink.vue'
+import CountUp from '@/components/CountUp.vue'
+import { reducedMotion } from '@/lib/motion'
+import { SOURCES_CHECKED } from '@/data/swiss-law'
 
 const router = useRouter()
 const route = useRoute()
@@ -47,13 +52,42 @@ const noRecordings = computed(() => {
 /** UX-22 / M4: the model endpoint did not answer the start-up probe (null = unknown: say nothing). */
 const llmDown = computed(() => !isReplay.value && health.value?.llm_reachable === false)
 
-/** UX-17 / M5: at the moment of submitting, say where pages go when they leave the network. */
+/**
+ * UX-17 / M5: at the moment of submitting, say where pages go when they leave the network.
+ * Swiss cloud is said by the Swiss badge above the field ("Processed in Switzerland · provider"),
+ * so only the external endpoint keeps this warning line, with its way to change it.
+ */
 const sendNotice = computed(() => {
   const h = health.value
   if (h?.mode === 'external') return { shape: 'diamond' as const, color: 'var(--amber)', text: t('notice.external', { host: h.base_url_host ?? t('common.unknown') }) }
-  if (h?.mode === 'swiss_cloud') return { shape: 'square' as const, color: 'var(--ink)', text: t('notice.swiss', { provider: providerName(h.provider, h.base_url_host) }) }
   return null
 })
+
+/* ---- Why it matters in Switzerland (facts: _prive/SWISS_FACTS.md) ---------------- */
+
+const GAP = { n: 5, total: 70 } as const
+const AUDIT = { min: 3800, max: 8500 } as const
+const checkedOn = computed(() => formatDate(SOURCES_CHECKED, false))
+/** The numbers count up when the section scrolls into view (at once with reduced motion). */
+const why = ref<HTMLElement | null>(null)
+const whySeen = ref(false)
+let whyIo: IntersectionObserver | null = null
+onMounted(() => {
+  if (reducedMotion() || typeof IntersectionObserver === 'undefined' || !why.value) {
+    whySeen.value = true
+    return
+  }
+  whyIo = new IntersectionObserver(
+    (entries) => {
+      if (!entries.some((e) => e.isIntersecting)) return
+      whySeen.value = true
+      whyIo?.disconnect()
+    },
+    { rootMargin: '0px 0px -8% 0px', threshold: 0.12 },
+  )
+  whyIo.observe(why.value)
+})
+onBeforeUnmount(() => whyIo?.disconnect())
 
 /* ---- Problems, each with one way forward --------------------------------- */
 
@@ -252,6 +286,9 @@ onMounted(async () => {
         <div class="hero__main">
           <p class="hero__lede m-rise" style="--i: 2">{{ t('home.lede') }}</p>
 
+          <!-- Where the model runs, from /api/health: the Swiss claim only when it is true. -->
+          <SwissBadge v-if="!unreachable" class="hero__swiss m-rise" style="--i: 3" :health="health" />
+
           <!-- Blocking problems, each with one way forward -->
           <div ref="notice" class="hero__notice">
             <ErrorState v-if="unreachable" :title="t('offline.title')" :body="t('offline.body')" :details="t('offline.detail')" role="alert">
@@ -391,6 +428,46 @@ onMounted(async () => {
           </div>
         </figure>
       </div>
+    </section>
+
+    <!-- Why it matters in Switzerland: the law, the gap, the value. Context, not legal advice. -->
+    <section ref="why" class="container why" aria-labelledby="why-title">
+      <h2 id="why-title" v-reveal class="why__title">{{ t('swiss.title') }}</h2>
+      <ul class="why__cols" role="list">
+        <li v-reveal="1" class="why__col">
+          <p class="why__big" translate="no">WCAG 2.1 AA</p>
+          <p class="why__body">{{ t('swiss.law.body') }}</p>
+          <SourceLink class="why__src" source="behig" :label="t('swiss.law.source')" />
+        </li>
+        <li v-reveal="2" class="why__col">
+          <p class="why__big">
+            <span aria-hidden="true"
+              ><CountUp v-if="whySeen" :value="GAP.n" /><template v-else>{{ formatNumber(GAP.n) }}</template
+              ><span class="why__small">/{{ formatNumber(GAP.total) }}</span></span
+            ><span class="sr-only">{{ t('swiss.gap.sr', { n: formatNumber(GAP.n), total: formatNumber(GAP.total) }) }}</span>
+          </p>
+          <p class="why__body">{{ t('swiss.gap.body') }}</p>
+          <SourceLink class="why__src" source="correctiv" :label="t('swiss.gap.source')" />
+        </li>
+        <li v-reveal="3" class="why__col">
+          <p class="why__big">
+            <span aria-hidden="true"
+              ><span class="why__small why__small--lead">CHF</span
+              ><CountUp v-if="whySeen" :value="AUDIT.min" /><template v-else>{{ formatNumber(AUDIT.min) }}</template>–<CountUp
+                v-if="whySeen"
+                :value="AUDIT.max"
+              /><template v-else>{{ formatNumber(AUDIT.max) }}</template></span
+            ><span class="sr-only">{{ t('swiss.value.sr', { min: formatNumber(AUDIT.min), max: formatNumber(AUDIT.max) }) }}</span>
+          </p>
+          <p class="why__body">{{ t('swiss.value.body') }}</p>
+          <SourceLink class="why__src" source="accessForAll" :label="t('swiss.value.source')" />
+        </li>
+      </ul>
+      <p v-reveal="4" class="why__sov">
+        <span class="why__mark" aria-hidden="true" />
+        <span class="why__sov-text">{{ t('swiss.sov.body') }}{{ ' ' }}<SourceLink source="bsAi" :label="t('swiss.sov.source')" /></span>
+      </p>
+      <p v-reveal="5" class="why__fine">{{ t('swiss.fine', { date: checkedOn }) }}</p>
     </section>
 
     <section v-if="recent.length" id="recent" class="container recent" aria-labelledby="recent-title">
@@ -947,6 +1024,93 @@ onMounted(async () => {
   }
 }
 
+/* ---- Swiss badge (hero) ------------------------------------------------------ */
+.hero__swiss {
+  margin-top: var(--s-5);
+}
+
+/* ---- Why it matters in Switzerland ------------------------------------------ */
+.why {
+  padding-top: var(--s-7);
+  padding-bottom: var(--s-8);
+}
+.why__title {
+  font-size: var(--fs-32);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.why__cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gutter);
+  margin: var(--s-6) 0 0;
+  padding: 0;
+}
+.why__col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-3);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--line);
+}
+.why__big {
+  font-size: clamp(2rem, 1.2rem + 1.9vw, 2.75rem);
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.why__small {
+  margin-left: 2px;
+  font-size: 0.5em;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--muted);
+}
+.why__small--lead {
+  margin: 0 0.3em 0 0;
+}
+.why__body {
+  max-width: 38ch;
+  font-size: var(--fs-15);
+  line-height: 1.55;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+.why__src {
+  margin-top: auto;
+}
+.why__sov {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  max-width: 78ch;
+  margin-top: var(--s-7);
+  font-size: var(--fs-16);
+  line-height: 1.55;
+  font-weight: 500;
+  text-wrap: pretty;
+}
+.why__mark {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  background: var(--klar-red);
+  transform: translateY(-1px);
+}
+.why__sov-text :deep(.src-link) {
+  vertical-align: baseline;
+}
+.why__fine {
+  margin-top: var(--s-3);
+  padding-left: calc(9px + var(--s-3));
+  font-size: var(--fs-12);
+  color: var(--muted);
+}
+
 /* ---- Recent checks ---------------------------------------------------------- */
 /* Same columns as the hero, so the list lines up with the field above it. */
 .recent {
@@ -1040,6 +1204,10 @@ onMounted(async () => {
     max-width: 520px;
     margin-top: var(--s-7);
   }
+  .why__cols {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-6);
+  }
 }
 @media (max-width: 480px) {
   .story__card {
@@ -1077,6 +1245,9 @@ onMounted(async () => {
   }
   .hero__dot {
     color: CanvasText;
+  }
+  .why__mark {
+    background: CanvasText;
   }
 }
 </style>

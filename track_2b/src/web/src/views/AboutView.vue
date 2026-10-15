@@ -2,7 +2,7 @@
 import { computed, onMounted, type Component } from 'vue'
 import { ArrowRight, Cloud, CodeXml, MessageSquareText, Server, TextQuote, UserCheck, WifiOff } from '@lucide/vue'
 import type { Mode } from '@/types'
-import { t, type MessageKey } from '@/i18n'
+import { formatDate, t, type MessageKey } from '@/i18n'
 import { ensureBooted, health } from '@/stores/app'
 import { implementedCount, loadCriteria } from '@/stores/criteria'
 import { MODE_COLOR, MODE_SHAPE } from '@/lib/format'
@@ -10,6 +10,8 @@ import { useDocumentTitle } from '@/composables/useDocumentTitle'
 import ShapeIcon from '@/components/ShapeIcon.vue'
 import CopyBlock from '@/components/CopyBlock.vue'
 import CountUp from '@/components/CountUp.vue'
+import SourceLink from '@/components/SourceLink.vue'
+import { SOURCES_CHECKED, type SourceId } from '@/data/swiss-law'
 
 useDocumentTitle(() => t('about.docTitle'))
 
@@ -37,6 +39,30 @@ const archs: { key: 'onprem' | 'airgap' | 'cloud'; icon: Component; cmd: string 
   { key: 'airgap', icon: WifiOff, cmd: 'make airgap-check' },
   { key: 'cloud', icon: Cloud, cmd: 'LLM_BASE_URL=https://maas.phoeniqs.com/v1' },
 ]
+/** Swiss law in brief: one line per level, each with its official text (_prive/SWISS_FACTS.md). */
+const lawRows: { term: MessageKey; body: MessageKey; links: { source: SourceId; label: MessageKey }[] }[] = [
+  {
+    term: 'swiss.about.fed',
+    body: 'swiss.about.fed.body',
+    links: [
+      { source: 'behig', label: 'swiss.about.fed.law' },
+      { source: 'behiv', label: 'swiss.about.fed.ord' },
+    ],
+  },
+  { term: 'swiss.about.std', body: 'swiss.about.std.body', links: [{ source: 'ech0059', label: 'swiss.about.std.link' }] },
+  {
+    term: 'swiss.about.cantons',
+    body: 'swiss.about.cantons.body',
+    links: [
+      { source: 'bsBrg', label: 'swiss.about.cantons.bs' },
+      { source: 'vsVrimb', label: 'swiss.about.cantons.vs' },
+    ],
+  },
+  { term: 'swiss.about.eu', body: 'swiss.about.eu.body', links: [{ source: 'eaa', label: 'swiss.about.eu.link' }] },
+  { term: 'swiss.about.next', body: 'swiss.about.next.body', links: [{ source: 'behigRevision', label: 'swiss.about.next.link' }] },
+]
+const checkedOn = computed(() => formatDate(SOURCES_CHECKED, false))
+
 /** The four states of the header badge. */
 const modes: Mode[] = ['local', 'swiss_cloud', 'external', 'replay']
 
@@ -97,7 +123,29 @@ const ENV_LINES = ['LLM_NAME=swiss-ai/Apertus-v1.5-8B', 'LLM_BASE_URL=https://yo
       </div>
     </section>
 
-    <!-- 3. Where pages go: the three architectures, then the badge's four states. -->
+    <!-- 3. Swiss law in brief: why accessibility is a duty, each line with its official text. -->
+    <section id="law" v-reveal class="sec split" aria-labelledby="ab-law">
+      <div>
+        <h2 id="ab-law" class="sec__title">{{ t('swiss.about.title') }}</h2>
+        <p class="sec__lede">{{ t('swiss.about.lede') }}</p>
+      </div>
+      <div class="law">
+        <dl class="law__list">
+          <div v-for="(r, i) in lawRows" :key="r.term" v-reveal="i" class="law__row">
+            <dt class="law__term">{{ t(r.term) }}</dt>
+            <dd class="law__body">
+              <p>{{ t(r.body) }}</p>
+              <p class="law__links">
+                <SourceLink v-for="l in r.links" :key="l.source" :source="l.source" :label="t(l.label)" />
+              </p>
+            </dd>
+          </div>
+        </dl>
+        <p class="law__fine">{{ t('swiss.fine', { date: checkedOn }) }}</p>
+      </div>
+    </section>
+
+    <!-- 4. Where pages go: the three architectures, then the badge's four states. -->
     <section id="modes" class="sec" aria-labelledby="ab-modes">
       <div class="sec__head">
         <h2 id="ab-modes" class="sec__title">{{ t('about.modes') }}</h2>
@@ -126,7 +174,7 @@ const ENV_LINES = ['LLM_NAME=swiss-ai/Apertus-v1.5-8B', 'LLM_BASE_URL=https://yo
       </div>
     </section>
 
-    <!-- 4. Connect (target of every "connect an endpoint" link). -->
+    <!-- 5. Connect (target of every "connect an endpoint" link). -->
     <section id="connect" v-reveal class="sec split" aria-labelledby="ab-connect">
       <div>
         <h2 id="ab-connect" class="sec__title">{{ t('connect.title') }}</h2>
@@ -153,7 +201,7 @@ const ENV_LINES = ['LLM_NAME=swiss-ai/Apertus-v1.5-8B', 'LLM_BASE_URL=https://yo
       </div>
     </section>
 
-    <!-- 5. What Klar. does not do. -->
+    <!-- 6. What Klar. does not do. -->
     <section v-reveal class="sec split" aria-labelledby="ab-no">
       <h2 id="ab-no" class="sec__title">{{ t('about.no') }}</h2>
       <ul class="nots" role="list">
@@ -169,7 +217,7 @@ const ENV_LINES = ['LLM_NAME=swiss-ai/Apertus-v1.5-8B', 'LLM_BASE_URL=https://yo
       </RouterLink>
     </div>
 
-    <!-- 6. Credits and licences. -->
+    <!-- 7. Credits and licences. -->
     <section v-reveal class="credits split" aria-labelledby="ab-credits">
       <h2 id="ab-credits" class="credits__title">{{ t('about.credits') }}</h2>
       <dl class="credits__list">
@@ -388,6 +436,44 @@ const ENV_LINES = ['LLM_NAME=swiss-ai/Apertus-v1.5-8B', 'LLM_BASE_URL=https://yo
 }
 .cov__link:hover svg {
   transform: translateX(3px);
+}
+
+/* ---- Swiss law in brief ------------------------------------------------ */
+.law {
+  min-width: 0;
+}
+.law__list {
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
+.law__row {
+  display: grid;
+  grid-template-columns: minmax(0, 9.5rem) minmax(0, 1fr);
+  gap: var(--s-1) var(--s-5);
+  padding: var(--s-4) 0;
+  border-bottom: 1px solid var(--line);
+}
+.law__term {
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+.law__body {
+  margin: 0;
+  color: var(--muted);
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+.law__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--s-4);
+  margin-top: var(--s-1);
+}
+.law__fine {
+  margin-top: var(--s-3);
+  font-size: var(--fs-12);
+  color: var(--muted);
 }
 
 /* ---- Architectures ---------------------------------------------------- */
@@ -683,6 +769,9 @@ const ENV_LINES = ['LLM_NAME=swiss-ai/Apertus-v1.5-8B', 'LLM_BASE_URL=https://yo
     font-size: var(--fs-24);
   }
   .badge-key__list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .law__row {
     grid-template-columns: minmax(0, 1fr);
   }
   .credit {
