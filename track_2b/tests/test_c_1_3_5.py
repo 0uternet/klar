@@ -167,3 +167,11 @@ def test_everyday_compte_does_not_make_an_account_form():
     _, cands = run(field("#em", "Courriel", ac="email", ftype="email"), field("#pw", "Mot de passe", ftype="password"),
                    forms=[form2])
     assert next(x for x in cands if x.selector == "#pw").extra["kind"] == "password"
+
+
+def test_number_fields_are_quantities_unless_the_label_names_a_purpose():
+    from klar.checks.c_1_3_5 import numeric_purpose
+    assert not numeric_purpose("Anzahl Exemplare") and not numeric_purpose("Nombre d’exemplaires")
+    assert not numeric_purpose("Numero di esemplari")
+    assert numeric_purpose("Geburtsjahr") and numeric_purpose("Jahrgang") and numeric_purpose("PLZ")
+    assert numeric_purpose("Année de naissance") and numeric_purpose("Telefono")

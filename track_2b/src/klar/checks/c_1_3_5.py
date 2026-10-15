@@ -17,6 +17,8 @@ Decided in code
     purposes current/new-password                                    → failed
     (any other password-type field, e.g. an access code or a shared network key, goes to Apertus)
   * search fields, buttons, checkboxes, radios, files, hidden fields → not candidates
+  * number field (type="number") whose label names no birth date, card, postcode or phone
+    (a quantity: "Anzahl Exemplare")                              → inapplicable (heuristic)
 Asked to Apertus (one categorical question per field without a purpose token, or with
 "off"/"on", or whose label contradicts its name-part token)
   "Whose data does this field collect?"
@@ -207,6 +209,12 @@ register({
         "fr": "Ce champ de mot de passe n'a pas de jeton autocomplete (current-password ou new-password).",
         "it": "Questo campo password non ha un token autocomplete (current-password o new-password).",
     },
+    "c135.quantity": {
+        "en": "A number field that asks for a quantity or count, not for data about the user: 1.3.5 does not apply.",
+        "de": "Ein Zahlenfeld für eine Menge oder Anzahl, nicht für Daten über die Person: 1.3.5 gilt nicht.",
+        "fr": "Un champ numérique qui demande une quantité, pas des données sur la personne : le critère 1.3.5 ne s'applique pas.",
+        "it": "Un campo numerico che chiede una quantità, non dati sulla persona: l'1.3.5 non si applica.",
+    },
     "c135.apertus_user_own": {
         "en": "Apertus judged that “{label}” asks for the user's own data, but the field declares no input purpose (autocomplete missing or off).",
         "de": "Apertus beurteilt, dass «{label}» nach eigenen Daten der Person fragt, das Feld aber keinen Eingabezweck angibt (autocomplete fehlt oder ist off).",
@@ -269,6 +277,18 @@ register({
     },
 })
 
+# A number field matches a WCAG §7 purpose only for these (birth date, card, postcode, phone).
+NUMERIC_PURPOSE_STEMS = ("geburt", "jahrgang", "naissance", "nascita", "birth", "karte", "carte", "carta", "card",
+                         "plz", "npa", "cap", "postleit", "postal", "telefon", "téléphone", "telefono", "phone",
+                         "tel", "natel", "mobile", "handy", "jahr", "année", "anno", "year", "monat", "mois",
+                         "mese", "month", "tag", "jour", "giorno", "day")
+
+
+def numeric_purpose(label: str) -> bool:
+    ws = re.findall(r"\w+", (label or "").casefold())
+    return any(w.startswith(NUMERIC_PURPOSE_STEMS) for w in ws)
+
+
 CATEGORIES = ["user_own", "other_person", "either", "not_listed"]
 CATEGORY_OUTCOME = {"user_own": "failed", "other_person": "passed", "either": "cantTell", "not_listed": "passed"}
 NAME_CATEGORIES = ["given_name", "family_name", "full_name", "other"]
@@ -317,6 +337,9 @@ class IdentifyInputPurpose(BaseCheck):
             if ftype == "password" and password_label(label) and f.get("form") in account_forms:
                 out.append(self.candidate(page, text=label, kind="password", value=value or "", **common))
                 continue
+            if ftype == "number" and not numeric_purpose(label):
+                out.append(self.candidate(page, text=label, kind="quantity", value=value, **common))
+                continue
             if asked >= MAX_QUESTIONS:
                 continue
             asked += 1
@@ -349,6 +372,9 @@ class IdentifyInputPurpose(BaseCheck):
             return self.finding(c, outcome="passed", source="rule", confidence="medium", act_rule="73f2c2",
                                 excerpt=excerpt, explanation=t("c135.valid", ui, value=value),
                                 user_impact=t("c135.impact_ok", ui))
+        if kind == "quantity":
+            return self.finding(c, outcome="inapplicable", source="heuristic", confidence="medium",
+                                explanation=t("c135.quantity", ui), user_impact=t("c135.impact_ok", ui))
         if kind == "password":
             token = "current-password"
             return self.finding(c, outcome="failed", source="heuristic", confidence="medium",
