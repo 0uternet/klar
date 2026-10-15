@@ -104,6 +104,12 @@
     }
     return s.trim();
   }
+  // A colour that depends on a variable set by a :focus rule (utility-CSS rings), or on an undefined
+  // variable, cannot be measured without focusing. A variable set globally (:root) is a fact.
+  function focusDependent(decl, el) {
+    const names = Array.from((decl || '').matchAll(/var\(\s*(--[\w-]+)/g), (m) => m[1]);
+    return names.some((n) => focusVars.has(n) || !K.cs(el).getPropertyValue(n).trim());
+  }
   function* styleRules(list) {
     for (const rule of list) {
       if (rule.type === 1) yield rule;
@@ -115,6 +121,8 @@
   }
   const focusable = (el) => K.visible(el) && !el.disabled && el.tabIndex >= 0;
   const indicators = new Map();
+  // Custom properties that a :focus rule sets: their value while focused is unknown here.
+  const focusVars = new Set();
   for (const sheet of Array.from(document.styleSheets)) {
     let rules;
     try { rules = sheet.cssRules; } catch (e) { continue; }  // cross-origin sheet
@@ -123,9 +131,12 @@
       const sel = rule.selectorText || '';
       if (!/:focus(?!-within)/.test(sel)) continue;
       const s = rule.style;
+      for (let i = 0; i < s.length; i++) if (s[i].startsWith('--')) focusVars.add(s[i]);
       const props = { os: s.outlineStyle, ow: s.outlineWidth, oc: s.outlineColor, bs: s.boxShadow, bc: s.borderColor || s.borderBottomColor,
                       bst: s.borderStyle || s.borderBottomStyle, bw: s.borderWidth || s.borderBottomWidth, b: s.border };
       if (!props.os && !props.oc && !props.bs && !props.bc && !s.outline) continue;
+      // A shorthand with var() leaves its longhands empty in the CSSOM: keep it, resolved per element.
+      if (!props.os && s.outline && /var\(/i.test(s.outline)) props.outline_raw = s.outline;
       for (const part of sel.split(',')) {
         if (!/:focus(?!-within)/.test(part)) continue;
         let base = part.replace(/:focus-visible|:focus(?!-within)/g, '').trim();
@@ -166,21 +177,28 @@
     const drawsBorder = !!props.bc && !ruleKillsBorder && (!!(props.bst && props.bw) || elHasBorder);
     let indicator = null;
     const parts = [];
-    const ow = parseFloat(resolveVar(props.ow, el)) || (props.os && props.os !== 'none' ? 2 : 0);
-    if (props.os && props.os !== 'none' && props.os !== 'auto' && ow > 0) { indicator = 'outline'; parts.push(res(props.oc || 'currentcolor')); }
+    let { os, ow: owRaw, oc } = props;
+    if (props.outline_raw) {
+      const r = resolveVar(props.outline_raw, el);
+      os = (r.match(/\b(none|auto|solid|dashed|dotted|double|groove|ridge|inset|outset)\b/i) || [])[1] || '';
+      owRaw = (r.match(/\d*\.?\d+(px|em|rem)\b/i) || [])[0] || (/\bthick\b/i.test(r) ? '5px' : /\bthin\b/i.test(r) ? '1px' : '');
+      oc = r;
+    }
+    const ow = parseFloat(resolveVar(owRaw, el)) || (os && os !== 'none' ? 2 : 0);
+    if (os && os !== 'none' && os !== 'auto' && ow > 0) { indicator = 'outline'; parts.push(res(oc || 'currentcolor')); }
     if (props.bs && props.bs !== 'none') {
       parts.push(resAll(props.bs, !!indicator));   // next to an outline: rings only
       indicator = indicator || 'box_shadow';
     }
     if (drawsBorder) { indicator = indicator || 'border'; parts.push(res(props.bc)); }
-    if (!indicator && (props.os === 'none' || props.ow === '0px')) indicator = 'removed';
+    if (!indicator && (os === 'none' || owRaw === '0px')) indicator = 'removed';
     if (!indicator) continue;
     const colour = parts.filter(Boolean).join(' ');
     out.focus.push({
       selector: K.path(el), html: K.outer(el), rule, indicator, colour, outside: K.layersAround(el, true).layers,
       // Colours from CSS variables are resolved outside the focus state (nothing is focused):
       // utility-CSS rings set their colour variable only while focused, so a low value proves nothing.
-      uses_var: /var\(/i.test([props.oc, props.bs, props.bc].filter(Boolean).join(' ')),
+      uses_var: focusDependent([props.oc, props.bs, props.bc, props.outline_raw].filter(Boolean).join(' '), el),
       own: K.layers(el, null).layers, lang: K.lang(el), text: K.norm(el.innerText || el.value || '').slice(0, 120),
     });
   }

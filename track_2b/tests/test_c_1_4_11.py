@@ -205,3 +205,15 @@ def test_live_border_reset_and_drop_shadow_do_not_rescue_a_weak_outline(make_set
     scan, _ = _scan(make_settings, page, vision=False)
     fs = {f.selector: f.reason_code for f in scan.findings if f.criterion == "1.4.11"}
     assert fs["#a"] == "focus_fail" and fs["#b"] == "focus_fail" and fs["#c"] == "focus_pass"
+
+
+@pytest.mark.browser
+def test_live_focus_colour_from_a_global_variable_is_measured(make_settings, chromium):
+    """Review finding: a variable set on :root is a fact (fails at 1.4:1); one set only by a :focus
+    rule (utility-CSS rings) is unknown without focusing (no verdict)."""
+    page = """<html lang="de"><head><style>:root{--focus:#ddd}
+#g:focus{outline:2px solid var(--focus)} .ring:focus{--ring:#000} #r:focus{outline:2px solid var(--ring, #eee)}
+</style></head><body style="background:#fff;font:16px Arial"><a id="g" href="/g">Gebühren</a> <a id="r" class="ring" href="/r">Recht</a></body></html>"""
+    scan, _ = _scan(make_settings, page, vision=False)
+    fs = {f.selector: f.reason_code for f in scan.findings if f.criterion == "1.4.11"}
+    assert fs.get("#g") == "focus_fail" and "#r" not in fs
