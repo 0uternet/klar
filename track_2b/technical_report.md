@@ -175,7 +175,7 @@ On-premise cost: a CHF 5,000 workstation over 3 years at 2,000 h a year, plus 15
 
 - **Hardware.** One workstation: NVIDIA RTX 5090 GPU (32 GB), 16-core CPU, 96 GB RAM. Times and costs in §5 depend on it; exact software versions are in `data/replay/RECORDING.json`.
 - **Determinism.** Temperature 0, seed 42 per request, vLLM `--seed 0`, one request at a time, exact cache keys. Labels `labels-v1` (manifest sha256 `af027a85…`); prompt version in every key. All answers were recorded on 16 October 2026 inside the Docker image the `Makefile` builds: the demo (34 pages, 407 answers, exact-key replay check passed), then the test and dev runs; `RUNLOG.jsonl` logs each run with its commit.
-- **Commands** (from `track_2b/`). `make run`: demo scan from recorded answers. `make eval`: recomputes Table 3 from the committed recordings, without a GPU. `make run-gpu` / `make run-cpu`: local model. `make airgap-check`: offline proof. CI: <https://github.com/0uternet/klar/actions/workflows/ci.yml>.
+- **Commands** (from `track_2b/`). `make run`: demo scan from recorded answers. `make eval`: recomputes Table 3 from the committed recordings, without a GPU; a check on 16 October 2026 matched every row except −context, where the server had answered 6 repeated questions differently the second time. `make run-gpu` / `make run-cpu`: local model. `make airgap-check`: offline proof. CI: <https://github.com/0uternet/klar/actions/workflows/ci.yml>.
 
 ## 8. Next steps
 

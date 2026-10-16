@@ -17,7 +17,7 @@ cd track_2b
 make run
 ```
 
-The first run builds the image (about 8 minutes), then scans the 34-page demo site. Open <http://localhost:8080>, choose a demo page under **Recent checks**, open a finding and expand **Context shown to the model**: it shows exactly what Apertus saw and answered. To see real Swiss pages, pick **ebgb.admin.ch** or **biel-bienne.ch** on the home page: their answers were recorded on 16 October 2026, so anything changed since then is left to a person.
+The first run builds the image (about 8 minutes), then scans the 34-page demo site. Open <http://localhost:8080>, choose a demo page under **Recent checks**, open a finding and expand **Context shown to the model**: it shows exactly what Apertus saw and answered. To see real Swiss pages, pick **ebgb.admin.ch** or **biel-bienne.ch** on the home page: their answers were recorded on 16 October 2026, so anything changed since then is left to a person. On a busy or much slower machine, a few image questions can miss their recording: they are marked *not recorded* and also left to a person.
 
 ### Choose where Apertus runs
 
