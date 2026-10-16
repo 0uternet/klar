@@ -4,23 +4,56 @@
 
 **Result** (test split, 605 cases, labels frozen before the first test run; [technical report §5](technical_report.md#5-evaluation)): with Apertus 8B on one on-premise GPU, Klar. finds 78 % of real barriers (axe-core: 15 %; the same rules without Apertus: 54 %), with 93 % of its alerts correct, and leaves 12 % of checked elements to a person instead of 45 %. In exchange, 14 % of real barriers are missed (rules alone: 5 %). A page costs about half a centime on-premise; a certification audit costs CHF 3,800–8,500.
 
+[![Klar. in two minutes: demo video](https://img.youtube.com/vi/N6FVKlYc3lY/maxresdefault.jpg)](https://youtu.be/N6FVKlYc3lY)
+
 **Demo video (2 min):** <https://youtu.be/N6FVKlYc3lY>
+
+## Run it
+
+You need Docker (Docker Desktop on Windows or macOS, Docker Engine on Linux) and `make`. All commands run from `track_2b/`.
 
 ```bash
 cd track_2b
-make run        # Docker: builds, starts http://localhost:8080 and scans the bundled demo site
+make run
 ```
 
 The first run builds the image (about 8 minutes), then scans the 34-page demo site. Open <http://localhost:8080>, choose a demo page under **Recent checks**, open a finding and expand **Context shown to the model**: it shows exactly what Apertus saw and answered. To see real Swiss pages, pick **ebgb.admin.ch** or **biel-bienne.ch** on the home page: their answers were recorded on 16 October 2026, so anything changed since then is left to a person.
 
-With no configuration, `make run` uses **replay mode**: it replays recorded Apertus answers, so you need no key, no GPU and no model download. To use a live Apertus endpoint, set the three LLM_* variables, in your shell or in `track_2b/.env` (see `.env.example`), e.g. Apertus 70B on Phoeniqs, a Swiss cloud:
+### Choose where Apertus runs
 
-```bash
-export LLM_NAME=inference-apertus-v15-70b
-export LLM_BASE_URL=https://maas.phoeniqs.com/v1
-export LLM_API_KEY=...
-make run
+With no configuration, `make run` **replays recorded Apertus answers**: no account, no key, no GPU, no download. For live answers, copy `.env.example` to `.env` in `track_2b/`, set one mode below, then run `make stop` and the command shown. `DEMO=0` starts the app without the 34-page demo scan, so a live test only costs the pages you check.
+
+**Sovereign Swiss cloud: Apertus 70B on Phoeniqs.** Phoeniqs (kvant) has a free Evaluation Plan: 1 million tokens for 30 days, no credit card ([documentation](https://documentation.kvant.cloud/maas/)). Create an API key, then in `.env`:
+
 ```
+LLM_BASE_URL=https://maas.phoeniqs.com/v1
+LLM_NAME=inference-apertus-v15-70b
+LLM_API_KEY=your-phoeniqs-key
+```
+
+Start with `make run DEMO=0`.
+
+**Quickest live test: Apertus 70B through Hugging Face.** At <https://huggingface.co/settings/tokens>, create a fine-grained token with **Make calls to Inference Providers** ticked, then in `.env`:
+
+```
+LLM_BASE_URL=https://router.huggingface.co/v1
+LLM_NAME=swiss-ai/Apertus-v1.5-70B:featherless-ai
+LLM_API_KEY=hf_your-token
+```
+
+Start with `make run DEMO=0`. The provider runs outside Switzerland, so use it on public pages only; the interface counts these requests as external.
+
+**On-premise GPU: Apertus 8B, text and images.** You need an NVIDIA GPU with at least 24 GB, the NVIDIA Container Toolkit and about 50 GB of disk. Accept the licence on <https://huggingface.co/swiss-ai/Apertus-v1.5-8B> and create a token of type **Read**, then in `.env`:
+
+```
+HF_TOKEN=hf_your-token
+```
+
+Start with `make run-gpu`. The first run downloads the model (about 18 GB) into `track_2b/models/`; after that, add `HF_HUB_OFFLINE=1` and the token can be removed. The token reaches the model server only, never the app.
+
+**On-premise CPU: Apertus 8B, text only.** Nothing to set: `make run-cpu` downloads the quantised model (5 GB, checked by sha256) once. It is slow (about a minute per question), so use it for a few pages or an air-gapped test.
+
+### Commands
 
 | Command | What it does |
 |---|---|

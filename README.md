@@ -6,7 +6,9 @@ Accessibility scanners check that a link text, a label or a language tag *exists
 
 It runs **on-premise or air-gapped** on a single GPU workstation, or in a **sovereign Swiss cloud**. Internal and unpublished pages never leave your organisation.
 
-> The project lives in [`track_2b/`](track_2b/). Start with its `Makefile` and [`technical_report.md`](track_2b/technical_report.md).
+[![Klar. in two minutes: demo video](https://img.youtube.com/vi/N6FVKlYc3lY/maxresdefault.jpg)](https://youtu.be/N6FVKlYc3lY)
+
+> The project lives in [`track_2b/`](track_2b/): start with its [README](track_2b/README.md) (how to run it) and the [technical report](track_2b/technical_report.md).
 
 ## Licence
 
