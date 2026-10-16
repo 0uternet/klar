@@ -73,6 +73,14 @@ def test_store_skips_corrupt_lines(tmp_path):
     assert store.get({"key": "k", "task_key": "", "loose_key": ""}) == {"key": "k", "answer": {"a": 1}}
 
 
+def test_first_recorded_answer_wins_for_a_repeated_question(tmp_path):
+    # A later re-ask of the same question (e.g. the -context ablation) must not replace the
+    # answer the main run used, or a replay would not reproduce that run.
+    (tmp_path / "m.jsonl").write_text('{"key": "k", "answer": {"a": 1}}\n{"key": "k", "answer": {"a": 2}}\n', encoding="utf-8")
+    store = AnswerStore(tmp_path, "m")
+    assert store.get({"key": "k", "task_key": "", "loose_key": ""})["answer"] == {"a": 1}
+
+
 def test_replay_store_is_read_only(make_settings):
     s = make_settings(replay=True)
     backend = make_backend(s, RequestCounter())

@@ -5,8 +5,8 @@
 - **Track:** Track 2B — Klar.
 - **Event:** Online
 - **Team:** Klar — Mehdi Taleb (solo founder)
-- **Demo:** [video URL]
-- **Code:** <https://github.com/0uternet/klar> (Apache-2.0) · **Dataset:** `track_2b/data/testset` (CDLA-Permissive-2.0; ACT cases under the W3C licence) · **Model:** Apertus v1.5 8B, on-premise
+- **Demo:** <https://youtu.be/N6FVKlYc3lY> (2 min)
+- **Code:** <https://github.com/0uternet/klar> (Apache-2.0) · **Dataset:** `track_2b/data/testset` (CDLA-Permissive-2.0; ACT cases under the W3C licence) · **Model:** Apertus v1.5 8B on-premise (70B in one comparison run)
 
 ## 1. Summary
 

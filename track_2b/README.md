@@ -4,6 +4,8 @@
 
 **Result** (test split, 605 cases, labels frozen before the first test run; [technical report §5](technical_report.md#5-evaluation)): with Apertus 8B on one on-premise GPU, Klar. finds 78 % of real barriers (axe-core: 15 %; the same rules without Apertus: 54 %), with 93 % of its alerts correct, and leaves 12 % of checked elements to a person instead of 45 %. In exchange, 14 % of real barriers are missed (rules alone: 5 %). A page costs about half a centime on-premise; a certification audit costs CHF 3,800–8,500.
 
+**Demo video (2 min):** <https://youtu.be/N6FVKlYc3lY>
+
 ```bash
 cd track_2b
 make run        # Docker: builds, starts http://localhost:8080 and scans the bundled demo site

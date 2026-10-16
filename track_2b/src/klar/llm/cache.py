@@ -122,11 +122,14 @@ class AnswerStore:
                 self._index(rec)
 
     def _index(self, rec: dict) -> None:
+        # The first answer recorded for a key wins. A later run that asks the same question
+        # again (the -context ablation does, when an element has no computed context) may get a
+        # different answer from the server; it is kept in the file but never replaces the first.
         self._records.append(rec)
         for kind in ("key", "task_key", "loose_key"):
             k = rec.get(kind)
             if k:
-                self._by[kind][k] = rec
+                self._by[kind].setdefault(k, rec)
 
     def __len__(self) -> int:
         return len(self._by["key"])
