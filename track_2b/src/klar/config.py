@@ -1,7 +1,7 @@
 """Environment → Settings, including the sovereignty mode.
 
-The three LLM_* variables select the model endpoint. Everything
-else is prefixed KLAR_ and optional.
+The three LLM_* variables select the model endpoint. Everything else is
+prefixed KLAR_ and optional.
 
 | Variable                      | Default                          | Meaning                                              |
 |-------------------------------|----------------------------------|------------------------------------------------------|

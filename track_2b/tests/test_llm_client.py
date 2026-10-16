@@ -86,6 +86,39 @@ def test_a_mid_scan_400_is_a_failed_question_not_a_silent_downgrade(make_setting
     assert all("response_format" in r for r in fake.requests)
 
 
+def test_an_endpoint_that_refuses_system_messages_gets_them_in_the_user_message(make_settings):
+    def responder(req):
+        if req["messages"][0]["role"] == "system":
+            return 400, "This model only accepts a system message as the first message (system_message_invalid)"
+        return GOOD
+
+    with FakeLLM(responder) as fake:
+        c = client(make_settings(llm_base_url=fake.base_url))
+        first = c.ask(task(), prompt_version="t/v1", criterion="2.4.4")
+        second = c.ask(task("again"), prompt_version="t/v1", criterion="2.4.4")
+    assert first.answer == GOOD and second.answer == GOOD
+    assert first.requests == 2 and second.requests == 1  # folded once, then for every question
+    folded = fake.requests[-1]["messages"]
+    assert [m["role"] for m in folded] == ["user"]
+    assert folded[0]["content"].startswith("You check WCAG 2.4.4.") and folded[0]["content"].endswith("again")
+
+
+def test_on_such_an_endpoint_the_retry_is_one_user_turn_too(make_settings):
+    answers = iter(['{"outcome": "probably"}', json.dumps(GOOD)])
+
+    def responder(req):
+        if [m["role"] for m in req["messages"]] != ["user"]:
+            return 400, "This model only accepts a system message as the first message (system_message_invalid)"
+        return next(answers)
+
+    with FakeLLM(responder) as fake:
+        res = client(make_settings(llm_base_url=fake.base_url)).ask(task(), prompt_version="t/v1", criterion="2.4.4")
+    assert res.answer == GOOD
+    retry = fake.requests[-1]["messages"]
+    assert [m["role"] for m in retry] == ["user"]
+    assert "Your previous answer:" in retry[0]["content"] and "not valid" in retry[0]["content"]
+
+
 def test_one_retry_with_the_validation_error(make_settings):
     answers = iter(['{"outcome": "probably"}', json.dumps(GOOD)])
     with FakeLLM(lambda r: next(answers)) as fake:

@@ -4,9 +4,16 @@
     run_scan(scan, job, settings=…, llm=backend, vision=True, counter=…, emit=callback)
 
 `emit(event, data)` receives "progress" (a ProgressStep dict), "finding" (a
-Finding as dict) and "done" ({scan_id, state}). The whole scan runs in the
-calling thread (Playwright's sync API); model questions run in a small thread
-pool and are guarded back in the calling thread.
+Finding as dict), "control" ({scan_id, paused, stopping}) and "done"
+({scan_id, state}). The whole scan runs in the calling thread (Playwright's
+sync API); model questions run in a small thread pool and are guarded back in
+the calling thread.
+
+A ScanControl (ScanJob.control) lets the API pause, resume or stop a running
+scan. It takes effect at the next pause point: between steps, between checks
+and before each model question. Paused time does not count against
+KLAR_SCAN_TIMEOUT. A stopped scan ends "done" with what it found so far; the
+elements it did not reach are noted "stopped" and listed in stats.
 
 Order of the cascade for every candidate:
   1. prompt-injection pre-filter (guard.suspicious) → cantTell, never decided, never asked
@@ -18,6 +25,7 @@ Order of the cascade for every candidate:
 from __future__ import annotations
 
 import logging
+import threading
 import time
 import uuid
 from collections import defaultdict, deque
@@ -53,6 +61,41 @@ class ScanTimeout(RuntimeError):
     pass
 
 
+class ScanStopped(RuntimeError):
+    pass
+
+
+class ScanControl:
+    """Pause, resume and stop one scan from another thread (the API)."""
+
+    def __init__(self) -> None:
+        self._running = threading.Event()
+        self._running.set()
+        self.stop_requested = False
+
+    @property
+    def paused(self) -> bool:
+        return not self._running.is_set()
+
+    def pause(self) -> None:
+        if not self.stop_requested:
+            self._running.clear()
+
+    def resume(self) -> None:
+        self._running.set()
+
+    def stop(self) -> None:
+        self.stop_requested = True
+        self._running.set()  # a paused scan wakes up to stop
+
+    def wait_until_resumed(self) -> None:
+        while not self._running.wait(0.5):
+            pass
+
+    def state(self) -> dict:
+        return {"paused": self.paused, "stopping": self.stop_requested}
+
+
 @dataclass
 class ScanJob:
     url: str | None = None
@@ -65,6 +108,7 @@ class ScanJob:
     # candidate ids are computed from this instead of the page URL (evaluation: the case
     # path, so ids do not depend on the port of the local test server)
     id_base: str | None = None
+    control: ScanControl | None = None  # pause / resume / stop from the API
 
 
 def now() -> datetime:
@@ -104,6 +148,7 @@ def empty_stats(vision: bool) -> dict:
         "criteria_apertus_list": [], "check_errors": [], "blocked_requests": [], "guard_log": [],
         "axe_superseded": [], "title_fetch": {},
         "timeout_notes": 0, "timeout_skipped_checks": [], "free_answers": 0,
+        "stopped": False, "stopped_notes": 0, "stopped_skipped_checks": [], "paused_seconds": 0.0,
         "error_code": None, "http_status": None, "final_url": None, "page_title": None, "max_llm_calls": None,
     }
 
@@ -143,7 +188,8 @@ class Progress:
             e["detail"] = detail
         self.emit("progress", dict(e))
 
-    def finish(self, step: str, detail: str | None = None, state: str = "done") -> None:
+    def finish(self, step: str, detail: str | None = None, state: str = "done", *, complete: bool = True) -> None:
+        """`complete=False`: the step ended early (stopped); its count stays where it was."""
         e = self._entry(step)
         if step not in self._t:
             self._t[step] = time.monotonic()
@@ -151,12 +197,18 @@ class Progress:
         e.update(state=state, duration_ms=int((time.monotonic() - self._t[step]) * 1000))
         if detail is not None:
             e["detail"] = detail
-        if e.get("total") is not None and state == "done":
+        if e.get("total") is not None and state == "done" and complete:
             e["current"] = e["total"]
         self.emit("progress", dict(e))
 
     def running(self) -> str | None:
         return next((e["step"] for e in self.scan.progress if e["state"] == "running"), None)
+
+    def shift(self, seconds: float) -> None:
+        """A pause ended: the running step's duration leaves out the paused time."""
+        step = self.running()
+        if step in self._t:
+            self._t[step] += seconds
 
 
 def _note_for(check: BaseCheck, c: Candidate, res: LLMResult) -> Finding:
@@ -264,7 +316,34 @@ def run_scan(scan: Scan, job: ScanJob, *, settings: Settings, llm: LLMBackend, v
         if time.monotonic() > deadline:
             raise ScanTimeout(f"scan exceeded KLAR_SCAN_TIMEOUT ({settings.scan_timeout:.0f} s)")
 
+    control = job.control
+    live_page: list[CapturedPage] = []  # the rendered page, whose deadline a pause extends
+
+    def hold() -> bool:
+        """Pause point: wait while the scan is paused (that time does not count against
+        KLAR_SCAN_TIMEOUT). True when the scan must stop here."""
+        nonlocal deadline
+        if control is None:
+            return False
+        if control.paused:
+            emit("control", {"scan_id": scan.id, **control.state()})
+            t0 = time.monotonic()
+            control.wait_until_resumed()
+            waited = time.monotonic() - t0
+            deadline += waited
+            stats["paused_seconds"] = round(stats["paused_seconds"] + waited, 1)
+            p.shift(waited)
+            for pg in live_page:
+                pg.deadline = deadline
+            emit("control", {"scan_id": scan.id, **control.state()})
+        return control.stop_requested
+
+    def hold_or_stop() -> None:
+        if hold():
+            raise ScanStopped("stopped by the user")
+
     try:
+        hold_or_stop()  # a scan stopped while it was still queued never opens the page
         selected = resolve_criteria(job.criteria)
         checks = [cls(ui, settings, vision=vision) for crit, cls in registry.implemented().items() if crit in selected]
         for module, error in registry.import_errors().items():  # a broken check module must not stay silent
@@ -281,9 +360,11 @@ def run_scan(scan: Scan, job: ScanJob, *, settings: Settings, llm: LLMBackend, v
             page = render(browser, url=job.url, html=job.html, scan_dir=scan_dir, opts=opts)
             page.deadline = deadline  # checks read page.remaining() (see CapturedPage.deadline)
             page.id_base = job.id_base
+            live_page.append(page)
             stats.update(http_status=page.http_status, final_url=page.url, page_title=page.title or None)
             p.finish("render", page.title or page.url)
             try:
+                hold_or_stop()
                 check_deadline()
                 # ---- axe-core ------------------------------------------------------
                 p.start("axe")
@@ -300,19 +381,29 @@ def run_scan(scan: Scan, job: ScanJob, *, settings: Settings, llm: LLMBackend, v
                     p.finish("axe", f"error: {exc}", state="error")
 
                 # ---- extract + deterministic decisions --------------------------------
+                hold_or_stop()
                 check_deadline()
-                p.start("extract")
+                p.start("extract", total=len(checks))
                 extract(page)
                 pending: list[tuple[BaseCheck, Candidate]] = []
                 decided: list[Finding] = []
                 out_of_time = False
+                stopped = False
 
                 def timed_out() -> bool:
                     nonlocal out_of_time
                     out_of_time = out_of_time or time.monotonic() > deadline
                     return out_of_time
 
-                for check in checks:
+                for idx, check in enumerate(checks):
+                    if idx:
+                        p.update("extract", current=idx)
+                    # A stop between checks: the checks not started are listed in stats,
+                    # what was found so far is kept.
+                    if hold():
+                        stopped = True
+                        stats["stopped_skipped_checks"] = [ch.criterion for ch in checks[idx:]]
+                        break
                     # KLAR_SCAN_TIMEOUT between checks: a check that was not started is
                     # skipped (no candidates exist yet to note) and listed in stats
                     if timed_out():
@@ -382,6 +473,11 @@ def run_scan(scan: Scan, job: ScanJob, *, settings: Settings, llm: LLMBackend, v
                         add(check.note(c, "note.timeout"))
                     stats["timeout_notes"] += len(pending)
                     raise ScanTimeout(f"scan exceeded KLAR_SCAN_TIMEOUT ({settings.scan_timeout:.0f} s)")
+                if stopped:  # nothing more is asked: the findings so far stay, the scan ends done
+                    for check, c in pending:
+                        add(check.note(c, "note.stopped"))
+                    stats["stopped_notes"] += len(pending)
+                    raise ScanStopped("stopped by the user")
                 p.finish("extract", f"{stats['candidates']} elements, {len(pending)} for Apertus")
 
                 # ---- Apertus ------------------------------------------------------------
@@ -419,22 +515,41 @@ def run_scan(scan: Scan, job: ScanJob, *, settings: Settings, llm: LLMBackend, v
                                          image_root=scan_dir)
 
                 done_n = 0
-                pool = ThreadPoolExecutor(max_workers=max(1, settings.llm_concurrency))
-                futures = {pool.submit(ask, check, c): (check, c) for check, c in asked}
+                workers = max(1, settings.llm_concurrency)
+                pool = ThreadPoolExecutor(max_workers=workers)
+                # Questions go out one by one (at most `workers` in flight), so a pause or a
+                # stop takes effect before the next question.
+                todo = deque(asked)
+                inflight: dict = {}
+                stopping = False
+
+                def dispatch() -> None:
+                    nonlocal stopping
+                    while todo and not stopping and len(inflight) < workers:
+                        if hold():
+                            stopping = True
+                            return
+                        check, c = todo.popleft()
+                        inflight[pool.submit(ask, check, c)] = (check, c)
+
                 try:
-                    remaining = set(futures)
-                    while remaining:
+                    dispatch()
+                    while inflight:
                         timeout = max(0.0, deadline - time.monotonic())
-                        finished, remaining = wait(remaining, timeout=timeout, return_when=FIRST_COMPLETED)
+                        finished, _ = wait(set(inflight), timeout=timeout, return_when=FIRST_COMPLETED)
                         if not finished:  # time limit: the rest is not asked
-                            for fut in remaining:
+                            left = []
+                            for fut in list(inflight):
                                 fut.cancel()
-                                check, c = futures[fut]
+                                left.append(inflight.pop(fut))
+                            left += list(todo)
+                            todo.clear()
+                            for check, c in left:
                                 add(check.note(c, "note.timeout"))
-                            stats["timeout_notes"] += len(remaining)
+                            stats["timeout_notes"] += len(left)
                             raise ScanTimeout(f"scan exceeded KLAR_SCAN_TIMEOUT ({settings.scan_timeout:.0f} s)")
                         for fut in finished:
-                            check, c = futures[fut]
+                            check, c = inflight.pop(fut)
                             task, res = fut.result()
                             guard_info: dict | None = None
                             done_n += 1
@@ -477,9 +592,17 @@ def run_scan(scan: Scan, job: ScanJob, *, settings: Settings, llm: LLMBackend, v
                                 responses.append({**response_record(check, c, task, res, llm, settings, scan_dir,
                                                                     guard_info), "_finding": fid})
                             p.update("apertus", current=done_n)
+                        dispatch()
                 finally:
                     pool.shutdown(wait=False, cancel_futures=True)
+                if stopping:  # the questions not sent are noted; the answers so far stay
+                    for check, c in todo:
+                        add(check.note(c, "note.stopped"))
+                    stats["stopped_notes"] += len(todo)
+                    raise ScanStopped("stopped by the user")
                 p.finish("apertus", f"{done_n}/{len(asked)}")
+
+                hold_or_stop()
 
                 # ---- verify (final consistency pass) -----------------------------------------
                 p.start("verify")
@@ -499,6 +622,14 @@ def run_scan(scan: Scan, job: ScanJob, *, settings: Settings, llm: LLMBackend, v
             finally:
                 page.close()
         scan.state = "done"
+    except ScanStopped:
+        # Stopped by the user: a regular end with what was found so far (not an error).
+        log.info("scan %s stopped by the user", scan.id)
+        scan.state = "done"
+        stats["stopped"] = True
+        step = p.running()
+        if step:
+            p.finish(step, "stopped", complete=False)
     except Exception as exc:
         log.exception("scan %s failed", scan.id) if not isinstance(exc, ScanTimeout) else log.warning("%s", exc)
         scan.state = "error"

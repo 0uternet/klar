@@ -9,7 +9,7 @@ import FindingCard from '@/components/FindingCard.vue'
 import ShapeIcon from '@/components/ShapeIcon.vue'
 
 /**
- * One criterion (UX-4): its rows to review, then the rows with no problem, folded behind
+ * One criterion: its rows to review, then the rows with no problem, folded behind
  * a quiet toggle in the section header. Rows enter, leave and move with FLIP (list).
  */
 const props = defineProps<{

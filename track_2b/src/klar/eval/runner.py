@@ -418,7 +418,7 @@ def build_report(results: list[dict], *, systems, settings: Settings, llm, caps,
         "by_criterion": {k: _group_block(v, systems) for k, v in sorted(by["criterion"].items())},
         "by_lang": {k: _group_block(v, systems) for k, v in sorted(by["lang"].items())},
         "by_trap": {k: _group_block(v, systems) for k, v in sorted(by["trap"].items())},
-        # Prompt-injection cases (manifest tag "injection"), reported on their own (SEC-1).
+        # Prompt-injection cases (manifest tag "injection"), reported on their own.
         "injection": {k: _group_block(v, systems) for k, v in sorted(by["injection"].items())},
         "tiers": tiers,
         "share_to_llm": share_to_llm,

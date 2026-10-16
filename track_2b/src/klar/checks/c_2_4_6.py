@@ -133,15 +133,15 @@ register({
     },
     "c246.cap": {
         "en": "Not checked: Klar. judges at most {n} headings of the main content per page. A person must check this one.",
-        "de": "Nicht geprüft: Klar. beurteilt höchstens {n} Überschriften des Hauptinhalts pro Seite. Eine Person muss diese prüfen.",
+        "de": "Nicht geprüft: Klar. beurteilt höchstens {n} Überschriften des Hauptinhalts pro Seite. Eine Person muss diese Überschrift prüfen.",
         "fr": "Non vérifié : Klar. évalue au plus {n} titres du contenu principal par page. Une personne doit vérifier celui-ci.",
-        "it": "Non verificato: Klar. valuta al massimo {n} titoli del contenuto principale per pagina. Una persona deve verificare questo.",
+        "it": "Non verificato: Klar. valuta al massimo {n} titoli del contenuto principale per pagina. Una persona deve verificare questo titolo.",
     },
     "c246.cap_landmark": {
         "en": "Not checked: Klar. judges at most {n} headings of the header, navigation, side and footer blocks per page. A person must check this one.",
-        "de": "Nicht geprüft: Klar. beurteilt höchstens {n} Überschriften in Kopf-, Navigations-, Seiten- und Fussbereich pro Seite. Eine Person muss diese prüfen.",
-        "fr": "Non vérifié : Klar. évalue au plus {n} titres de l'en-tête, de la navigation, des encadrés et du pied de page par page. Une personne doit vérifier celui-ci.",
-        "it": "Non verificato: Klar. valuta al massimo {n} titoli di intestazione, navigazione, riquadri laterali e piè di pagina per pagina. Una persona deve verificare questo.",
+        "de": "Nicht geprüft: Klar. beurteilt höchstens {n} Überschriften in Kopfbereich, Navigation, Seitenleiste und Fussbereich pro Seite. Eine Person muss diese Überschrift prüfen.",
+        "fr": "Non vérifié : par page, Klar. évalue au plus {n} titres de l'en-tête, de la navigation, des encadrés et du pied de page. Une personne doit vérifier celui-ci.",
+        "it": "Non verificato: per ogni pagina Klar. valuta al massimo {n} titoli nell'intestazione, nella navigazione, nei riquadri laterali e nel piè di pagina. Una persona deve verificare questo titolo.",
     },
     "c246.label_autocomplete": {
         "en": "The label “{text}” names what its field is declared to ask for (autocomplete “{token}”).",
@@ -157,7 +157,7 @@ register({
     },
     "c246.apertus_generic": {
         "en": "“{text}” is a broad category over content that only partly fits it. Experts disagree whether that is descriptive: a person must decide.",
-        "de": "«{text}» ist ein Oberbegriff über einem Inhalt, der nur teilweise dazu passt. Ob das beschreibend ist, ist umstritten: Eine Person muss entscheiden.",
+        "de": "«{text}» ist ein Oberbegriff für einen Inhalt, der nur teilweise dazu passt. Ob das beschreibend ist, ist umstritten: Eine Person muss entscheiden.",
         "fr": "« {text} » est une catégorie générale pour un contenu qui n'y correspond qu'en partie. Les avis divergent : une personne doit trancher.",
         "it": "«{text}» è una categoria generica per un contenuto che vi corrisponde solo in parte. Gli esperti non concordano: una persona deve decidere.",
     },
@@ -174,7 +174,7 @@ register({
         "it": "Apertus giudica che il titolo «{text}» sia un segnaposto o una parola vuota che non indica l'argomento della sezione.",
     },
     "c246.apertus_different_topic": {
-        "en": "Apertus judged that the heading “{text}” names another topic than its section contains. The section is estimated from the page structure: a person must check.",
+        "en": "Apertus judged that the heading “{text}” names a different topic from the one its section covers. The section is estimated from the page structure: a person must check.",
         "de": "Apertus beurteilt, dass die Überschrift «{text}» ein anderes Thema nennt, als der Abschnitt enthält. Der Abschnitt wird aus der Seitenstruktur geschätzt: Eine Person muss prüfen.",
         "fr": "Apertus juge que le titre « {text} » nomme un autre sujet que le contenu de sa section. La section est estimée à partir de la structure de la page : une personne doit vérifier.",
         "it": "Apertus giudica che il titolo «{text}» indichi un argomento diverso da quello della sezione. La sezione è stimata dalla struttura della pagina: una persona deve verificare.",
@@ -186,7 +186,7 @@ register({
         "it": "Apertus giudica che l'etichetta «{text}» non dica cosa inserire.",
     },
     "c246.apertus_wrong": {
-        "en": "Apertus judged that the label “{text}” names other data than the field asks for.",
+        "en": "Apertus judged that the label “{text}” names different data from what the field asks for.",
         "de": "Apertus beurteilt, dass die Beschriftung «{text}» andere Angaben nennt, als das Feld verlangt.",
         "fr": "Apertus juge que l'étiquette « {text} » nomme d'autres données que celles demandées par le champ.",
         "it": "Apertus giudica che l'etichetta «{text}» indichi dati diversi da quelli richiesti dal campo.",

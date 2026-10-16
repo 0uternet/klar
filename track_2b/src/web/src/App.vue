@@ -76,7 +76,7 @@ useShortcuts({
 
 <template>
   <a href="#main" class="skip-link" @click.prevent="skipToMain">{{ t('app.skip') }}</a>
-  <!-- UX-14: while the finding panel is a modal overlay, everything behind it is inert. -->
+  <!-- While the finding panel is a modal overlay, everything behind it is inert. -->
   <AppHeader :inert="modalOpen || undefined" />
   <main id="main" tabindex="-1">
     <div v-if="health?.config_error" class="container config-error" :inert="modalOpen || undefined">

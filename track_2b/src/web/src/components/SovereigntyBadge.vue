@@ -28,8 +28,8 @@ const label = computed(() => (mode.value ? t(`sov.${mode.value}`) : offline.valu
 /** Colour of the status dot's halo (the shape inside keeps the meaning without colour). */
 const dotColor = computed(() => (mode.value ? MODE_COLOR[mode.value] : offline.value ? 'var(--red-text)' : 'var(--grey-shape)'))
 /**
- * A problem with the current configuration (UX-8: replay without recordings;
- * UX-22: model not reachable). Only for the header and About badges: the inline
+ * A problem with the current configuration (replay without recordings;
+ * model not reachable). Only for the header and About badges: the inline
  * badge of a report or scan describes that run.
  */
 const warning = computed(() => {
@@ -58,7 +58,7 @@ const modelLine = computed(() => {
 
 /**
  * "AI requests that left this network" (SOV-1/2), counted per destination by the
- * server (Health.ai_requests). Unknown stays "unknown", never 0 (FE-1).
+ * server (Health.ai_requests). Unknown stays "unknown", never 0.
  */
 const counterInfo = computed(() => aiCounterText(mode.value, props.health?.ai_requests, provider.value))
 const counter = computed(() => counterInfo.value.text)
@@ -167,7 +167,7 @@ watch(() => route.fullPath, () => (open.value = false))
               <span class="sov__count-n tabular">{{ formatNumber(left) }}</span>
               <span class="sov__count-label">{{ t('sov.left') }}</span>
             </p>
-            <!-- FE-1: a number the server did not report stays "unknown", never 0. -->
+            <!-- A number the server did not report stays "unknown", never 0. -->
             <p v-else class="sov__count-label">{{ counter }}</p>
             <dl class="sov__dest">
               <div v-for="d in dests" :key="d.key">

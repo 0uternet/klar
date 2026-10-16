@@ -1,4 +1,4 @@
-# Klar. CI. GitHub Actions is the only place where the Docker path is
+# Klar. CI. GitHub Actions is the only place where the Docker path (the default `make run`) is
 # exercised, so the Docker jobs reproduce it exactly: a clean checkout, no .env, `make ...` from
 # track_2b/ with a cold Docker build. No secret is needed by any job.
 #
@@ -11,7 +11,7 @@
 #   docker-test   make test (pytest + web type-check inside the Docker test stage)
 #   hygiene       generic audit: local paths, co-author lines, placeholders, secrets, big files, artefacts
 #   leakage       no prompt / code / demo-site string appears in the test split
-#   e2e-arm64     make run on linux/arm64 (Apple Silicon judges); public repositories only
+#   e2e-arm64     make run on linux/arm64 (Apple Silicon); public repositories only
 #   make-381      the Makefile under macOS's GNU make 3.81 (dry run)
 #
 # Actions are pinned to commit SHAs (tag in the comment).
@@ -72,7 +72,7 @@ jobs:
           test -f ../klar/api/static/index.html
 
   e2e-replay:
-    name: "e2e-replay: make run (Docker, replay)"
+    name: "e2e-replay: make run (Docker, replay), exactly the default path"
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
@@ -87,7 +87,7 @@ jobs:
           docker compose version
           make --version | head -n 1
 
-      - name: Clean checkout has no .env and no LLM variables (judges start in replay mode)
+      - name: Clean checkout has no .env and no LLM variables (a fresh clone starts in replay mode)
         run: test ! -e .env && test -z "${LLM_BASE_URL:-}"
 
       - name: Static checks (compose files, shell scripts)
@@ -101,7 +101,7 @@ jobs:
             echo "::error::the vLLM command must not enable tool calling"; exit 1
           fi
 
-      # SEC-4 test, part 1: a .env holding a secret exists BEFORE the app starts. It sets no
+      # Secret isolation, part 1: a .env holding a secret exists BEFORE the app starts. It sets no
       # LLM_* variable, so `make run` below still runs in replay mode.
       - name: Write a .env with a dummy secret and a harmless knob
         run: printf 'HF_TOKEN=hf_dummy_ci_token\nKLAR_ALLOWED_HOSTS=ci.example\n' > .env
@@ -133,7 +133,7 @@ jobs:
           EOF
           test -s var/reports/demo-latest.html
 
-      # SEC-4 test, part 2: the running app never received the secret from .env. The positive
+      # Secret isolation, part 2: the running app never received the secret from .env. The positive
       # controls prove that .env WAS read: by the app (KLAR_ALLOWED_HOSTS) and for the model
       # server (HF_TOKEN in the rendered llm-gpu service).
       - name: Secrets stay out of the app container (HF_TOKEN reaches only the model server)
@@ -153,9 +153,10 @@ jobs:
           echo "OK: HF_TOKEN only in llm-gpu; the app got KLAR_ALLOWED_HOSTS from .env"
           rm -f .env
 
-      # Non-blocking for now: `klar eval --split test` refuses to run until the git tag labels-v1
-      # exists. This step becomes blocking (remove continue-on-error) once labels-v1 exists.
-      - name: make eval (replay; non-blocking until labels-v1 exists)
+      # Recomputes the test split from the committed recordings (needs the tag labels-v1: fetch-depth 0).
+      # Non-blocking: exact replay keys include the bytes of image crops, and Chromium on another host
+      # may render a crop differently; such a question then ends as "not recorded", not as a wrong answer.
+      - name: make eval (replay of the recorded answers; non-blocking)
         continue-on-error: true
         run: make eval BUILD=0
 

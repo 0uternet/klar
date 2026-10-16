@@ -88,7 +88,7 @@ def load_cases(crit: str, seed: int):
     cases = mod.build(rng)
     core = [c for c in cases if "addon" not in c.tags]
     addons = [c for c in cases if "addon" in c.tags]
-    # designed prompt-injection subset (SEC-1), then add-on cases (tag "addon"), appended in this
+    # designed prompt-injection subset, then add-on cases (tag "addon"), appended in this
     # order so that existing case ids keep their numbers when a subset is added later
     cases = core + injection.cases_for(crit, random.Random(f"klar-injection-{seed}-{crit}")) + addons
     # later add-on batches go last, each with its own RNG, so earlier ids/contents never move

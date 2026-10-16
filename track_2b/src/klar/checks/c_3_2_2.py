@@ -239,16 +239,16 @@ def effect_of(rec: dict) -> str | None:
 
 register({
     "c322.no_change": {
-        "en": "Changing this control does not change the context: no new page, window or focus move. The page waits for a button.",
-        "de": "Eine Änderung an diesem Element wechselt den Kontext nicht: keine neue Seite, kein neues Fenster, kein Fokussprung.",
-        "fr": "Modifier ce contrôle ne change pas de contexte : ni nouvelle page, ni nouvelle fenêtre, ni déplacement du focus.",
-        "it": "Modificare questo controllo non cambia il contesto: nessuna nuova pagina, finestra o spostamento del focus.",
+        "en": "Changing this control does not change the context: no new page, window or focus move. The page waits until a button is pressed.",
+        "de": "Eine Änderung an diesem Element wechselt den Kontext nicht: keine neue Seite, kein neues Fenster, kein Fokussprung. Die Seite wartet, bis eine Schaltfläche betätigt wird.",
+        "fr": "Modifier ce contrôle ne change pas de contexte : ni nouvelle page, ni nouvelle fenêtre, ni déplacement du focus. La page attend un clic sur un bouton.",
+        "it": "Modificare questo controllo non cambia il contesto: nessuna nuova pagina, finestra o spostamento del focus. La pagina attende che si prema un pulsante.",
     },
     "c322.content_only": {
         "en": "Changing this control only updates content on the same page (a filter or extra fields); focus and page stay put.",
-        "de": "Eine Änderung an diesem Element aktualisiert nur Inhalte auf derselben Seite (Filter oder zusätzliche Felder); Fokus und Seite bleiben.",
-        "fr": "Modifier ce contrôle ne fait que mettre à jour le contenu de la même page (filtre ou champs supplémentaires) ; le focus et la page restent.",
-        "it": "Modificare questo controllo aggiorna solo il contenuto della stessa pagina (filtro o campi aggiuntivi); focus e pagina restano.",
+        "de": "Eine Änderung an diesem Element aktualisiert nur Inhalte auf derselben Seite (Filter oder zusätzliche Felder); Fokus und Seite bleiben unverändert.",
+        "fr": "Modifier ce contrôle ne fait que mettre à jour le contenu de la même page (filtre ou champs supplémentaires) ; le focus et la page restent en place.",
+        "it": "Modificare questo controllo aggiorna solo il contenuto della stessa pagina (filtro o campi aggiuntivi); focus e pagina non cambiano.",
     },
     "c322.major": {
         "en": "Changing this control replaces a large part of the page (a heading changes) without moving the focus. Whether that is a change of context is a judgement: a person must decide.",
@@ -269,14 +269,14 @@ register({
     "c322.apertus_warning_before": {
         "en": "Changing this control {effect_text}, and Apertus judged that a text before it announces this.",
         "de": "Eine Änderung an diesem Element {effect_text}; Apertus beurteilt, dass ein Text davor das ankündigt.",
-        "fr": "Modifier ce contrôle {effect_text} ; Apertus juge qu'un texte placé avant l'annonce.",
+        "fr": "Modifier ce contrôle {effect_text} ; Apertus juge qu'un texte placé avant le contrôle l'annonce.",
         "it": "Modificare questo controllo {effect_text}; Apertus giudica che un testo posto prima lo annunci.",
     },
     "c322.apertus_warning_after": {
         "en": "Changing this control {effect_text}. Only a text after it announces this, which screen-reader users reach too late. Experts disagree: a person must decide.",
-        "de": "Eine Änderung an diesem Element {effect_text}. Nur ein Text danach kündigt das an, den Screenreader-Nutzende zu spät erreichen. Fachleute sind uneins: Eine Person muss entscheiden.",
-        "fr": "Modifier ce contrôle {effect_text}. Seul un texte placé après l'annonce, que les utilisateurs de lecteurs d'écran atteignent trop tard. Les experts divergent : une personne doit trancher.",
-        "it": "Modificare questo controllo {effect_text}. Solo un testo posto dopo lo annuncia, che chi usa un lettore di schermo raggiunge troppo tardi. Gli esperti non concordano: una persona deve decidere.",
+        "de": "Eine Änderung an diesem Element {effect_text}. Nur ein nachfolgender Text kündigt das an; Screenreader-Nutzende erreichen ihn zu spät. Fachleute sind uneins: Eine Person muss entscheiden.",
+        "fr": "Modifier ce contrôle {effect_text}. Seul un texte placé après le contrôle l'annonce, et les utilisateurs de lecteurs d'écran l'atteignent trop tard. Les experts divergent : une personne doit trancher.",
+        "it": "Modificare questo controllo {effect_text}. Lo annuncia solo un testo posto dopo, che chi usa un lettore di schermo raggiunge troppo tardi. Gli esperti non concordano: una persona deve decidere.",
     },
     "c322.apertus_no_warning": {
         "en": "Changing this control {effect_text}, and Apertus found no text that announces this.",
@@ -291,9 +291,9 @@ register({
         "it": "Modificare questo controllo {effect_text}. Apertus non ha potuto decidere se sia annunciato prima: una persona deve verificare.",
     },
     "c322.untested": {
-        "en": "This control reacts to changes with a script. Klar. changes controls only on the demo site and on test pages: a person must check that changing it does not open a page, a window or move the focus unannounced.",
-        "de": "Dieses Element reagiert per Skript auf Änderungen. Klar. ändert Elemente nur auf der Demo-Site und auf Testseiten: Eine Person muss prüfen, dass eine Änderung nicht unangekündigt eine Seite, ein Fenster öffnet oder den Fokus verschiebt.",
-        "fr": "Ce contrôle réagit aux changements par un script. Klar. ne modifie des contrôles que sur le site de démonstration et les pages de test : une personne doit vérifier qu'un changement n'ouvre pas une page ou une fenêtre et ne déplace pas le focus sans annonce.",
+        "en": "This control reacts to changes with a script. Klar. changes controls only on the demo site and on test pages: a person must check that changing it does not open a page or window, or move the focus, without warning.",
+        "de": "Dieses Element reagiert per Skript auf Änderungen. Klar. ändert Elemente nur auf der Demo-Website und auf Testseiten: Eine Person muss prüfen, ob eine Änderung ohne Ankündigung eine Seite oder ein Fenster öffnet oder den Fokus verschiebt.",
+        "fr": "Ce contrôle réagit aux changements par un script. Klar. ne modifie des contrôles que sur le site de démonstration et les pages de test : une personne doit vérifier qu'aucun changement n'ouvre une page ou une fenêtre, ni ne déplace le focus, sans avertissement.",
         "it": "Questo controllo reagisce alle modifiche con uno script. Klar. modifica i controlli solo sul sito demo e sulle pagine di test: una persona deve verificare che una modifica non apra pagine o finestre né sposti il focus senza preavviso.",
     },
     "c322.impact": {

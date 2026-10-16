@@ -67,7 +67,7 @@ register({
         "it": "In {page} le voci della navigazione «{block}» compaiono in un altro ordine ({items}).",
     },
     "c323.block_order": {
-        "en": "On {page} the navigation “{block}” sits at another place relative to the other repeated blocks and the content.",
+        "en": "On {page} the navigation “{block}” sits in a different place relative to the other repeated blocks and the content.",
         "de": "Auf {page} steht die Navigation «{block}» an anderer Stelle im Verhältnis zu den anderen wiederholten Blöcken und zum Inhalt.",
         "fr": "Sur {page}, la navigation « {block} » se trouve à un autre endroit par rapport aux autres blocs répétés et au contenu.",
         "it": "In {page} la navigazione «{block}» si trova in un altro punto rispetto agli altri blocchi ripetuti e al contenuto.",
@@ -75,14 +75,14 @@ register({
     "c323.footer_only": {
         "en": "Only the small footer list “{block}” changes order on {page}. Whether such a list is a navigation mechanism is disputed: a person must decide.",
         "de": "Nur die kurze Fusszeilen-Liste «{block}» ändert auf {page} die Reihenfolge. Ob sie als Navigation gilt, ist umstritten: Eine Person muss entscheiden.",
-        "fr": "Seule la courte liste du pied de page « {block} » change d'ordre sur {page}. Qu'elle soit un mécanisme de navigation est discuté : une personne doit trancher.",
+        "fr": "Seule la courte liste du pied de page « {block} » change d'ordre sur {page}. Une telle liste est-elle un mécanisme de navigation ? Les avis divergent : une personne doit trancher.",
         "it": "Solo la breve lista del piè di pagina «{block}» cambia ordine in {page}. Se sia un meccanismo di navigazione è controverso: una persona deve decidere.",
     },
     "c323.other_brand": {
-        "en": "{page} shows its navigation in another order, but its header names another offer (“{brand}”). Whether it belongs to the same set of pages is for a person to decide.",
+        "en": "{page} shows its navigation in a different order, but its header names a different service (“{brand}”). Whether it belongs to the same set of pages is for a person to decide.",
         "de": "{page} zeigt die Navigation in anderer Reihenfolge, nennt im Kopf aber ein anderes Angebot («{brand}»). Ob die Seite zur selben Gruppe gehört, muss eine Person entscheiden.",
-        "fr": "{page} présente la navigation dans un autre ordre, mais son en-tête nomme une autre offre (« {brand} »). Une personne doit décider si elle fait partie du même ensemble de pages.",
-        "it": "{page} mostra la navigazione in un altro ordine, ma la sua intestazione nomina un'altra offerta («{brand}»). Una persona deve decidere se fa parte dello stesso insieme di pagine.",
+        "fr": "{page} présente la navigation dans un autre ordre, mais son en-tête nomme un autre service (« {brand} »). Une personne doit décider si elle fait partie du même ensemble de pages.",
+        "it": "{page} mostra la navigazione in un altro ordine, ma la sua intestazione nomina un altro servizio («{brand}»). Una persona deve decidere se fa parte dello stesso insieme di pagine.",
     },
     "c323.impact": {
         "en": "People who rely on the position of the menu, for example screen-reader or magnifier users, lose their way when it moves.",
@@ -103,9 +103,9 @@ register({
         "it": "Usate lo stesso modello di navigazione in tutte le pagine, con le voci nello stesso ordine.",
     },
     "c323.needs_url": {
-        "en": "Consistent navigation concerns a set of pages; pasted HTML has no site around it. Scan the page by its address.",
-        "de": "Einheitliche Navigation betrifft eine Gruppe von Seiten; eingefügtes HTML hat keine Website dazu. Scannen Sie die Seite über ihre Adresse.",
-        "fr": "La navigation cohérente concerne un ensemble de pages ; le HTML collé n'a pas de site autour. Analysez la page par son adresse.",
+        "en": "The Consistent Navigation criterion concerns a set of pages; pasted HTML has no site around it. Scan the page by its address.",
+        "de": "Das Kriterium «Einheitliche Navigation» betrifft eine Gruppe von Seiten; eingefügtes HTML gehört zu keiner Website. Scannen Sie die Seite über ihre Adresse.",
+        "fr": "La navigation cohérente concerne un ensemble de pages ; le HTML collé n'appartient à aucun site. Analysez la page par son adresse.",
         "it": "La navigazione coerente riguarda un insieme di pagine; l'HTML incollato non ha un sito intorno. Analizzate la pagina tramite il suo indirizzo.",
     },
     "c323.too_few": {

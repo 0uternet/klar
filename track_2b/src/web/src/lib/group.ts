@@ -3,7 +3,7 @@
  * Decisions on a group apply to every item.
  *  - Notes (cantTell with a note reason_code: "not recorded", "model unreachable"…)
  *    group by criterion + outcome + reason_code: the quoted text does not matter,
- *    the reason is the same (UX-3).
+ *    the reason is the same.
  *  - Other findings group by criterion + outcome + reason + normalised quote
  *    (typically one template repeated across a page or a site).
  */
@@ -22,6 +22,7 @@ export const NOTE_CODES: readonly string[] = [
   'vision_required',
   'budget',
   'timeout',
+  'stopped',
   'suspicious',
   'not_grounded',
   'unparseable',
@@ -61,7 +62,7 @@ export function reviewedCount(g: FindingGroup): number {
   return g.items.filter((f) => f.status !== 'to_review').length
 }
 
-/* ---- Review scope (UX-4): only Failed and Needs review ask for a decision ---- */
+/* ---- Review scope: only Failed and Needs review ask for a decision ---- */
 
 export const REVIEW_OUTCOMES: readonly Outcome[] = ['failed', 'cantTell']
 

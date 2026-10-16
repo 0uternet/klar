@@ -90,10 +90,10 @@ register({
         "it": "Apertus: il testo fa parte di un grafico, schema, mappa o foto con un contenuto visivo importante; non è un'immagine di testo.",
     },
     "c145.apertus_specimen": {
-        "en": "Apertus: the particular look of the text is the information here (a sample of how it looks), which is essential.",
-        "de": "Apertus: Hier ist das Aussehen des Textes selbst die Information (ein Muster, wie es aussieht); das gilt als wesentlich.",
-        "fr": "Apertus : ici, l'apparence du texte est elle-même l'information (un exemple de son aspect), ce qui est essentiel.",
-        "it": "Apertus: qui l'aspetto del testo è l'informazione stessa (un esempio di come appare), il che è essenziale.",
+        "en": "Apertus: the look of the text is itself the information (for example a font sample), so the image is essential.",
+        "de": "Apertus: Das Aussehen des Textes ist selbst die Information (zum Beispiel eine Schriftprobe); das Bild ist daher wesentlich.",
+        "fr": "Apertus : l'apparence du texte est elle-même l'information (par exemple un échantillon de police) ; l'image est donc essentielle.",
+        "it": "Apertus: l'aspetto del testo è esso stesso l'informazione (per esempio un campione di carattere), quindi l'immagine è essenziale.",
     },
     "c145.apertus_document_facsimile": {
         "en": "Apertus: this is a facsimile of a signed or stamped document. It is essential if the original's appearance matters, a failure if it only replaces the text. A person must decide.",
@@ -131,7 +131,7 @@ register({
         "fr": "Cette image peut contenir du texte, mais la limite de questions sur image par page est atteinte. Une personne doit vérifier.",
         "it": "Questa immagine potrebbe contenere testo, ma il limite di domande su immagini per pagina è raggiunto. Una persona deve verificare.",
     },
-    "c145.alt_part": {"en": " (alternative: «{alt}»)", "de": " (Alternativtext: «{alt}»)", "fr": " (alternative : «{alt}»)",
+    "c145.alt_part": {"en": " (alternative: “{alt}”)", "de": " (Alternativtext: «{alt}»)", "fr": " (alternative : « {alt} »)",
                       "it": " (alternativa: «{alt}»)"},
     "c145.impact": {
         "en": "People with low vision who enlarge text, change fonts, colours or spacing cannot adapt text inside an image; it blurs when zoomed.",
@@ -140,10 +140,10 @@ register({
         "it": "Le persone ipovedenti che ingrandiscono il testo o adattano carattere, colori e spaziature non possono adattare il testo in un'immagine; ingrandito diventa sfocato.",
     },
     "c145.impact_ok": {
-        "en": "No adaptable text is locked inside this image.",
-        "de": "In diesem Bild ist kein anpassbarer Text eingeschlossen.",
-        "fr": "Aucun texte adaptable n'est enfermé dans cette image.",
-        "it": "In questa immagine non è racchiuso testo adattabile.",
+        "en": "No real-text version is needed for this image.",
+        "de": "Dieses Bild muss nicht durch echten Text ersetzt werden.",
+        "fr": "Aucune version en vrai texte n'est nécessaire pour cette image.",
+        "it": "Per questa immagine non serve una versione in vero testo.",
     },
     "c145.fix_hint": {
         "en": "Replace the image with real text styled with CSS (web font, colours, a background image without text).",

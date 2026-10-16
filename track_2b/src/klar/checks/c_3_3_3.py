@@ -45,7 +45,7 @@ SUGGESTS = {"format_or_example", "allowed_values", "corrected_value", "missing_v
 register({
     "c333.secret": {
         "en": "This field asks for a password or access code. Suggesting the correct value would reveal it, so a plain error message is enough (security exception).",
-        "de": "Dieses Feld fragt nach einem Kennwort oder Zugangscode. Ein Korrekturvorschlag würde ihn verraten, eine einfache Fehlermeldung genügt (Sicherheitsausnahme).",
+        "de": "Dieses Feld fragt nach einem Kennwort oder Zugangscode. Ein Korrekturvorschlag würde den Wert verraten, daher genügt eine einfache Fehlermeldung (Sicherheitsausnahme).",
         "fr": "Ce champ demande un mot de passe ou un code d'accès. Suggérer la bonne valeur la révélerait : un simple message d'erreur suffit (exception de sécurité).",
         "it": "Questo campo chiede una password o un codice di accesso. Suggerire il valore giusto lo rivelerebbe: basta un semplice messaggio di errore (eccezione di sicurezza).",
     },
@@ -57,15 +57,15 @@ register({
     },
     "c333.presence_only": {
         "en": "The page only checks that this field is filled in, and the message “{message}” says that it is missing: that is the correction.",
-        "de": "Die Seite prüft nur, ob dieses Feld ausgefüllt ist, und die Meldung «{message}» sagt, dass es fehlt: Das ist die Korrektur.",
+        "de": "Die Seite prüft nur, ob dieses Feld ausgefüllt ist, und die Meldung «{message}» sagt, dass es fehlt: Das genügt als Korrekturhinweis.",
         "fr": "La page vérifie seulement que ce champ est rempli, et le message « {message} » dit qu'il manque : c'est la correction.",
         "it": "La pagina verifica solo che questo campo sia compilato, e il messaggio «{message}» dice che manca: questa è la correzione.",
     },
     "c333.native_pattern": {
-        "en": "The browser only says that the format does not match: the field has a pattern but no title that describes it. A person must check whether the format is explained.",
-        "de": "Der Browser sagt nur, dass das Format nicht passt: Das Feld hat ein Muster (pattern), aber keinen title, der es beschreibt. Eine Person muss prüfen, ob das Format erklärt wird.",
-        "fr": "Le navigateur dit seulement que le format ne correspond pas : le champ a un motif (pattern) sans title qui le décrive. Une personne doit vérifier si le format est expliqué.",
-        "it": "Il browser dice solo che il formato non corrisponde: il campo ha un pattern ma nessun title che lo descriva. Una persona deve verificare se il formato è spiegato.",
+        "en": "The browser only says that the format does not match: the field has a pattern but no title attribute that describes it. A person must check whether the format is explained.",
+        "de": "Der Browser sagt nur, dass das Format nicht passt: Das Feld hat ein Muster (pattern), aber kein title-Attribut, das es beschreibt. Eine Person muss prüfen, ob das Format erklärt wird.",
+        "fr": "Le navigateur dit seulement que le format ne correspond pas : le champ a un motif (pattern) sans attribut title qui le décrive. Une personne doit vérifier si le format est expliqué.",
+        "it": "Il browser dice solo che il formato non corrisponde: il campo ha un pattern ma nessun attributo title che lo descriva. Una persona deve verificare se il formato è spiegato.",
     },
     "c333.no_text": {
         "en": "The page detects an error in this field but shows no text at all, so it suggests no correction.",
@@ -111,13 +111,13 @@ register({
     },
     "c333.untested": {
         "en": "Klar. submits forms only on the demo site and on test pages. A person must enter wrong values and check that the messages say how to correct them.",
-        "de": "Klar. schickt Formulare nur auf der Demo-Site und auf Testseiten ab. Eine Person muss falsche Werte eingeben und prüfen, ob die Meldungen sagen, wie man sie korrigiert.",
+        "de": "Klar. schickt Formulare nur auf der Demo-Website und auf Testseiten ab. Eine Person muss falsche Werte eingeben und prüfen, ob die Meldungen sagen, wie man sie korrigiert.",
         "fr": "Klar. n'envoie des formulaires que sur le site de démonstration et les pages de test. Une personne doit saisir des valeurs fausses et vérifier que les messages disent comment les corriger.",
         "it": "Klar. invia moduli solo sul sito demo e sulle pagine di test. Una persona deve inserire valori errati e verificare che i messaggi dicano come correggerli.",
     },
     "c333.probe_failed": {
         "en": "Klar. could not complete the test submission of this form (the page did not respond in time). A person must check it.",
-        "de": "Klar. konnte das Testabsenden dieses Formulars nicht abschliessen (die Seite reagierte nicht rechtzeitig). Eine Person muss es prüfen.",
+        "de": "Klar. konnte das testweise Absenden dieses Formulars nicht abschliessen (die Seite reagierte nicht rechtzeitig). Eine Person muss es prüfen.",
         "fr": "Klar. n'a pas pu terminer l'envoi de test de ce formulaire (la page n'a pas répondu à temps). Une personne doit le vérifier.",
         "it": "Klar. non ha potuto completare l'invio di prova di questo modulo (la pagina non ha risposto in tempo). Una persona deve verificarlo.",
     },

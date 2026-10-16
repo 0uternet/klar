@@ -72,4 +72,4 @@ def test_downgrade_produces_a_grounded_cant_tell():
     f = guard.downgrade(finding("invented"), c, "quote not found in the element", "de")
     assert f.outcome == "cantTell" and f.confidence == "low"
     assert f.excerpt in c.text  # the fallback excerpt is chosen by code, verbatim
-    assert "nicht belegt" in f.explanation and f.fix_diff is None and f.reason_code == "not_grounded"
+    assert "passte nicht zur Seite" in f.explanation and f.fix_diff is None and f.reason_code == "not_grounded"

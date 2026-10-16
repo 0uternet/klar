@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ArrowRight } from '@lucide/vue'
-import { DEMO_NAME, DEMO_URL, isDemoUrl } from '@/config'
+import { ArrowRight, FlaskConical, Globe } from '@lucide/vue'
+import { DEMO_NAME, DEMO_URL, isDemoUrl, isRealSample, REAL_SAMPLES } from '@/config'
 import { api, ApiError } from '@/api'
 import { formatDate, formatNumber, formatRelative, locale, t, tp, type MessageKey } from '@/i18n'
 import { ensureBooted, health, healthRetrying, lastScanId, prefill, refreshHealth, unreachable } from '@/stores/app'
@@ -41,19 +41,21 @@ useShortcuts({
 
 /** The second headline line, with the brand's red full stop (as in the logo). */
 const BRAND = 'Klar.'
+// Tax revenue 2021–2025 in CHF millions (41 → 58), drawn to scale on a zero baseline.
+const STORY_BARS = [41, 45, 49, 53, 58].map((v) => Math.round(v * 6.55) / 10)
 const titleB = computed(() => t('home.titleB').split(/(Klar\.)/))
 
 const isReplay = computed(() => health.value?.mode === 'replay')
-/** UX-8 / M3: replay mode without any recorded answer. */
+/** Replay mode without any recorded answer. */
 const noRecordings = computed(() => {
   const r = health.value?.replay_recorded
   return isReplay.value && !!r && typeof r.records === 'number' && r.records === 0
 })
-/** UX-22 / M4: the model endpoint did not answer the start-up probe (null = unknown: say nothing). */
+/** The model endpoint did not answer the start-up probe (null = unknown: say nothing). */
 const llmDown = computed(() => !isReplay.value && health.value?.llm_reachable === false)
 
 /**
- * UX-17 / M5: at the moment of submitting, say where pages go when they leave the network.
+ * At the moment of submitting, say where pages go when they leave the network.
  * Swiss cloud is said by the Swiss badge above the field ("Processed in Switzerland · provider"),
  * so only the external endpoint keeps this warning line, with its way to change it.
  */
@@ -135,8 +137,8 @@ async function onSubmit(input: CheckInput, opts: { bypassGate?: boolean; auto?: 
   if (!opts.auto) autoRetried = false
   lastInput = input
   await ensureBooted()
-  // UX-1: only external addresses are gated; pasted HTML and the demo always run.
-  if (isReplay.value && 'url' in input && !isDemoUrl(input.url) && !opts.bypassGate) {
+  // Only external addresses are gated; pasted HTML and the demo always run.
+  if (isReplay.value && 'url' in input && !isDemoUrl(input.url) && !isRealSample(input.url) && !opts.bypassGate) {
     replayGate.value = { host: hostOf(input.url) }
     void focusNotice()
     return
@@ -215,11 +217,16 @@ function tryDemo() {
   field.value?.fill(DEMO_URL)
   void onSubmit({ url: DEMO_URL })
 }
+function tryReal(url: string) {
+  replayGate.value = null
+  field.value?.fill(url)
+  void onSubmit({ url })
+}
 function checkAnyway() {
   if (lastInput) void onSubmit(lastInput, { bypassGate: true })
 }
 
-/* ---- Recent checks (UX-10): finished scans already on this server ---------- */
+/* ---- Recent checks: finished scans already on this server ---------- */
 
 interface Recent {
   id: string
@@ -334,13 +341,28 @@ onMounted(async () => {
           >
             <template v-if="!isReplay" #aside>
               <button type="button" class="demo-link" :disabled="busy" @click="tryDemo">
-                <ShapeIcon shape="square" color="var(--klar-red)" :size="8" />
+                <FlaskConical :size="15" aria-hidden="true" class="demo-link__icon" />
                 <span class="demo-link__name">{{ t('home.demo.secondary') }}</span>{{ ' ' }}
                 <span class="demo-link__sub">{{ DEMO_NAME }}</span>
                 <ArrowRight :size="16" aria-hidden="true" class="demo-link__arrow" />
               </button>
             </template>
           </UrlInput>
+
+          <div v-if="!unreachable" class="real m-rise" style="--i: 4">
+            <p class="real__title">{{ t('home.real.title') }}</p>
+            <ul class="real__list" role="list">
+              <li v-for="s in REAL_SAMPLES" :key="s.url">
+                <button type="button" class="demo-link" :disabled="busy" @click="tryReal(s.url)">
+                  <Globe :size="15" aria-hidden="true" class="demo-link__icon" />
+                  <span class="demo-link__name">{{ s.host }}</span>{{ ' ' }}
+                  <span class="demo-link__sub">{{ t(s.who as MessageKey) }}</span>
+                  <ArrowRight :size="16" aria-hidden="true" class="demo-link__arrow" />
+                </button>
+              </li>
+            </ul>
+            <p v-if="isReplay" class="real__sub">{{ t('home.real.sub') }}</p>
+          </div>
 
           <p v-if="sendNotice" class="send-notice">
             <ShapeIcon :shape="sendNotice.shape" :color="sendNotice.color" :size="9" />
@@ -372,7 +394,7 @@ onMounted(async () => {
 
         <!--
           The proof of the idea, as a short story played once on load (≤ 4 s, no loop):
-          the scanner passes alt="Bild", Klar. flags the meaning, a person accepts.
+          the scanner passes a meaningless alt on a chart, Klar. flags the meaning, a person accepts.
           An illustration, labelled as such; screen readers get one sentence (the figure's label).
         -->
         <figure v-if="!unreachable" v-reveal="3" class="story" role="img" :aria-label="t('home.story.label')">
@@ -380,39 +402,63 @@ onMounted(async () => {
           <div class="story__card" inert>
             <span class="story__tag">{{ t('home.story.tag') }}</span>
             <div class="story__page">
-              <span class="story__chart">
-                <span v-for="(h, i) in [38, 52, 46, 68, 84]" :key="i" class="story__bar" :style="{ height: `${h}%`, '--i': i }" />
-              </span>
-              <code class="story__code" lang="de" translate="no"
-                ><span class="tk-p">&lt;</span><span class="tk-t">img</span> <span class="tk-a">src</span>=<span class="tk-v">"steuern.png"</span
-                ><br /><span class="story__indent"> </span><span class="tk-a">alt</span>=<span class="tk-v">"Bild"</span><span class="tk-p">&gt;</span></code
+              <!-- The image itself: a dated chart with a title, so it reads as data, not as a score. -->
+              <svg class="story__img" viewBox="0 0 120 84" focusable="false" aria-hidden="true">
+                <text class="story__img-title" x="10" y="16">{{ t('home.story.chartTitle') }}</text>
+                <rect
+                  v-for="(h, i) in STORY_BARS"
+                  :key="i"
+                  class="story__bar"
+                  :x="14 + i * 19"
+                  :y="66 - h"
+                  width="13"
+                  :height="h"
+                  rx="1.5"
+                  :style="{ '--i': i }"
+                />
+                <line class="story__img-axis" x1="10" x2="110" y1="66.5" y2="66.5" />
+                <text class="story__img-value" x="20.5" :y="63 - STORY_BARS[0]">41</text>
+                <text class="story__img-value" x="96.5" :y="63 - STORY_BARS[4]">58</text>
+                <text class="story__img-year" x="20.5" y="78">2021</text>
+                <text class="story__img-year" x="96.5" y="78">2025</text>
+              </svg>
+              <code class="story__code" :lang="locale" translate="no"
+                ><span class="tk-p">&lt;</span><span class="tk-t">img</span> <span class="tk-a">src</span>=<span class="tk-v">"{{ t('home.story.file') }}"</span
+                ><br /><span class="story__indent"> </span><span class="tk-a">alt</span>=<span class="tk-v">"{{ t('home.story.badAlt') }}"</span
+                ><span class="tk-p">&gt;</span></code
               >
             </div>
 
             <ol class="story__rows">
               <li class="story__row story__row--scanner">
-                <span class="story__who">{{ t('home.story.scanner') }}</span>
+                <span class="story__who"
+                  ><span class="story__step">1</span>{{ t('home.story.scanner') }}<span class="story__sub">{{ t('home.story.scannerSub') }}</span></span
+                >
                 <span class="story__what">
                   <VerdictChip outcome="passed" size="sm" />
                   <span class="story__muted">{{ t('home.story.present') }}</span>
                 </span>
               </li>
               <li class="story__row story__row--klar">
-                <span class="story__who story__who--klar">Klar<span class="hero__dot">.</span></span>
+                <span class="story__who story__who--klar"
+                  ><span class="story__step">2</span>Klar<span class="hero__dot">.</span><span class="story__sub">{{ t('home.story.klarSub') }}</span></span
+                >
                 <span class="story__what story__what--stack">
                   <span class="story__chips">
                     <VerdictChip outcome="failed" size="sm" />
                     <CriterionTag code="1.1.1" />
                   </span>
                   <span class="story__impact">{{ t('home.story.impact') }}</span>
-                  <span class="story__diff" lang="de" translate="no">
-                    <span class="story__del"><span class="story__sign">−</span><code>alt="Bild"</code></span>
-                    <span class="story__add"><span class="story__sign">+</span><code>alt="Steuerertrag 2021–2025: steigend"</code></span>
+                  <span class="story__diff" :lang="locale" translate="no">
+                    <span class="story__del"><span class="story__sign">−</span><code>alt="{{ t('home.story.badAlt') }}"</code></span>
+                    <span class="story__add"><span class="story__sign">+</span><code>alt="{{ t('home.story.goodAlt') }}"</code></span>
                   </span>
                 </span>
               </li>
               <li class="story__row story__row--you">
-                <span class="story__who">{{ t('home.story.you') }}</span>
+                <span class="story__who"
+                  ><span class="story__step">3</span>{{ t('home.story.you') }}<span class="story__sub">{{ t('home.story.youSub') }}</span></span
+                >
                 <span class="story__what">
                   <span class="story__accept">
                     <span class="story__accept-bg" />
@@ -590,6 +636,29 @@ onMounted(async () => {
   color: var(--muted);
 }
 
+/* Real Swiss pages with recorded answers: the live web, also in replay mode. */
+.real {
+  margin-top: var(--s-4);
+}
+.real__title {
+  margin: 0;
+  font-size: var(--fs-14);
+  font-weight: 600;
+}
+.real__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1) var(--s-4);
+  margin: var(--s-1) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.real__sub {
+  margin: var(--s-1) 0 0;
+  font-size: var(--fs-13, 13px);
+  color: var(--muted);
+}
+
 /* Live modes: the demo is one quiet, obvious shortcut under the field. */
 .demo-link {
   display: inline-flex;
@@ -740,30 +809,42 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: var(--s-4);
-  padding-right: 96px;
 }
-.story__chart {
+.story__img {
   flex: none;
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-  width: 76px;
-  height: 56px;
-  padding: 8px 8px 0;
+  width: 132px;
+  height: 92px;
   background: var(--surface-2);
   border-radius: 8px;
-  box-shadow: inset 0 -1px 0 var(--line);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.story__img-title {
+  font-size: 9px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+.story__img-axis {
+  stroke: var(--muted);
+  stroke-width: 1;
+}
+.story__img-value,
+.story__img-year {
+  font-size: 7.5px;
+  text-anchor: middle;
+}
+.story__img-value {
+  font-weight: 600;
+  fill: var(--ink);
+}
+.story__img-year {
+  fill: var(--muted);
 }
 .story__bar {
-  flex: 1;
-  background: var(--blue);
-  border-radius: 2px 2px 0 0;
+  fill: var(--blue);
+  transform-box: fill-box;
   transform-origin: bottom;
   animation: story-bar var(--dur-4) var(--ease-out) both;
   animation-delay: calc(250ms + var(--i) * var(--stagger));
-}
-.story__bar:last-child {
-  background: var(--ink);
 }
 .story__code {
   font-size: 0.8125rem;
@@ -794,7 +875,7 @@ onMounted(async () => {
 }
 .story__row {
   display: grid;
-  grid-template-columns: 4.25rem minmax(0, 1fr);
+  grid-template-columns: 7.5rem minmax(0, 1fr);
   gap: var(--s-3);
   align-items: start;
   padding: var(--s-4) 0;
@@ -819,6 +900,48 @@ onMounted(async () => {
 .story__who--klar {
   color: var(--ink);
   font-weight: 700;
+}
+/* Two sources, two moments: a numbered step, and what each one checks. */
+.story__step {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 700;
+  vertical-align: 1px;
+}
+.story__row--klar .story__step {
+  background: var(--klar-red);
+  color: #fff;
+}
+.story__sub {
+  display: block;
+  margin-top: 3px;
+  padding-left: 22px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+.story__row--klar {
+  margin: 0 calc(-1 * var(--s-3));
+  padding-left: var(--s-3);
+  padding-right: var(--s-3);
+  border-radius: 10px;
+  border-top-color: transparent;
+  background: var(--surface-2);
+}
+.story__row--klar + .story__row {
+  border-top-color: transparent;
+}
+.demo-link__icon {
+  flex: none;
+  color: var(--muted);
 }
 .story__what {
   display: flex;
@@ -1214,8 +1337,11 @@ onMounted(async () => {
     padding: var(--s-4);
   }
   .story__page {
-    padding-right: 0;
     padding-top: var(--s-6);
+  }
+  .story__img {
+    width: 96px;
+    height: 67px;
   }
   .story__row {
     grid-template-columns: 1fr;
@@ -1240,8 +1366,12 @@ onMounted(async () => {
   }
 }
 @media (forced-colors: active) {
-  .story__bar {
-    background: CanvasText;
+  .story__bar,
+  .story__img text {
+    fill: CanvasText;
+  }
+  .story__img-axis {
+    stroke: CanvasText;
   }
   .hero__dot {
     color: CanvasText;

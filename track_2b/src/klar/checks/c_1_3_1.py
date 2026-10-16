@@ -90,9 +90,9 @@ register({
     },
     "c131.apertus_not_heading": {
         "en": "Apertus judged that this styled text is not a heading ({role}); no heading markup is needed.",
-        "de": "Apertus beurteilt diesen hervorgehobenen Text nicht als Überschrift ({role}); es braucht keine Überschrift.",
+        "de": "Apertus beurteilt diesen hervorgehobenen Text nicht als Überschrift ({role}); er muss nicht als Überschrift ausgezeichnet werden.",
         "fr": "Selon Apertus, ce texte mis en forme n'est pas un titre ({role}) ; aucun balisage de titre n'est nécessaire.",
-        "it": "Secondo Apertus questo testo formattato non è un titolo ({role}); non serve un markup da titolo.",
+        "it": "Secondo Apertus questo testo formattato non è un titolo ({role}); non va marcato come titolo.",
     },
     "c131.apertus_unsure": {
         "en": "Apertus could not tell whether this structure needs markup. A person must check it.",
@@ -109,8 +109,8 @@ register({
     "c131.style_unknown": {
         "en": "A bold line stands alone before other text. Without the rendered page its size cannot be compared with the headings. A person must check whether it is a heading.",
         "de": "Eine fette Zeile steht allein vor weiterem Text. Ohne gerenderte Seite lässt sich ihre Grösse nicht mit den Überschriften vergleichen. Eine Person muss prüfen, ob es eine Überschrift ist.",
-        "fr": "Une ligne en gras précède seule un autre texte. Sans la page rendue, sa taille ne peut pas être comparée aux titres. Une personne doit vérifier s'il s'agit d'un titre.",
-        "it": "Una riga in grassetto precede da sola altro testo. Senza la pagina renderizzata la sua dimensione non si può confrontare con i titoli. Una persona deve verificare se è un titolo.",
+        "fr": "Une ligne en gras isolée précède un autre texte. Sans la page rendue, sa taille ne peut pas être comparée aux titres. Une personne doit vérifier s'il s'agit d'un titre.",
+        "it": "Una riga isolata in grassetto precede altro testo. Senza la pagina renderizzata la sua dimensione non si può confrontare con i titoli. Una persona deve verificare se è un titolo.",
     },
     "c131.group_no_question": {
         "en": "These options are not grouped (no fieldset/legend or named group), and no visible question was found next to them. A person must check whether a question belongs to them.",
@@ -122,11 +122,11 @@ register({
         "en": "A large bold link works as the title of a card or teaser but is not a heading. Whether such titles must be headings is debated.",
         "de": "Ein grosser fetter Link dient als Titel einer Karte oder eines Teasers, ist aber keine Überschrift. Ob solche Titel Überschriften sein müssen, ist umstritten.",
         "fr": "Un grand lien en gras sert de titre à une carte ou à une accroche, mais n'est pas un titre balisé. L'obligation d'en faire un titre est débattue.",
-        "it": "Un grande link in grassetto funge da titolo di una scheda o di un teaser, ma non è un titolo. Se debba esserlo è controverso.",
+        "it": "Un grande link in grassetto funge da titolo di una scheda o di un teaser, ma non è marcato come titolo. Se debba esserlo è controverso.",
     },
     "c131.table_visual_headers": {
         "en": "This data table shows its header row or column only visually (bold or coloured cells). There are no th cells, so the headers are not announced.",
-        "de": "Diese Datentabelle zeigt ihre Kopfzeile oder Kopfspalte nur optisch (fett oder farbig). Es gibt keine th-Zellen, daher werden die Kopfzellen nicht vorgelesen.",
+        "de": "Diese Datentabelle zeigt ihre Kopfzeile oder Kopfspalte nur optisch (fett oder farbig). Es gibt keine th-Zellen, daher werden sie nicht als Kopfzellen angesagt.",
         "fr": "Ce tableau de données ne montre sa ligne ou colonne d'en-tête que visuellement (gras ou couleur). Sans cellules th, les en-têtes ne sont pas annoncés.",
         "it": "Questa tabella di dati mostra la riga o colonna d'intestazione solo visivamente (grassetto o colore). Senza celle th le intestazioni non vengono annunciate.",
     },
@@ -167,10 +167,10 @@ register({
         "it": "La tabella marca le intestazioni con celle th.",
     },
     "c131.fake_list": {
-        "en": "{n} items are drawn as a list with typed characters instead of a list element (ul/ol).",
-        "de": "{n} Einträge sind mit getippten Zeichen als Liste dargestellt statt mit einem Listenelement (ul/ol).",
-        "fr": "{n} éléments sont présentés comme une liste avec des caractères tapés au lieu d'un élément de liste (ul/ol).",
-        "it": "{n} voci sono presentate come elenco con caratteri digitati invece che con un elemento di lista (ul/ol).",
+        "en": "{n} items look like a list but use typed characters instead of a list element (ul/ol).",
+        "de": "{n} Einträge sehen wie eine Liste aus, verwenden aber getippte Zeichen statt eines Listenelements (ul/ol).",
+        "fr": "{n} éléments ressemblent à une liste, mais utilisent des caractères tapés au lieu d'un élément de liste (ul/ol).",
+        "it": "{n} voci sembrano un elenco ma usano caratteri digitati invece di un elemento di elenco (ul/ol).",
     },
     "c131.group_missing": {
         "en": "The options are not grouped with their question (no fieldset with legend and no named group).",
@@ -199,7 +199,7 @@ register({
     "c131.kv_grid": {
         "en": "Short label/value pairs are laid out in two visual columns without list or table markup. Whether they need structure is debated.",
         "de": "Kurze Bezeichnung-Wert-Paare stehen in zwei optischen Spalten ohne Listen- oder Tabellenauszeichnung. Ob sie Struktur brauchen, ist umstritten.",
-        "fr": "De courtes paires libellé/valeur sont disposées en deux colonnes visuelles, sans balisage de liste ni de tableau. Leur besoin de structure est débattu.",
+        "fr": "De courtes paires libellé/valeur sont disposées en deux colonnes visuelles, sans balisage de liste ni de tableau. La nécessité de les structurer est débattue.",
         "it": "Brevi coppie etichetta/valore sono disposte in due colonne visive senza markup di elenco o tabella. Se serva una struttura è controverso.",
     },
     "c131.kv_colon": {
@@ -210,9 +210,9 @@ register({
     },
     "c131.run_in": {
         "en": "A bold run-in label inside a paragraph: emphasis marked up with b/strong, not a heading.",
-        "de": "Fett gesetzter Einstieg innerhalb eines Absatzes: Hervorhebung mit b/strong, keine Überschrift.",
+        "de": "Fett gesetztes Stichwort innerhalb eines Absatzes: Hervorhebung mit b/strong, keine Überschrift.",
         "fr": "Amorce en gras dans un paragraphe : mise en évidence avec b/strong, pas un titre.",
-        "it": "Attacco in grassetto dentro un paragrafo: enfasi con b/strong, non un titolo.",
+        "it": "Etichetta in grassetto dentro un paragrafo: enfasi con b/strong, non un titolo.",
     },
     "c131.impact_heading": {
         "en": "Screen-reader users cannot reach this section with heading navigation and do not hear that a new section starts.",
@@ -229,7 +229,7 @@ register({
     "c131.impact_layout": {
         "en": "Screen-reader users hear table headers and relationships that are not in the content.",
         "de": "Screenreader-Nutzende hören Tabellenköpfe und Beziehungen, die es im Inhalt nicht gibt.",
-        "fr": "Les personnes utilisant un lecteur d'écran entendent des en-têtes et des relations absentes du contenu.",
+        "fr": "Les personnes utilisant un lecteur d'écran entendent des en-têtes et des relations qui n'existent pas dans le contenu.",
         "it": "Chi usa un lettore di schermo sente intestazioni e relazioni che nel contenuto non esistono.",
     },
     "c131.impact_list": {
@@ -251,10 +251,10 @@ register({
         "it": "Chi usa un lettore di schermo riceve la stessa struttura che la pagina mostra visivamente.",
     },
     "c131.fix_heading": {
-        "en": "In the CMS, format this text as a heading (level {level}) instead of styling a paragraph.",
-        "de": "Formatieren Sie diesen Text im CMS als Überschrift (Ebene {level}) statt einen Absatz zu gestalten.",
-        "fr": "Dans le CMS, formatez ce texte comme titre (niveau {level}) au lieu de styler un paragraphe.",
-        "it": "Nel CMS formattate questo testo come titolo (livello {level}) invece di formattare un paragrafo.",
+        "en": "In your CMS, format this text as a heading (level {level}) instead of styling a paragraph.",
+        "de": "Formatieren Sie diesen Text im CMS als Überschrift (Ebene {level}), statt einen Absatz nur optisch zu gestalten.",
+        "fr": "Dans votre CMS, formatez ce texte comme titre (niveau {level}) au lieu de mettre en forme un paragraphe.",
+        "it": "Nel CMS, formattate questo testo come titolo (livello {level}) invece di formattare un paragrafo.",
     },
     "c131.fix_table": {
         "en": "Mark the header row or column as header cells (th) with scope=\"col\" or scope=\"row\".",

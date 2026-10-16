@@ -3,7 +3,7 @@
  * Same origin only: the UI is served by FastAPI, so no CORS and no third party.
  */
 import { API_BASE } from '@/config'
-import type { ExportFormat } from '@/types'
+import type { ExportFormat, ScanControlState } from '@/types'
 import { normaliseCriteria, normaliseFinding, normaliseHealth, normaliseScan, normaliseScanList, normaliseStep } from './normalise'
 import { ApiError, type KlarApi } from './types'
 
@@ -63,6 +63,11 @@ export const httpApi: KlarApi = {
     return normaliseScanList(await request<unknown>(`/scans?limit=${limit}`))
   },
 
+  async controlScan(id, action) {
+    const data = await request<Partial<ScanControlState>>(`/scans/${encodeURIComponent(id)}/${action}`, { method: 'POST' })
+    return { paused: data?.paused === true, stopping: data?.stopping === true }
+  },
+
   async patchFinding(id, body) {
     return normaliseFinding(await request<unknown>(`/findings/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(body) }))
   },
@@ -104,6 +109,10 @@ export const httpApi: KlarApi = {
         const data = parse<unknown>((ev as MessageEvent<string>).data)
         if (data) h.onFinding?.(normaliseFinding(data))
       })
+      es.addEventListener('control', (ev) => {
+        const data = parse<Partial<ScanControlState>>((ev as MessageEvent<string>).data)
+        if (data) h.onControl?.({ paused: data.paused === true, stopping: data.stopping === true })
+      })
       es.addEventListener('done', (ev) => {
         finished = true
         const data = parse<{ scan_id?: string; state?: 'queued' | 'running' | 'done' | 'error' }>((ev as MessageEvent<string>).data) ?? {}
@@ -135,7 +144,7 @@ export const httpApi: KlarApi = {
   },
 
   /**
-   * UX-29: fetch, then save the blob, so a server error is reported instead of being
+   * Fetch, then save the blob, so a server error is reported instead of being
    * saved as a file. Name: klar-{host}-{yyyy-mm-dd}.{ext} (ext from the server's name).
    */
   async exportScan(scan, format: ExportFormat) {

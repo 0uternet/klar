@@ -76,7 +76,7 @@ const credits: { name: string; role: MessageKey; licence: string }[] = [
   { name: 'Lucide', role: 'about.credits.icons', licence: 'ISC' },
 ]
 
-/** The three endpoint variables (see .env.example). */
+/** The three LLM_* variables that select the model endpoint (see .env.example). */
 const ENV_LINES = ['LLM_NAME=swiss-ai/Apertus-v1.5-8B', 'LLM_BASE_URL=https://your-apertus-endpoint/v1', 'LLM_API_KEY=your-key'].join('\n')
 </script>
 

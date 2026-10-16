@@ -194,7 +194,7 @@ register({
     "c135.invalid": {
         "en": "The autocomplete value “{value}” is not a valid input purpose, so browsers and assistive tools cannot fill in or label this field.",
         "de": "Der autocomplete-Wert «{value}» ist kein gültiger Eingabezweck; Browser und Hilfsmittel können dieses Feld weder ausfüllen noch kennzeichnen.",
-        "fr": "La valeur autocomplete « {value} » n'est pas une finalité valide : navigateurs et aides techniques ne peuvent ni remplir ni signaler ce champ.",
+        "fr": "La valeur autocomplete « {value} » n'est pas une finalité valide : navigateurs et technologies d'assistance ne peuvent ni remplir ni identifier ce champ.",
         "it": "Il valore autocomplete «{value}» non è uno scopo valido: browser e tecnologie assistive non possono compilare né identificare questo campo.",
     },
     "c135.valid": {
@@ -230,7 +230,7 @@ register({
     "c135.apertus_either": {
         "en": "The page lets the user fill in “{label}” for themselves or for someone else, so whether it must declare a purpose cannot be decided from the page. A person must decide.",
         "de": "Die Seite erlaubt, «{label}» für sich selbst oder für jemand anderen auszufüllen; ob ein Eingabezweck nötig ist, lässt sich so nicht entscheiden. Eine Person muss entscheiden.",
-        "fr": "La page permet de remplir « {label} » pour soi ou pour quelqu'un d'autre : on ne peut pas décider s'il faut une finalité. Une personne doit trancher.",
+        "fr": "La page permet de remplir « {label} » pour soi ou pour quelqu'un d'autre : impossible de savoir, d'après la page, si le champ doit déclarer une finalité. Une personne doit trancher.",
         "it": "La pagina consente di compilare «{label}» per sé o per altri: non si può decidere se serva uno scopo. Una persona deve decidere.",
     },
     "c135.apertus_not_listed": {
@@ -248,7 +248,7 @@ register({
     "c135.wrong_purpose": {
         "en": "The label “{label}” asks for a different part of the name than autocomplete=\"{value}\" says; autofill will put the wrong value here.",
         "de": "Die Beschriftung «{label}» fragt nach einem anderen Namensteil, als autocomplete=\"{value}\" angibt; das automatische Ausfüllen setzt hier den falschen Wert ein.",
-        "fr": "L'étiquette « {label} » demande une autre partie du nom que autocomplete=\"{value}\" ; le remplissage automatique y mettra la mauvaise valeur.",
+        "fr": "L'étiquette « {label} » demande une autre partie du nom que celle indiquée par autocomplete=\"{value}\" ; le remplissage automatique y mettra une mauvaise valeur.",
         "it": "L'etichetta «{label}» chiede una parte del nome diversa da autocomplete=\"{value}\"; la compilazione automatica inserirà il valore sbagliato.",
     },
     "c135.fix_hint": {
@@ -270,10 +270,10 @@ register({
         "it": "Le persone con disabilità motorie o cognitive non possono far compilare questo campo dal browser, e gli strumenti non possono aggiungervi icone familiari.",
     },
     "c135.impact_ok": {
-        "en": "Browsers can fill in this field, and tools can show what it asks for.",
-        "de": "Browser können dieses Feld ausfüllen, und Hilfsmittel können zeigen, wonach es fragt.",
-        "fr": "Les navigateurs peuvent remplir ce champ, et les outils peuvent montrer ce qu'il demande.",
-        "it": "I browser possono compilare questo campo e gli strumenti possono mostrare cosa chiede.",
+        "en": "People who use autofill meet no barrier in this field.",
+        "de": "Wer automatisches Ausfüllen nutzt, stösst bei diesem Feld auf keine Barriere.",
+        "fr": "Les personnes qui utilisent le remplissage automatique ne rencontrent aucun obstacle dans ce champ.",
+        "it": "Chi usa la compilazione automatica non incontra barriere in questo campo.",
     },
 })
 

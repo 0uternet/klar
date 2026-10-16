@@ -4,7 +4,7 @@ import type { RunNote } from '@/lib/notes'
 import ShapeIcon from './ShapeIcon.vue'
 
 /**
- * "About this run" (UX-2): what this run could not do. Calm plain rows: a shape (the tone),
+ * "About this run": what this run could not do. Calm plain rows: a shape (the tone),
  * one sentence, and one way forward as a text link. No boxes: the warning lives in the icon.
  */
 defineProps<{ notes: RunNote[]; label?: string }>()

@@ -287,6 +287,8 @@ class BaseCheck:
         explanation and user_impact are the i18n texts rendered for it. `reason` is the
         model's short English reason (Apertus findings only)."""
         code = reason_code or c.extra.get("kind") or source
+        if outcome == "inapplicable" and user_impact == t("impact.review", self.ui_lang):
+            user_impact = t("impact.not_applicable", self.ui_lang)  # nothing for a person to decide here
         return Finding(
             id=c.id, criterion=self.criterion, criterion_name=self.name, level=self.level,  # type: ignore[arg-type]
             act_rule=self.act_rule if act_rule is ... else act_rule, en301549=self.en301549,

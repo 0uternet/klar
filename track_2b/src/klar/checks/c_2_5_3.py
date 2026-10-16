@@ -130,20 +130,20 @@ register({
     "c253.several_blocks": {
         "en": "The control shows several texts (“{label}”) and its name “{name}” repeats only one of them. Which text is the label is a judgement: a person must decide.",
         "de": "Das Element zeigt mehrere Texte («{label}»), sein Name «{name}» wiederholt nur einen davon. Welcher Text die Beschriftung ist, muss eine Person entscheiden.",
-        "fr": "Le contrôle affiche plusieurs textes (« {label} ») et son nom « {name} » n'en reprend qu'un. Quel texte est l'étiquette relève du jugement : une personne doit trancher.",
+        "fr": "Le contrôle affiche plusieurs textes (« {label} ») et son nom « {name} » n'en reprend qu'un. Le choix du texte qui sert d'étiquette relève du jugement : une personne doit trancher.",
         "it": "Il controllo mostra più testi («{label}») e il suo nome «{name}» ne riprende solo uno. Quale testo sia l'etichetta va giudicato: una persona deve decidere.",
     },
     "c253.unclear_label": {
         "en": "This field has no visible label element, only nearby text or a placeholder; its name is “{name}”. A person must decide which text is its label.",
         "de": "Dieses Feld hat kein sichtbares Label, nur Text in der Nähe oder einen Platzhalter; sein Name ist «{name}». Eine Person muss entscheiden, welcher Text die Beschriftung ist.",
         "fr": "Ce champ n'a pas d'étiquette visible, seulement un texte proche ou un placeholder ; son nom est « {name} ». Une personne doit décider quel texte est son étiquette.",
-        "it": "Questo campo non ha un'etichetta visibile, solo testo vicino o un placeholder; il suo nome è «{name}». Una persona deve decidere quale testo sia l'etichetta.",
+        "it": "Questo campo non ha un'etichetta visibile, solo testo vicino o un segnaposto; il suo nome è «{name}». Una persona deve decidere quale testo sia l'etichetta.",
     },
     "c253.apertus_icon": {
         "en": "Apertus judged that the visible “{label}” is an icon or symbol, not a word label; any descriptive name is fine.",
         "de": "Apertus beurteilt, dass das sichtbare «{label}» ein Symbol ist, keine Wortbeschriftung; jeder beschreibende Name ist zulässig.",
         "fr": "Apertus juge que le « {label} » visible est une icône ou un symbole, pas une étiquette textuelle ; tout nom descriptif convient.",
-        "it": "Apertus giudica che «{label}» visibile sia un'icona o un simbolo, non un'etichetta testuale; qualsiasi nome descrittivo va bene.",
+        "it": "Apertus giudica che l'elemento visibile «{label}» sia un'icona o un simbolo, non un'etichetta testuale; qualsiasi nome descrittivo va bene.",
     },
     "c253.apertus_unsure": {
         "en": "Apertus could not decide whether “{label}” is a word label. A person must check that the name “{name}” contains it.",
@@ -159,15 +159,15 @@ register({
     },
     "c253.impact": {
         "en": "Speech-input users who say “{label}” cannot activate this control, and screen-reader users hear a different name than what is shown.",
-        "de": "Wer per Sprache «{label}» sagt, kann dieses Element nicht auslösen, und Screenreader-Nutzende hören einen anderen Namen als den angezeigten.",
+        "de": "Wer mit Sprachsteuerung «{label}» sagt, kann dieses Element nicht auslösen, und Screenreader-Nutzende hören einen anderen Namen als den angezeigten.",
         "fr": "Les personnes qui disent « {label} » en commande vocale ne peuvent pas activer ce contrôle, et les lecteurs d'écran annoncent un autre nom que celui affiché.",
-        "it": "Chi usa la voce e dice «{label}» non può attivare questo controllo, e chi usa un lettore di schermo sente un nome diverso da quello mostrato.",
+        "it": "Chi usa i comandi vocali e dice «{label}» non può attivare questo controllo, e chi usa un lettore di schermo sente un nome diverso da quello mostrato.",
     },
     "c253.impact_ok": {
         "en": "Speech-input users can activate this control by saying its visible label.",
         "de": "Wer per Sprache steuert, kann dieses Element mit seiner sichtbaren Beschriftung auslösen.",
-        "fr": "Les personnes en commande vocale peuvent activer ce contrôle en disant son étiquette visible.",
-        "it": "Chi usa la voce può attivare questo controllo pronunciando la sua etichetta visibile.",
+        "fr": "Les personnes qui utilisent la commande vocale peuvent activer ce contrôle en prononçant son étiquette visible.",
+        "it": "Chi usa i comandi vocali può attivare questo controllo pronunciando la sua etichetta visibile.",
     },
 })
 

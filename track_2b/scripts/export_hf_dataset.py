@@ -1,4 +1,4 @@
-"""Build the Hugging Face dataset folder of the submission from the repository.
+"""Build the Hugging Face dataset folder from the repository.
 
     python scripts/export_hf_dataset.py --results eval/results/apertus-8b-gpu [--results ...] [--out dist/hf-dataset]
 
@@ -51,7 +51,7 @@ def main() -> int:
     # The cases themselves, with the licences and the labelling protocol next to them.
     for part in ("generated", "act"):
         shutil.copytree(TESTSET / part, out / "cases" / part)
-    for f in ("PROTOCOL.md", "STATS.md", "LICENSE-CDLA-Permissive-2.0.txt", "review_sample.csv"):
+    for f in ("PROTOCOL.md", "STATS.md", "LICENSE-CDLA-Permissive-2.0.txt", "review_sample.csv", "review_relabel.csv"):
         if (TESTSET / f).is_file():
             shutil.copy2(TESTSET / f, out / f)
 

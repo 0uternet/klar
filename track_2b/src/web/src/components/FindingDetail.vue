@@ -99,7 +99,7 @@ const impact = computed(() =>
 )
 
 /**
- * "How to fix" (UX-5): the diff when there is one, else the CMS hint alone; with
+ * "How to fix": the diff when there is one, else the CMS hint alone; with
  * neither, a failed or uncertain finding says so plainly. "No change needed" is
  * only ever said of a passed or not-applicable finding.
  */
@@ -117,7 +117,7 @@ const NOTE_ACTION: Partial<Record<string, MessageKey>> = {
 }
 const noteAction = computed(() => (isNote(props.finding) ? (NOTE_ACTION[props.finding.reason_code] ?? null) : null))
 
-/** UX-13: what Accept and Reject mean for this kind of finding. */
+/** What Accept and Reject mean for this kind of finding. */
 const decideHint = computed(() => (props.finding.outcome === 'cantTell' ? t('decide.hint.review') : t('decide.hint.failed')))
 
 const contextEntries = computed(() => Object.entries(props.finding.context_shown ?? {}))

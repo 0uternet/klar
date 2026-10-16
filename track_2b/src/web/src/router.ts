@@ -102,3 +102,15 @@ export const router = createRouter({
     return { top: 0 }
   },
 })
+
+// The other pages load in the background once the first one is shown, so a tab opens at once.
+void router.isReady().then(() => {
+  const warm = () => {
+    void import('./views/HumanView.vue')
+    void import('./views/AboutView.vue')
+    void import('./views/ScanView.vue')
+    void import('./views/ReportView.vue')
+  }
+  if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(warm, { timeout: 3000 })
+  else setTimeout(warm, 1500)
+})

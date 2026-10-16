@@ -113,6 +113,25 @@ def build_messages(task: LLMTask, image_root: Path | None, *, plain_json: bool) 
     return [{"role": "system", "content": system}, {"role": "user", "content": content}]
 
 
+def fold_system(messages: list[dict]) -> list[dict]:
+    """For endpoints that take a single user turn (seen on a hosted Apertus 70B): the system
+    prompt goes first in the user message, and a retry (the previous answer and the
+    correction) follows it in that same message. Same question, same cache key."""
+    if len(messages) < 2 or messages[0].get("role") != "system":
+        return messages
+    system, content = messages[0]["content"], messages[1]["content"]
+    later = [f"Your previous answer:\n{m['content']}" if m["role"] == "assistant" else m["content"] for m in messages[2:]]
+    if isinstance(content, str):
+        return [{"role": "user", "content": "\n\n".join([system, content, *later])}]
+    return [{"role": "user", "content": [{"type": "text", "text": system}, *content,
+                                         *({"type": "text", "text": t} for t in later)]}]
+
+
+def refuses_system_message(exc: Exception) -> bool:
+    text = str(exc)
+    return "system_message_invalid" in text or "only accepts a system message" in text
+
+
 class LLMClient:
     """Live backend with the content-addressed cache in front of it."""
 
@@ -123,6 +142,7 @@ class LLMClient:
         self.store = store
         self.counter = counter
         self._caps = capabilities
+        self._fold_system = False  # set once the endpoint refuses a system message
         self._client = openai_client or OpenAI(
             base_url=settings.llm_base_url,
             api_key=settings.llm_api_key or "local",
@@ -205,9 +225,10 @@ class LLMClient:
     def _complete(self, task: LLMTask, image_root: Path | None, result: LLMResult,
                   extra: list[dict] | None = None, schema: dict | None = None) -> tuple[str | None, tuple[int, int]]:
         json_schema, thinking_flag = self.flags()
+        messages = build_messages(task, image_root, plain_json=not json_schema) + (extra or [])
         kwargs: dict = {
             "model": self.model,
-            "messages": build_messages(task, image_root, plain_json=not json_schema) + (extra or []),
+            "messages": fold_system(messages) if self._fold_system else messages,
             "temperature": TEMPERATURE,
             "seed": SEED,
             "max_tokens": task.max_tokens,
@@ -226,6 +247,15 @@ class LLMClient:
             self.counter.add(self.settings.destination)
             try:
                 resp = self._client.chat.completions.create(**kwargs)
+            except openai.BadRequestError as exc:
+                if self._fold_system or not refuses_system_message(exc):
+                    raise
+                # The endpoint refuses system messages: fold the instructions into the user
+                # message, now and for every later question.
+                log.info("endpoint refuses system messages; sending the instructions in the user message")
+                self._fold_system = True
+                kwargs["messages"] = fold_system(kwargs["messages"])
+                continue
             except (openai.APIConnectionError, openai.APITimeoutError, openai.RateLimitError,
                     openai.InternalServerError):
                 if transient_retry_left <= 0:

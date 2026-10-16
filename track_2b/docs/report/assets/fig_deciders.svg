@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 92" role="img" aria-labelledby="t d" font-family="'Ubuntu Sans', Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+<title id="t">Who decides each test case</title>
+<desc id="d">Stacked bar of the 605 test cases by decider: Rules 9 % (100 % of their alerts correct); Heuristics 38 % (98 % of their alerts correct); Apertus 8B 39 % (82 % of its alerts correct); Nothing to judge 14 % (no candidate element).</desc>
+<rect width="780" height="92" fill="#FFFFFF"/>
+<rect x="0.0" y="2" width="70.5" height="28" rx="4" fill="#0F1115"/><text x="9.0" y="21.0" font-size="14" font-weight="800" fill="#FFFFFF" text-anchor="start">9 %</text>
+<rect x="73.5" y="2" width="293.5" height="28" rx="4" fill="#565B66"/><text x="82.5" y="21.0" font-size="14" font-weight="800" fill="#FFFFFF" text-anchor="start">38 %</text>
+<rect x="370.0" y="2" width="301.3" height="28" rx="4" fill="#D0021B"/><text x="379.0" y="21.0" font-size="14" font-weight="800" fill="#FFFFFF" text-anchor="start">39 %</text>
+<rect x="674.3" y="2" width="102.7" height="28" rx="4" fill="#E4E2DC"/><text x="683.3" y="21.0" font-size="14" font-weight="800" fill="#0F1115" text-anchor="start">14 %</text>
+<rect x="0" y="46" width="11" height="11" rx="2" fill="#0F1115"/><text x="17.0" y="56.0" font-size="13" font-weight="700" fill="#0F1115" text-anchor="start">Rules</text>
+<text x="17.0" y="74.0" font-size="12" font-weight="400" fill="#565B66" text-anchor="start">100 % of their alerts correct</text>
+<rect x="195" y="46" width="11" height="11" rx="2" fill="#565B66"/><text x="212.0" y="56.0" font-size="13" font-weight="700" fill="#0F1115" text-anchor="start">Heuristics</text>
+<text x="212.0" y="74.0" font-size="12" font-weight="400" fill="#565B66" text-anchor="start">98 % of their alerts correct</text>
+<rect x="390" y="46" width="11" height="11" rx="2" fill="#D0021B"/><text x="407.0" y="56.0" font-size="13" font-weight="700" fill="#D0021B" text-anchor="start">Apertus 8B</text>
+<text x="407.0" y="74.0" font-size="12" font-weight="400" fill="#565B66" text-anchor="start">82 % of its alerts correct</text>
+<rect x="585" y="46" width="11" height="11" rx="2" fill="#E4E2DC"/><text x="602.0" y="56.0" font-size="13" font-weight="700" fill="#0F1115" text-anchor="start">Nothing to judge</text>
+<text x="602.0" y="74.0" font-size="12" font-weight="400" fill="#565B66" text-anchor="start">no candidate element</text>
+</svg>

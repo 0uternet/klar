@@ -1,5 +1,5 @@
 /**
- * Run notes (UX-2, catalogue N1–N8): what this run could not do, from the scan's
+ * Run notes (catalogue N1–N8): what this run could not do, from the scan's
  * own counters, ordered by severity, each with one way forward. Pure (message
  * keys only) so it is unit-tested; RunNotes.vue renders them.
  */
@@ -15,7 +15,7 @@ export type NoteAction =
   | { kind: 'filter'; reason: string }
 
 export interface RunNote {
-  id: 'N1' | 'N1b' | 'N2' | 'NT' | 'N3' | 'N4' | 'N5' | 'N6' | 'N7' | 'N8'
+  id: 'N1' | 'N1b' | 'N2' | 'NT' | 'NS' | 'N3' | 'N4' | 'N5' | 'N6' | 'N7' | 'N8'
   /** Bold title (N2 when Apertus answered nothing). */
   title?: MessageKey
   /** A plain message, or a plural base ("….one" / "….other") chosen by `count`. */
@@ -58,7 +58,7 @@ export function runNotes(scan: Pick<Scan, 'stats'>, findings: Finding[], isDemo:
     })
   }
 
-  // FE-4: the scan ran out of time (KLAR_SCAN_TIMEOUT): elements left as notes, checks never started.
+  // The scan ran out of time (KLAR_SCAN_TIMEOUT): elements left as notes, checks never started.
   const timeoutNotes = num(s.timeout_notes)
   const skippedChecks = list(s.timeout_skipped_checks).map(String)
   if (timeoutNotes > 0 || skippedChecks.length > 0) {
@@ -71,6 +71,21 @@ export function runNotes(scan: Pick<Scan, 'stats'>, findings: Finding[], isDemo:
       tone: 'warning',
       actions: [{ kind: 'runAgain' }, ...(byReason('timeout') > 0 ? [{ kind: 'filter' as const, reason: 'timeout' }] : [])],
       details: 'KLAR_SCAN_TIMEOUT',
+    })
+  }
+
+  // The person stopped the scan: what was found stays, the rest is listed.
+  const stoppedNotes = num(s.stopped_notes)
+  const stoppedChecks = list(s.stopped_skipped_checks).map(String)
+  if (s.stopped === true && (stoppedNotes > 0 || stoppedChecks.length > 0)) {
+    const skipped = stoppedChecks
+    out.push({
+      id: 'NS',
+      text: stoppedNotes > 0 ? 'notes.stopped' : 'notes.stoppedCrit',
+      count: stoppedNotes > 0 ? stoppedNotes : undefined,
+      params: { criteria: skipped.join(', ') },
+      tone: 'info',
+      actions: [{ kind: 'runAgain' }, ...(byReason('stopped') > 0 ? [{ kind: 'filter' as const, reason: 'stopped' }] : [])],
     })
   }
 
@@ -135,7 +150,7 @@ export function runNotes(scan: Pick<Scan, 'stats'>, findings: Finding[], isDemo:
   return out
 }
 
-/** "Apertus answers: {answered} of {asked}" (UX-2): null when nothing was asked. */
+/** "Apertus answers: {answered} of {asked}": null when nothing was asked. */
 export function apertusAnswers(stats: Scan['stats'] | undefined): { answered: number; asked: number } | null {
   const asked = num(stats?.asked_apertus)
   if (asked <= 0) return null

@@ -1,5 +1,5 @@
 /**
- * Unit checks for the "unknown is not 0" rule (FE-1) and the other no-invented-defaults
+ * Unit checks for the "unknown is not 0" rule and the other no-invented-defaults
  * rules of the API boundary. Bundled and run by scripts/unit.mjs (part of `npm run check`).
  */
 import { normaliseCriteria, normaliseHealth, normaliseStats } from '../src/api/normalise'
@@ -9,6 +9,7 @@ import { classifyHttpStatus, classifyScanError, classifyStartError, renderProble
 import { compareSections, groupFindings, reviewProgress } from '../src/lib/group'
 import { firstSentence, rowTitle } from '../src/lib/finding-text'
 import { apertusAnswers, runNotes } from '../src/lib/notes'
+import { etaText, stepEta } from '../src/lib/eta'
 import { scanTitle } from '../src/lib/format'
 import { guideFor } from '../src/data/human-guides'
 import type { Finding } from '../src/types'
@@ -62,7 +63,7 @@ await setLocale('de')
 check('DE counter says unbekannt', /unbekannt/.test(aiCounterText('local', null, 'vLLM').text))
 await setLocale('en')
 
-// 7. Start errors (UX-9, M11–M19): classified from today's 422 detail strings.
+// 7. Start errors: classified from today's 422 detail strings.
 const se = (s: number, d: string) => classifyStartError(s, d, 'x.example').id
 check('M11 private', se(422, "url not allowed: 192.168.1.1 is a private address (192.168.1.1); set KLAR_ALLOW_PRIVATE_NETWORKS=1 to allow") === 'M11')
 check('M12 blocked', se(422, 'url not allowed: x resolves to a blocked address 169.254.169.254') === 'M12')
@@ -75,7 +76,7 @@ check('M17 429 auto-retries once after 15 s', classifyStartError(429, 'queue ful
 check('M18 network', se(0, 'Network error') === 'M18')
 check('M19 5xx', se(502, 'Bad Gateway') === 'M19')
 
-// 8. Failed scans (UX-6, M20–M26): error_code first, regexes on stats.error as fallback.
+// 8. Failed scans: error_code first, regexes on stats.error as fallback.
 const fe = (stats: Record<string, unknown>, n = 0) => classifyScanError(stats as never, 'x.example', n, 'abc').id
 check('error_code tls → M20 (even with an unrelated text)', fe({ error_code: 'tls', error: 'whatever' }) === 'M20')
 check('error_code dns → M14', fe({ error_code: 'dns' }) === 'M14')
@@ -91,7 +92,7 @@ check('ScanTimeout without findings → retry', classifyScanError({ error_code: 
 check('unknown → M26 with the scan id in details', fe({ error: 'RuntimeError: boom' }) === 'M26' && /scan abc/.test(classifyScanError({ error: 'x' } as never, '', 0, 'abc').details ?? ''))
 check('M27 for 404 only', classifyHttpStatus(404, 'x')?.params.status === '404 Not Found' && classifyHttpStatus(200, 'x') === null && classifyHttpStatus(null, 'x') === null)
 
-// 9. Grouping and review scope (UX-3, UX-4).
+// 9. Grouping and review scope.
 const mk = (o: Partial<Finding>): Finding =>
   ({ id: Math.random().toString(36), criterion: '1.1.1', outcome: 'cantTell', reason_code: 'not_recorded', excerpt: 'a', user_impact: 'u', explanation: 'e', status: 'to_review', confidence: 'low', ...o }) as Finding
 const notes9 = groupFindings([mk({ excerpt: '<img alt="">' }), mk({ excerpt: '<img src=x>' }), mk({ reason_code: 'budget' })])
@@ -107,7 +108,7 @@ check('sections sorted by failed, then cantTell', order.map((s) => s.code).join(
 check('note row title by reason_code', rowTitle(mk({}), 'de').text === 'No recorded Apertus answer: check it yourself')
 check('axe row title = text after ": "', rowTitle(mk({ outcome: 'failed', reason_code: 'axe', explanation: 'axe-core rule “link-in-text-block”: Links must be distinguishable' }), 'en').text === 'Links must be distinguishable')
 
-// 10. Run notes (UX-2) and the answers counter.
+// 10. Run notes and the answers counter.
 const n10 = runNotes({ stats: { not_recorded: 4, llm_errors: 22, asked_apertus: 22, budget_skipped: { '1.1.1': 3 } } } as never, [], false)
 check('N1b before N2 before N3', n10.map((n) => n.id).join() === 'N1b,N2,N3', n10.map((n) => n.id))
 check('N2 all failed → bold title', n10[1]!.title === 'notes.llm.allTitle')
@@ -115,19 +116,19 @@ check('no notes on a clean run', runNotes({ stats: { not_recorded: 0, llm_errors
 check('answers = asked − errors − not recorded', JSON.stringify(apertusAnswers({ asked_apertus: 30, llm_errors: 2, not_recorded: 3 })) === '{"answered":25,"asked":30}')
 check('answers: nothing asked → null ("none needed")', apertusAnswers({ asked_apertus: 0 }) === null)
 
-// 11. Report title (UX-11).
+// 11. Report title.
 check('title from stats.page_title', scanTitle({ url: 'http://127.0.0.1:8090/demo/', stats: { page_title: 'Gemeinde Musterwil' }, progress: [] }).title === 'Gemeinde Musterwil')
 check('title from render detail when not a URL', scanTitle({ url: 'https://a.example/x', stats: {}, progress: [{ step: 'render', state: 'done', detail: 'Steuern', started_at: null, duration_ms: null, current: null, total: null }] }).title === 'Steuern')
 check('render detail that is a URL is ignored', scanTitle({ url: 'https://a.example/x', stats: {}, progress: [{ step: 'render', state: 'done', detail: 'https://a.example/x', started_at: null, duration_ms: null, current: null, total: null }] }).title === 'a.example/x')
 check('pasted HTML without title → null (UI says "Pasted HTML")', scanTitle({ url: 'inline:html', stats: {}, progress: [] }).title === null)
 
-// 12. UX-7: no guide states what Klar. does, in any language.
+// 12. No guide states what Klar. does, in any language.
 for (const lang of ['en', 'de', 'fr', 'it'] as const) {
   const bad = ['1.3.2', '1.4.1', '2.4.7', '3.2.3', '3.3.4', '9.9.9'].filter((c) => /Klar/.test(guideFor(c, lang).why))
   check(`guides never claim Klar. capabilities (${lang})`, bad.length === 0, bad)
 }
 
-// 13. FE-4: timeout note, budget limit, new reason titles, specific titles for check notes.
+// 13. Timeout note, budget limit, new reason titles, specific titles for check notes.
 const nt = runNotes({ stats: { timeout_notes: 12, timeout_skipped_checks: ['2.4.4', '3.1.2'] } } as never, [], true)
 check('timeout note with elements and criteria', nt[0]?.id === 'NT' && nt[0].text === 'notes.timeoutBoth' && nt[0].count === 12 && nt[0].params.criteria === '2.4.4, 3.1.2', nt[0])
 check('timeout note offers "Run again"', nt[0]?.actions[0]?.kind === 'runAgain')
@@ -149,6 +150,19 @@ check('an unmatched quote does not swallow the text', inch === 'Bildschirm 24" Z
 const tm = renderProblem(classifyScanError({ error_code: 'scan_timeout', error: 'scan exceeded KLAR_SCAN_TIMEOUT (12 s)' } as never, 'x', 3, 'a'))
 check('timeout limit in words (12 seconds)', /after 12 seconds\./.test(tm.body), tm.body)
 check('timeout limit in words (15 minutes)', /after 15 minutes\./.test(renderProblem(classifyScanError({ error_code: 'scan_timeout', error: '(900 s)' } as never, 'x', 3, 'a')).body))
+
+// 14. Time left: from the step's own pace, counted down between events, frozen while paused.
+const running = { step: 'apertus', state: 'running', started_at: null, detail: null, current: 4, total: 12, duration_ms: 8000 } as const
+check('eta: 4 of 12 in 8 s → 16 s left', stepEta(running, 1000, 1000, false) === 16, stepEta(running, 1000, 1000, false))
+check('eta counts down between events', stepEta(running, 6000, 1000, false) === 11, stepEta(running, 6000, 1000, false))
+check('eta is frozen while paused', stepEta(running, 6000, 1000, true) === 16, stepEta(running, 6000, 1000, true))
+check('no eta before the first item', stepEta({ ...running, current: 0 }, 1000, 1000, false) === null)
+check('eta text: seconds, then minutes', etaText(16.2) === '17 s' && etaText(200) === '4 min', [etaText(16.2), etaText(200)])
+
+// 15. A stopped scan says what it did not check.
+const ns = runNotes({ stats: { stopped: true, stopped_notes: 3, stopped_skipped_checks: ['3.3.1'] } }, [], false)
+check('stopped scan → NS note with the count', ns.length === 1 && ns[0]!.id === 'NS' && ns[0]!.count === 3, ns)
+check('stopped before anything was skipped → no note', runNotes({ stats: { stopped: true, stopped_notes: 0, stopped_skipped_checks: [] } }, [], false).length === 0)
 
 if (failed) {
   console.error(`unit: ${failed} check(s) failed`)

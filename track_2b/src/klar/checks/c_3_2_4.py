@@ -86,10 +86,10 @@ register({
         "it": "Apertus giudica che «{a}» e «{b}» ({page}) siano parole diverse per la stessa funzione.",
     },
     "c324.apertus_same_or_pattern": {
-        "en": "Apertus judged that “{a}” and “{b}” ({page}) follow one pattern.",
-        "de": "Apertus beurteilt, dass «{a}» und «{b}» ({page}) einem Muster folgen.",
-        "fr": "Apertus juge que « {a} » et « {b} » ({page}) suivent un même modèle.",
-        "it": "Apertus giudica che «{a}» e «{b}» ({page}) seguano uno stesso schema.",
+        "en": "Apertus judged that “{a}” and “{b}” ({page}) follow the same naming pattern.",
+        "de": "Apertus beurteilt, dass «{a}» und «{b}» ({page}) demselben Benennungsmuster folgen.",
+        "fr": "Apertus juge que « {a} » et « {b} » ({page}) suivent la même logique de dénomination.",
+        "it": "Apertus giudica che «{a}» e «{b}» ({page}) seguano lo stesso schema di denominazione.",
     },
     "c324.apertus_different_function": {
         "en": "Apertus judged that “{a}” and “{b}” ({page}) name different functions, which may be labelled differently.",
@@ -128,9 +128,9 @@ register({
         "it": "Date a questo componente lo stesso nome in tutte le pagine, per esempio «{a}».",
     },
     "c324.needs_url": {
-        "en": "Consistent identification concerns a set of pages; pasted HTML has no site around it. Scan the page by its address.",
-        "de": "Einheitliche Bezeichnung betrifft eine Gruppe von Seiten; eingefügtes HTML hat keine Website dazu. Scannen Sie die Seite über ihre Adresse.",
-        "fr": "L'identification cohérente concerne un ensemble de pages ; le HTML collé n'a pas de site autour. Analysez la page par son adresse.",
+        "en": "The Consistent Identification criterion concerns a set of pages; pasted HTML has no site around it. Scan the page by its address.",
+        "de": "Das Kriterium «Einheitliche Bezeichnung» betrifft eine Gruppe von Seiten; eingefügtes HTML gehört zu keiner Website. Scannen Sie die Seite über ihre Adresse.",
+        "fr": "L'identification cohérente concerne un ensemble de pages ; le HTML collé n'appartient à aucun site. Analysez la page par son adresse.",
         "it": "L'identificazione coerente riguarda un insieme di pagine; l'HTML incollato non ha un sito intorno. Analizzate la pagina tramite il suo indirizzo.",
     },
     "c324.too_few": {

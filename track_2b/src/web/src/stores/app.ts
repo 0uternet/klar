@@ -123,7 +123,7 @@ export const lastScanId = ref<string | null>(null)
 
 export const prefill = ref<{ url?: string; mode?: 'html' } | null>(null)
 
-/* ---- Modal finding panel (UX-14): header and footer become inert while it is open ---- */
+/* ---- Modal finding panel: header and footer become inert while it is open ---- */
 
 export const modalOpen = ref(false)
 

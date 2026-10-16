@@ -81,7 +81,7 @@ const looksLikeUrl = (s: string) =>
   /^[a-z][a-z0-9+.-]*:\/\//i.test(s) || /^inline[: ]/i.test(s) || /^[\w.-]+\.[a-z]{2,}(:\d+)?(\/|$)/i.test(s)
 
 /**
- * The report's H1 (UX-11): the page title when the server knows it (stats.page_title,
+ * The report's H1: the page title when the server knows it (stats.page_title,
  * else the render step's detail when that is not a URL), otherwise the short URL.
  * `url` is the address for the linked subline (null for pasted HTML).
  */

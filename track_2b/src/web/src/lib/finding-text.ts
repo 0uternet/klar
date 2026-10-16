@@ -1,5 +1,5 @@
 /**
- * What a finding row says (UX-3). Notes get a short title from their reason_code
+ * What a finding row says. Notes get a short title from their reason_code
  * (in the UI language); axe-core findings use their rule help; findings whose
  * impact is the backend's generic "a person must decide" sentence use the first
  * sentence of their specific explanation; everything else the backend's
@@ -15,7 +15,7 @@ export interface RowTitle {
   lang: UiLang | null
 }
 
-/** Reason codes with a plain row title of their own, besides the notes (FE-4). */
+/** Reason codes with a plain row title of their own, besides the notes. */
 const TITLED_REASONS: readonly string[] = ['language_switcher', 'phone_number']
 
 /** klar/i18n.py "impact.review": says nothing about this element, so never a row title. */
@@ -60,7 +60,7 @@ export function rowTitle(f: Finding, scanLang: UiLang): RowTitle {
     const help = i >= 0 ? f.explanation.slice(i + 2).trim() : ''
     if (help) return { text: help, lang: scanLang }
   }
-  // P2 (FE review): a check-specific note (e.g. 2.4.5 "needs a URL") titles the row with its own reason.
+  // A check-specific note (e.g. 2.4.5 "needs a URL") titles the row with its own reason.
   if (GENERIC_IMPACT.includes(f.user_impact.trim()) && f.explanation.trim()) return { text: firstSentence(f.explanation), lang: scanLang }
   return { text: f.user_impact, lang: scanLang }
 }

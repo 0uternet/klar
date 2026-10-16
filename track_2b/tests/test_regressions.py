@@ -1,4 +1,4 @@
-"""Regression tests for the Phase 2 review: WebSocket pages, 3.1.2 exceptions,
+"""Regression tests: WebSocket pages, 3.1.2 exceptions,
 axe supersession, error leakage, no-op fixes, injection imperatives."""
 
 import threading
@@ -18,7 +18,7 @@ from klar.llm.client import LLMResult
 from klar.pipeline import INTERNAL_ERROR, ScanJob, new_scan, run_scan
 
 
-# --- BE-1: a page that opens WebSockets must render (hard timeout) ---------------------------
+# --- A page that opens WebSockets must render (hard timeout) ---------------------------
 
 @pytest.mark.browser
 def test_websocket_page_renders_without_hanging(chromium, tmp_path):
@@ -47,7 +47,7 @@ def test_webrtc_cannot_bypass_routing():
     assert "--force-webrtc-ip-handling-policy=disable_non_proxied_udp" in CHROMIUM_ARGS
 
 
-# --- BE-2: 3.1.2 fails in code only for whole passages of running text ---------------------
+# --- 3.1.2 fails in code only for whole passages of running text ---------------------
 
 def _kinds(text: str, quoted=()) -> list[str]:
     p = {"selector": "p.x", "tag": "p", "html": f"<p>{text}</p>", "text": text, "lang": "de", "own_lang": None,

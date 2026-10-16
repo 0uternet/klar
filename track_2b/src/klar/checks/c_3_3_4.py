@@ -42,19 +42,19 @@ CATEGORY_OUTCOME = {"no_commitment": "inapplicable", "conditional_fee": "cantTel
 register({
     "c334.checked": {
         "en": "The page checks the entries before sending: an empty submission shows errors that can be corrected (“Checked”).",
-        "de": "Die Seite prüft die Eingaben vor dem Senden: Ein leeres Absenden zeigt Fehler, die man korrigieren kann («Geprüft»).",
+        "de": "Die Seite prüft die Eingaben vor dem Senden: Wird das Formular leer abgeschickt, erscheinen Fehler, die man korrigieren kann («Geprüft»).",
         "fr": "La page vérifie les saisies avant l'envoi : un envoi vide affiche des erreurs que l'on peut corriger (« Vérifié »).",
         "it": "La pagina controlla i dati prima dell'invio: un invio vuoto mostra errori che si possono correggere («Verificato»).",
     },
     "c334.confirmed": {
         "en": "Submitting does not finish at once: the page asks for a confirmation or shows a review step with a final button (“Confirmed”).",
-        "de": "Das Absenden schliesst nicht sofort ab: Die Seite verlangt eine Bestätigung oder zeigt einen Kontrollschritt mit einer letzten Schaltfläche («Bestätigt»).",
+        "de": "Das Absenden ist nicht sofort abgeschlossen: Die Seite verlangt eine Bestätigung oder zeigt einen Kontrollschritt mit einer letzten Schaltfläche («Bestätigt»).",
         "fr": "L'envoi ne se termine pas d'un coup : la page demande une confirmation ou affiche une étape de contrôle avec un bouton final (« Confirmé »).",
         "it": "L'invio non si conclude subito: la pagina chiede una conferma o mostra un passo di verifica con un pulsante finale («Confermato»).",
     },
     "c334.leaves": {
         "en": "Submitting this form continues on another page or server, which Klar. does not follow. A person must check whether a review, check or cancellation happens there.",
-        "de": "Dieses Formular wird auf einer anderen Seite oder einem Server fortgesetzt, dem Klar. nicht folgt. Eine Person muss prüfen, ob dort eine Kontrolle, Prüfung oder Stornierung möglich ist.",
+        "de": "Nach dem Absenden geht es auf einer anderen Seite oder einem anderen Server weiter; dorthin folgt Klar. nicht. Eine Person muss prüfen, ob dort eine Kontrolle, Prüfung oder Stornierung möglich ist.",
         "fr": "Ce formulaire se poursuit sur une autre page ou un serveur que Klar. ne suit pas. Une personne doit vérifier s'il y a là une étape de contrôle, de vérification ou d'annulation.",
         "it": "Questo modulo prosegue su un'altra pagina o un server che Klar. non segue. Una persona deve verificare se lì c'è un controllo, una verifica o un annullamento.",
     },
@@ -66,13 +66,13 @@ register({
     },
     "c334.probe_failed": {
         "en": "Klar. could not complete the test submission of this form (the page did not respond in time). A person must check it.",
-        "de": "Klar. konnte das Testabsenden dieses Formulars nicht abschliessen (die Seite reagierte nicht rechtzeitig). Eine Person muss es prüfen.",
+        "de": "Klar. konnte das testweise Absenden dieses Formulars nicht abschliessen (die Seite reagierte nicht rechtzeitig). Eine Person muss es prüfen.",
         "fr": "Klar. n'a pas pu terminer l'envoi de test de ce formulaire (la page n'a pas répondu à temps). Une personne doit le vérifier.",
         "it": "Klar. non ha potuto completare l'invio di prova di questo modulo (la pagina non ha risposto in tempo). Una persona deve verificarlo.",
     },
     "c334.untested": {
         "en": "Klar. submits forms only on the demo site and on test pages. If this form orders, pays, signs or deletes data, a person must check that it can be reviewed, checked or undone.",
-        "de": "Klar. schickt Formulare nur auf der Demo-Site und auf Testseiten ab. Wenn dieses Formular bestellt, bezahlt, verpflichtet oder Daten löscht, muss eine Person prüfen, ob es kontrolliert, geprüft oder rückgängig gemacht werden kann.",
+        "de": "Klar. schickt Formulare nur auf der Demo-Website und auf Testseiten ab. Wenn dieses Formular bestellt, bezahlt, verpflichtet oder Daten löscht, muss eine Person prüfen, ob es kontrolliert, geprüft oder rückgängig gemacht werden kann.",
         "fr": "Klar. n'envoie des formulaires que sur le site de démonstration et les pages de test. Si ce formulaire commande, paie, engage ou supprime des données, une personne doit vérifier qu'il peut être contrôlé, vérifié ou annulé.",
         "it": "Klar. invia moduli solo sul sito demo e sulle pagine di test. Se questo modulo ordina, paga, impegna o cancella dati, una persona deve verificare che possa essere controllato, verificato o annullato.",
     },
@@ -84,7 +84,7 @@ register({
     },
     "c334.apertus_conditional_fee": {
         "en": "The service is free, but a fee applies under some condition. Whether this is a binding commitment depends on terms not on the page: a person must decide.",
-        "de": "Das Angebot ist kostenlos, unter einer Bedingung fällt aber eine Gebühr an. Ob das eine verbindliche Verpflichtung ist, hängt von Bedingungen ab, die nicht auf der Seite stehen: Eine Person muss entscheiden.",
+        "de": "Das Angebot ist kostenlos, unter einer Bedingung fällt aber eine Gebühr an. Ob das eine verbindliche Verpflichtung ist, hängt von Bestimmungen ab, die nicht auf der Seite stehen: Eine Person muss entscheiden.",
         "fr": "Le service est gratuit, mais des frais s'appliquent sous condition. Savoir s'il s'agit d'un engagement dépend de conditions absentes de la page : une personne doit trancher.",
         "it": "Il servizio è gratuito, ma in certi casi si paga una tassa. Se sia un impegno vincolante dipende da condizioni non presenti nella pagina: una persona deve decidere.",
     },
@@ -121,7 +121,7 @@ register({
     "c334.impact_ok": {
         "en": "Users can catch a mistake before it becomes binding, or undo it.",
         "de": "Nutzende können einen Fehler erkennen, bevor er verbindlich wird, oder ihn rückgängig machen.",
-        "fr": "Les utilisateurs peuvent repérer une erreur avant qu'elle n'engage, ou l'annuler.",
+        "fr": "Les utilisateurs peuvent repérer une erreur avant qu'elle ne devienne définitive, ou l'annuler.",
         "it": "Gli utenti possono accorgersi di un errore prima che diventi vincolante, o annullarlo.",
     },
 })

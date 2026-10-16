@@ -225,7 +225,7 @@ export interface PatchFindingRequest {
 }
 
 export type ExportFormat = 'json' | 'earl' | 'csv' | 'html'
-/** Menu order: the printable HTML report first (UX-29). */
+/** Menu order: the printable HTML report first. */
 export const EXPORT_FORMATS: readonly ExportFormat[] = ['html', 'json', 'earl', 'csv']
 
 /** models.py `CriterionInfo` (item of GET /api/criteria). */
@@ -261,7 +261,16 @@ export interface ScanEventHandlers {
   onDone?: (done: Partial<ScanDone> & Partial<Scan>) => void
   /** Transport or server error. */
   onError?: (message: string) => void
+  /** `event: control` — the scan paused, resumed or is stopping. */
+  onControl?: (state: ScanControlState) => void
 }
+
+/** POST /api/scans/{id}/pause|resume|stop and SSE `control`: the scan's pause / stop state. */
+export interface ScanControlState {
+  paused: boolean
+  stopping: boolean
+}
+export type ScanControlAction = 'pause' | 'resume' | 'stop'
 
 /** What the hero field submits (UI only, not part of the API contract). */
 export type CheckInput = { url: string } | { html: string; name: string | null }

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 150" role="img" aria-labelledby="t d" font-family="'Ubuntu Sans', Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+<title id="t">What happens to real barriers, and the human workload</title>
+<desc id="d">Left: what happens to 100 real barriers. axe-core (Lighthouse): 15 found automatically, 0 sent to a person, 85 missed; Klar. rules, no Apertus: 54 found automatically, 41 sent to a person, 5 missed; Klar. with Apertus 8B: 78 found automatically, 8 sent to a person, 14 missed. Right: share of all checked elements left to a person: axe-core 0 %, rules 45 %, Apertus 12 %.</desc>
+<rect width="780" height="150" fill="#FFFFFF"/>
+<text x="0.0" y="14.0" font-size="14" font-weight="700" fill="#0F1115" text-anchor="start">What happens to 100 real barriers</text>
+<rect x="0" y="22" width="11" height="11" rx="2" fill="#D0021B"/><text x="16.0" y="32.0" font-size="12" font-weight="400" fill="#565B66" text-anchor="start">found automatically</text>
+<rect x="140" y="22" width="11" height="11" rx="2" fill="#E9B949"/><text x="156.0" y="32.0" font-size="12" font-weight="400" fill="#565B66" text-anchor="start">sent to a person</text>
+<rect x="264" y="22" width="11" height="11" rx="2" fill="#E4E2DC"/><text x="280.0" y="32.0" font-size="12" font-weight="400" fill="#565B66" text-anchor="start">missed</text>
+<text x="0.0" y="61.0" font-size="12.5" font-weight="400" fill="#565B66" text-anchor="start">axe-core (Lighthouse)</text>
+<rect x="190.0" y="46" width="42.1" height="22" rx="3" fill="#EBA3AA"/><text x="211.1" y="61.5" font-size="12" font-weight="700" fill="#0F1115" text-anchor="middle">15</text>
+<rect x="234.1" y="46" width="253.9" height="22" rx="3" fill="#E4E2DC"/><text x="361.1" y="61.5" font-size="12" font-weight="700" fill="#0F1115" text-anchor="middle">85</text>
+<text x="0.0" y="95.0" font-size="12.5" font-weight="400" fill="#565B66" text-anchor="start">Klar. rules, no Apertus</text>
+<rect x="190.0" y="80" width="159.4" height="22" rx="3" fill="#EBA3AA"/><text x="269.7" y="95.5" font-size="12" font-weight="700" fill="#0F1115" text-anchor="middle">54</text>
+<rect x="351.4" y="80" width="121.6" height="22" rx="3" fill="#E9B949"/><text x="412.2" y="95.5" font-size="12" font-weight="700" fill="#0F1115" text-anchor="middle">41</text>
+<rect x="475.0" y="80" width="13.0" height="22" rx="3" fill="#E4E2DC"/><text x="496.0" y="95.5" font-size="12" font-weight="700" fill="#0F1115" text-anchor="start">5</text>
+<text x="0.0" y="129.0" font-size="12.5" font-weight="700" fill="#0F1115" text-anchor="start">Klar. with Apertus 8B</text>
+<rect x="190.0" y="114" width="232.3" height="22" rx="3" fill="#D0021B"/><text x="306.1" y="129.5" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">78</text>
+<rect x="424.3" y="114" width="22.0" height="22" rx="3" fill="#E9B949"/><text x="435.3" y="129.5" font-size="12" font-weight="700" fill="#0F1115" text-anchor="middle">8</text>
+<rect x="448.3" y="114" width="39.7" height="22" rx="3" fill="#E4E2DC"/><text x="468.2" y="129.5" font-size="12" font-weight="700" fill="#0F1115" text-anchor="middle">14</text>
+
+<text x="548.0" y="14.0" font-size="14" font-weight="700" fill="#0F1115" text-anchor="start">Left to a person</text>
+<text x="548.0" y="31.0" font-size="12" font-weight="400" fill="#565B66" text-anchor="start">share of all checked elements</text>
+<rect x="548" y="46" width="150" height="22" rx="3" fill="#F3F3F1"/><text x="706.0" y="61.5" font-size="13" font-weight="400" fill="#0F1115" text-anchor="start">0 %</text>
+<rect x="548" y="80" width="150" height="22" rx="3" fill="#F3F3F1"/><rect x="548" y="80" width="135.9" height="22" rx="3" fill="#E9B949"/><text x="706.0" y="95.5" font-size="13" font-weight="400" fill="#0F1115" text-anchor="start">45 %</text>
+<rect x="548" y="114" width="150" height="22" rx="3" fill="#F3F3F1"/><rect x="548" y="114" width="36.3" height="22" rx="3" fill="#E9B949"/><text x="706.0" y="129.5" font-size="13" font-weight="700" fill="#D0021B" text-anchor="start">12 %</text>
+</svg>

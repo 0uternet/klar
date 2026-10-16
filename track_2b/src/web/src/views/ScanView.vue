@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowRight, ExternalLink } from '@lucide/vue'
-import type { Outcome, ProgressStep, Scan } from '@/types'
+import { ArrowRight, ExternalLink, Pause, Play, Square } from '@lucide/vue'
+import type { Outcome, ProgressStep, Scan, ScanControlAction, ScanControlState } from '@/types'
 import { KNOWN_STEPS } from '@/types'
 import { api, ApiError } from '@/api'
 import { formatNumber, polish, t, tp, type MessageKey } from '@/i18n'
@@ -12,6 +12,7 @@ import { scanTitle } from '@/lib/format'
 import { classifyScanError, hostOf, renderProblem, type Problem, type ProblemAction } from '@/lib/errors'
 import { evidenceLine, rowTitle } from '@/lib/finding-text'
 import { groupFindings, type FindingGroup } from '@/lib/group'
+import { etaText, stepEta } from '@/lib/eta'
 import { useDocumentTitle } from '@/composables/useDocumentTitle'
 import { useNow } from '@/composables/useNow'
 import { useRerun } from '@/composables/useRerun'
@@ -37,7 +38,44 @@ const finishedAt = ref<number | null>(null)
 const unsubscribe = shallowRef<(() => void) | null>(null)
 const cta = ref<HTMLElement | null>(null)
 
-/** H1 = the page title once the page is loaded, else the address (UX-11). */
+/* ---- Pause / resume / stop: the server confirms at the scan's next step, check or question ---- */
+const control = ref<ScanControlState>({ paused: false, stopping: false })
+/** An action sent but not yet confirmed by a `control` event ("Pausing…", "Stopping…"). */
+const requested = ref<ScanControlAction | null>(null)
+const controlBusy = ref(false)
+const confirmStop = ref(false)
+const pausedAt = ref<number | null>(null)
+const pausedMs = ref(0)
+/** Step → arrival time of its last progress event (the time left counts down between events). */
+const received = ref<Record<string, number>>({})
+
+function setControl(state: ScanControlState) {
+  if (state.paused && pausedAt.value == null) pausedAt.value = Date.now()
+  if (!state.paused && pausedAt.value != null) {
+    pausedMs.value += Date.now() - pausedAt.value
+    pausedAt.value = null
+  }
+  control.value = state
+  if (requested.value === 'pause' && state.paused) requested.value = null
+  if (requested.value === 'resume' && !state.paused) requested.value = null
+  if (requested.value === 'stop' && state.stopping) requested.value = null
+}
+
+async function doControl(action: ScanControlAction) {
+  confirmStop.value = false
+  controlBusy.value = true
+  requested.value = action
+  try {
+    const state = await api().controlScan(props.id, action)
+    if (action === 'stop') setControl(state)
+  } catch {
+    requested.value = null // the scan ended meanwhile: the done event takes over
+  } finally {
+    controlBusy.value = false
+  }
+}
+
+/** H1 = the page title once the page is loaded, else the address. */
 const head = computed(() => (scan.value ? scanTitle(scan.value) : null))
 const headTitle = computed(() => (head.value ? (head.value.title ?? t('report.pastedHtml')) : t('scan.connecting')))
 /** One line under the H1: the address when the H1 is a page title, or "Pasted HTML" under a pasted page's own title. */
@@ -55,13 +93,31 @@ const failedState = computed(() => scan.value?.state === 'error')
 /** The stream dropped mid-check: say so instead of a live "Checking" mark. */
 const offline = computed(() => transportError.value !== null && !finished.value && !failedState.value)
 const phase = computed(() => (failedState.value || offline.value ? 'failed' : finished.value ? 'done' : 'running'))
-const statusText = computed(() =>
-  failedState.value ? t('scan.failedEyebrow') : offline.value ? t('offline.badge') : finished.value ? t('scan.done') : t('scan.eyebrow'),
-)
+const stopped = computed(() => finished.value && scan.value?.stats?.stopped === true)
+const statusText = computed(() => {
+  if (failedState.value) return t('scan.failedEyebrow')
+  if (offline.value) return t('offline.badge')
+  if (finished.value) return stopped.value ? t('scan.stopped') : t('scan.done')
+  if (control.value.stopping || requested.value === 'stop') return t('scan.stopping')
+  if (control.value.paused && requested.value !== 'resume') return t('scan.paused')
+  if (requested.value === 'pause') return t('scan.pausing')
+  return t('scan.eyebrow')
+})
+/** Running time without the paused time. */
 const elapsed = computed(() => {
   if (!startedAt.value) return 0
-  return ((finishedAt.value ?? now.value) - startedAt.value) / 1000
+  const end = finishedAt.value ?? now.value
+  const pausing = pausedAt.value != null ? end - pausedAt.value : 0
+  return Math.max(0, end - startedAt.value - pausedMs.value - pausing) / 1000
 })
+/** "about 40 s left": from the running step's pace, once it has one. */
+const etaLabel = computed(() => {
+  if (phase.value !== 'running' || control.value.paused || control.value.stopping || requested.value === 'stop') return ''
+  const running = scan.value?.progress.find((s) => s.state === 'running')
+  const sec = running ? stepEta(running, now.value, received.value[running.step], false) : null
+  return sec == null ? '' : t('scan.eta', { t: etaText(sec) })
+})
+const canControl = computed(() => phase.value === 'running' && !!scan.value && !control.value.stopping && requested.value !== 'stop')
 
 /** Newest first; identical findings (and notes with the same reason) collapse into one row with ×N. */
 const live = computed(() => groupFindings(scan.value?.findings ?? []).reverse())
@@ -84,7 +140,7 @@ const counts = computed(() => {
 })
 const fmt = (n: number) => formatNumber(Math.round(n))
 
-/** UX-6: a failed check says what happened in plain words; the raw text stays under Details. */
+/** A failed check says what happened in plain words; the raw text stays under Details. */
 const failure = computed<Problem | null>(() => {
   const s = scan.value
   if (!s || s.state !== 'error') return null
@@ -119,6 +175,8 @@ function onProgress(data: ProgressStep | ProgressStep[]) {
   startedAt.value ??= Date.now()
   const before = new Map(s.progress.map((p) => [p.step, p.state]))
   applyProgress(s, data)
+  const at = Date.now()
+  for (const p of Array.isArray(data) ? data : [data]) received.value = { ...received.value, [p.step]: at }
   // Announce state changes politely (not every tick of the Apertus counter).
   for (const p of Array.isArray(data) ? data : [data]) {
     if (p.step !== 'done' && before.get(p.step) !== p.state && p.state === 'running') {
@@ -170,6 +228,9 @@ onMounted(async () => {
       return
     }
     if (s.state === 'running') startedAt.value = Date.now()
+    if (s.stats?.paused === true || s.stats?.stopping === true) {
+      setControl({ paused: s.stats.paused === true, stopping: s.stats.stopping === true })
+    }
   } catch (e) {
     if (e instanceof ApiError && e.status === 404) notFound.value = true
     else transportError.value = e instanceof Error ? e.message : String(e)
@@ -178,7 +239,12 @@ onMounted(async () => {
   unsubscribe.value = api().subscribe(props.id, {
     onProgress,
     onFinding: (f) => scan.value && applyFinding(scan.value, f),
-    onDone: (d) => void finish(d),
+    onControl: setControl,
+    onDone: (d) => {
+      if (pausedAt.value != null) setControl({ paused: false, stopping: control.value.stopping })
+      requested.value = null
+      void finish(d)
+    },
     onError: async (m) => {
       // Maybe the check ended while the stream dropped: ask the server before showing an error.
       const fresh = await loadScan(props.id, true).catch(() => null)
@@ -235,6 +301,10 @@ function reload() {
                 ><span class="sr-only">{{ t('scan.elapsed') }}: </span>{{ formatNumber(elapsed, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) }} s</span
               >
             </template>
+            <template v-if="etaLabel">
+              <span class="scan__sep" aria-hidden="true">·</span>
+              <span class="tabular scan__elapsed">{{ etaLabel }}</span>
+            </template>
           </p>
           <h1 class="h1 scan__h1 m-rise" style="--i: 1" tabindex="-1">{{ headTitle }}</h1>
           <p v-if="subUrl || subPasted" class="scan__sub m-rise" style="--i: 2">
@@ -243,6 +313,28 @@ function reload() {
             </a>
             <span v-else>{{ t('report.pastedHtml') }}</span>
           </p>
+        </div>
+        <div v-if="canControl || confirmStop" class="scan__controls" :class="{ 'scan__controls--confirm': confirmStop }">
+          <template v-if="!confirmStop">
+            <button
+              type="button"
+              class="btn btn--ghost"
+              :disabled="controlBusy || requested === 'pause' || requested === 'resume'"
+              @click="doControl(control.paused ? 'resume' : 'pause')"
+            >
+              <Play v-if="control.paused" :size="16" aria-hidden="true" />
+              <Pause v-else :size="16" aria-hidden="true" />
+              {{ control.paused ? t('scan.resume') : t('scan.pause') }}
+            </button>
+            <button type="button" class="btn btn--ghost" :disabled="controlBusy" @click="confirmStop = true">
+              <Square :size="14" aria-hidden="true" /> {{ t('scan.stop') }}
+            </button>
+          </template>
+          <div v-else class="scan__confirm" role="group" :aria-label="t('scan.stop')">
+            <span class="scan__confirm-text">{{ t('scan.stopConfirm') }}</span>
+            <button type="button" class="btn btn--primary" @click="doControl('stop')">{{ t('scan.stopYes') }}</button>
+            <button type="button" class="btn btn--ghost" @click="confirmStop = false">{{ t('scan.stopNo') }}</button>
+          </div>
         </div>
         <Transition name="fade-rise">
           <div v-if="finished" ref="cta" class="scan__cta">
@@ -268,7 +360,14 @@ function reload() {
       <div class="scan__grid">
         <section class="scan__progress m-rise" style="--i: 3" aria-labelledby="scan-progress">
           <h2 id="scan-progress" class="scan__h">{{ t('scan.progress') }}</h2>
-          <ProgressStepper :steps="scan?.progress ?? []" :failed="failedState" :error-title="failureText?.title" />
+          <ProgressStepper
+            :steps="scan?.progress ?? []"
+            :failed="failedState"
+            :error-title="failureText?.title"
+            :now="now"
+            :received="received"
+            :paused="control.paused"
+          />
         </section>
 
         <!-- Hidden when a failed check found nothing: an empty "arriving" box would suggest work still going on. -->
@@ -420,6 +519,26 @@ function reload() {
 }
 .scan__cta {
   justify-self: end;
+}
+.scan__controls,
+.scan__confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-self: end;
+  gap: var(--s-2);
+}
+.scan__controls .btn {
+  gap: 6px;
+}
+/* The stop confirmation takes its own row under the title instead of squeezing it. */
+.scan__controls--confirm {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+.scan__confirm-text {
+  font-size: var(--fs-14);
+  color: var(--muted);
 }
 .scan__open {
   --btn-h: 52px;
@@ -584,7 +703,9 @@ function reload() {
   .scan__head {
     grid-template-columns: 1fr;
   }
-  .scan__cta {
+  .scan__cta,
+  .scan__controls,
+  .scan__confirm {
     justify-self: stretch;
   }
   .scan__open {

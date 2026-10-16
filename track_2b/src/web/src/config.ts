@@ -9,6 +9,21 @@ export const DEMO_URL: string =
   import.meta.env.VITE_DEMO_URL ??
   (import.meta.env.DEV ? 'http://localhost:8080/demo/' : new URL('demo/', `${location.origin}/`).toString())
 
+/**
+ * Real Swiss pages whose Apertus answers ship with the replay recordings (data/replay), so a
+ * visitor without a model endpoint can still see Apertus at work on the live web. If a page
+ * changed since the recording, its new elements go to a person ("not recorded").
+ */
+export const REAL_SAMPLES: readonly { url: string; host: string; who: string }[] = [
+  { url: 'https://www.ebgb.admin.ch/de', host: 'ebgb.admin.ch', who: 'home.real.ebgb' },
+  { url: 'https://www.biel-bienne.ch/de', host: 'biel-bienne.ch', who: 'home.real.biel' },
+]
+
+export function isRealSample(url: string): boolean {
+  const norm = (u: string) => u.replace(/\/+$/, '').toLowerCase()
+  return REAL_SAMPLES.some((s) => norm(s.url) === norm(url))
+}
+
 /** True for pages of the bundled demo site (the only site with recorded replay answers). */
 export function isDemoUrl(url: string): boolean {
   try {

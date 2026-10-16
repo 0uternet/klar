@@ -378,7 +378,7 @@ def build(rng):
 
 
 # ---------------------------------------------------------------------------
-# v3 (backend review, 14 Oct): designed span categories that a language-detector rule tends to
+# v3 (14 Oct): designed span categories that a language-detector rule tends to
 # misclassify, each present in BOTH splits (forced split, one template per case, fresh fictional
 # vocabulary from the Beispielwil universe, nothing shared with the demo site).
 #   A  quoted title of a work inside running text  («», „“, "", <q>, <cite>, <i>)  -> C3 cantTell

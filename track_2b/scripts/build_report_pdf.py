@@ -1,10 +1,9 @@
-"""Render technical_report.md to the submission PDF (A4) and check the page limit.
+"""Render technical_report.md to Klar_Report.pdf (A4) and check the page limit.
 
     python scripts/build_report_pdf.py [--out Klar_Report.pdf] [--max-pages 6]
 
-The report is limited to 6 pages
-without references. The body (everything before "## References") must fit in
---max-pages; the script fails otherwise. Development tool only: it needs the
+The report is limited to 6 pages without references. The body (everything before
+"## References") must fit in --max-pages; the script fails otherwise. Development tool only: it needs the
 `markdown` package (pip install markdown==3.8.2) and Playwright Chromium, which the
 app already uses. Figures are inlined from docs/report/assets, so the PDF is self-contained.
 """
@@ -24,23 +23,24 @@ ROOT = Path(__file__).resolve().parents[1]
 
 CSS = """
 @page { size: A4; margin: 15mm 15mm 14mm 15mm; }
-html { font-family: "Liberation Sans", "DejaVu Sans", Arial, sans-serif; font-size: 8.6pt; line-height: 1.32; color: #111; }
+html { font-family: "Ubuntu Sans", "Segoe UI", "Liberation Sans", "DejaVu Sans", Arial, sans-serif; font-size: 8.8pt; line-height: 1.34; color: #0F1115; }
 body { margin: 0; }
 h1 { font-size: 15pt; margin: 0 0 3pt; }
 h1 + p { margin-top: 0; font-size: 10pt; }
-h2 { font-size: 10.6pt; margin: 8pt 0 2pt; border-bottom: 0.6pt solid #999; padding-bottom: 1pt; break-after: avoid; }
+h2 { font-size: 11pt; margin: 8pt 0 2pt; border-bottom: 0.6pt solid #D0021B; padding-bottom: 1pt; break-after: avoid; }
 h3 { font-size: 9.2pt; margin: 6pt 0 2pt; break-after: avoid; }
 p, ul, ol { margin: 2.5pt 0; }
 ul, ol { padding-left: 13pt; }
 li { margin: 0.8pt 0; }
-code { font-family: "DejaVu Sans Mono", Consolas, monospace; font-size: 7.6pt; }
+code { font-family: "Ubuntu Sans Mono", "DejaVu Sans Mono", Consolas, monospace; font-size: 7.8pt; }
 table { border-collapse: collapse; width: 100%; margin: 3pt 0 4pt; font-size: 7.4pt; break-inside: avoid; }
-th, td { border: 0.5pt solid #aaa; padding: 1.2pt 3pt; text-align: left; vertical-align: top; }
-th { background: #eee; }
-figure { margin: 4pt 0; text-align: center; break-inside: avoid; }
+th, td { border: 0.5pt solid #C9CDD4; padding: 1.4pt 3.5pt; text-align: left; vertical-align: top; }
+th { background: #F3F3F1; }
+figure { margin: 5pt 0; text-align: center; break-inside: avoid; }
 figure img { max-width: 100%; }
 figure.fig-narrow img { max-width: 62%; }
 figcaption { font-size: 7.6pt; color: #333; margin-top: 2pt; text-align: left; }
+p:has(+ table) { break-after: avoid; margin-bottom: 1pt; }
 a { color: #0645ad; text-decoration: none; }
 .references { font-size: 7.2pt; line-height: 1.22; }
 .references ol li { margin: 0.4pt 0; }

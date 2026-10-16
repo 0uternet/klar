@@ -1,6 +1,6 @@
 # Klar. - run every target from track_2b/.
 #
-# Judges / quick start: `make run`. It needs only Docker (Engine or Desktop) with Compose
+# Quick start: `make run`. It needs only Docker (Engine or Desktop) with Compose
 # v2.24+, and starts the app on http://localhost:8080 in replay mode when there is no .env:
 # no key, no model download. Then it scans the bundled demo site and prints the report path.
 #

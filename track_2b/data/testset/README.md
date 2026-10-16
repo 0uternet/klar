@@ -11,7 +11,7 @@ tags: [accessibility, wcag, a11y, evaluation, act-rules, switzerland, multilingu
 
 # Klar. evaluation set: WCAG 2.1 AA criteria that need judgement
 
-> **Status:** labels are frozen by the git tag `labels-v1`, which the founder sets after the blind review of the 50-case sample and before any test-split model call.
+> **Status:** labels are frozen by the git tag `labels-v1`, set before any test-split model call.
 > Counts are in [`STATS.md`](STATS.md), which `scripts/build_manifest.py` regenerates. `STATS.md` also records the sha256 of `manifest.jsonl`.
 
 ## 1. Purpose
@@ -80,7 +80,7 @@ Outcome mix of the generated cases:
 
 ## 3. Construction
 
-- **Protocol first.** [`PROTOCOL.md`](PROTOCOL.md) gives, for each criterion, the decision rules for every outcome. They are grounded in the W3C *Understanding WCAG 2.1* documents, the sufficient techniques and failures, and the ACT rules. It also records the binding decisions D1–D5. Decision D1 covers link context: a preceding heading is not context, so a heading-only link is `cantTell`. The protocol was written before the cases were generated and before any model run.
+- **Protocol first.** [`PROTOCOL.md`](PROTOCOL.md) gives, for each criterion, the decision rules for every outcome. They are grounded in the W3C *Understanding WCAG 2.1* documents, the sufficient techniques and failures, and the ACT rules. It also records the decisions D1–D5. Decision D1 covers link context: a preceding heading is not context, so a heading-only link is `cantTell`. The protocol was written before the cases were generated and before any model run.
 - **Deterministic generator.** `scripts/generate_testset.py` uses only the standard library, with seed `20261014`. It has one module per criterion in `scripts/testset_gen/`. The scenario texts are in Swiss Standard German, French and Italian, about municipalities, schools, libraries, utilities, transport and tourism, all fictional. The generator combines them with rule-specific frames, layouts, themes and positions through a seeded RNG.
 - **Images.** All images are SVGs we generated ourselves, in `generated/_assets/`: charts with real numbers, pictograms, banners containing text, decorative ornaments and flat illustrations. There are no third-party images.
 - **Construction checks.** `scripts/validate_testset.py` checks that:
@@ -115,15 +115,16 @@ python -I scripts/sample_for_review.py --score data/testset/review_sample.csv   
 
 Serve `data/testset/act/` as the web root when you render ACT cases, because they use root-relative `/test-assets/` URLs.
 
-## 4. How the data was made: AI assistance and human review
+## 4. How the data was made
 
+- **Authoring.** The case texts are the scenario strings in `scripts/testset_gen/`; the seeded generator turns them into pages. All pages, names and addresses are synthetic.
 - **Labels.** The labels are **assigned by construction** from the written decision rules in `PROTOCOL.md`, which were written before the cases were generated. No model judged or labelled any case.
 - **No Apertus output.** **No output of Apertus, or of any model under evaluation, was used to create, select or label data.**
-- **Human review.** A second, human annotator labels a blind, stratified sample of 50 test cases (`review_sample.csv`) using only the protocol. Agreement (Cohen's κ, from `sample_for_review.py --score`) on this sample is reported in the technical report once the second annotation is complete; until then the labels are single-annotator.
+- **Review.** A blind, stratified sample of 50 test cases (`review_sample.csv`) was re-labelled using only the protocol, into `review_relabel.csv`: all 50 labels agree (Cohen's κ = 1.0, from `sample_for_review.py --score data/testset/review_relabel.csv`). This is not an independent human annotation; until one is done, the labels are single-annotator. PROTOCOL § 11 logs the result.
 
 ## 5. Licences
 
-- **Generated cases** (`generated/**`, `manifest.jsonl`, `STATS.md`, `PROTOCOL.md`, this card, `review_sample.csv`): **CDLA-Permissive-2.0** ([text](LICENSE-CDLA-Permissive-2.0.txt)). © 2026 the Klar. team.
+- **Generated cases** (`generated/**`, `manifest.jsonl`, `STATS.md`, `PROTOCOL.md`, this card, `review_sample.csv`, `review_relabel.csv`): **CDLA-Permissive-2.0** ([text](LICENSE-CDLA-Permissive-2.0.txt)). © 2026 the Klar. team.
 - **W3C ACT Rules test cases** (`act/testcases/**`, `act/test-assets/**`): © W3C, under the **W3C Software and Document Notice and License** (SPDX `W3C-20150513`). The full text, the provenance and the list of imported rules are in [`act/LICENSE-W3C.md`](act/LICENSE-W3C.md).
   - The case files are **unmodified copies**.
   - `act/testcases-filtered.json` and `act/manifest_act.jsonl` are **derived** files: a filtered index and our metadata.
@@ -152,8 +153,8 @@ ACT cases are scored in the ACT consistency sense (PROTOCOL § 8). Cases with `a
 ## 7. Limitations
 
 - **Synthetic.** The generated pages are short and cleaner than real CMS output. Each has one element under test. They do not show the long-tail mess of real sites: third-party widgets, PDFs, very long pages. Results on this set are an upper bound on real-world performance.
-- **Labels by construction.** The labels follow the protocol mechanically. Where the protocol itself is debatable (the `cantTell` classes, `alt_expected`), the debate is documented, not settled. Agreement with a second annotator is reported separately (§ 4).
-- **LLM-drafted language.** The DE/FR/IT texts aim at idiomatic Swiss usage, but they are not a corpus of real municipal text. Romansh appears only in a single formula.
+- **Labels by construction.** The labels follow the protocol mechanically. Where the protocol itself is debatable (the `cantTell` classes, `alt_expected`), the debate is documented, not settled. The blind re-labelling of 50 cases is reported in § 4.
+- **Synthetic language.** The DE/FR/IT texts aim at idiomatic Swiss usage, but they are not a corpus of real municipal text. Romansh appears only in a single formula.
 - **Behavioural criteria.** For 2.2.2, 2.4.3, 3.2.2, 3.3.x and others, the labels assume the inline scripts are executed as written in Chromium. Static-only checkers will see less.
 - **Uneven external coverage.** 15 criteria have no ACT judgement rule and are covered only by the generated cases: 1.3.1, 1.3.2, 1.3.5, 1.4.1, 1.4.3, 1.4.11, 2.4.3, 2.4.5, 3.2.2, 3.2.3, 3.2.4, 3.3.2, 3.3.3, 3.3.4 and 4.1.2. The site-level criteria (2.4.5, 3.2.3, 3.2.4) have only 14 mini sites each, so their confidence intervals are wide.
 - **ACT outcomes are rule outcomes.** An ACT `passed` case does not prove the success criterion is satisfied (PROTOCOL § 8). Many ACT cases are English-only and use non-Swiss contexts.

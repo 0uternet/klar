@@ -9,7 +9,7 @@ import StatusBadge from './StatusBadge.vue'
 import KeyboardHint from './KeyboardHint.vue'
 
 /**
- * One row of the report (UX-3): verdict, a sentence that tells rows apart, and the quoted
+ * One row of the report: verdict, a sentence that tells rows apart, and the quoted
  * element on one line. The criterion is the section heading, so the row does not repeat it.
  * Identical findings come as one row with "×N"; the places are listed in the finding panel.
  * Accept and reject sit on the right, revealed on hover and focus (A and R work too).

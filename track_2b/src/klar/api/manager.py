@@ -12,7 +12,7 @@ from klar.llm import make_backend
 from klar.llm.capabilities import CapabilityCache
 from klar.llm.client import RequestCounter
 from klar.models import Finding, Scan, ScanRequest
-from klar.pipeline import ScanJob, count_outcomes, new_scan, resolve_criteria, run_scan
+from klar.pipeline import ScanControl, ScanJob, count_outcomes, new_scan, resolve_criteria, run_scan
 from klar.store import Store, apply_reviews
 
 log = logging.getLogger(__name__)
@@ -20,6 +20,10 @@ log = logging.getLogger(__name__)
 
 class QueueFull(RuntimeError):
     pass
+
+
+class NotRunning(RuntimeError):
+    """Pause / resume / stop of a scan that is not queued or running."""
 
 
 class EventBus:
@@ -66,6 +70,7 @@ class ScanManager:
     def __init__(self, services: Services, *, max_workers: int = 2):
         self.s = services
         self.live: dict[str, Scan] = {}
+        self.controls: dict[str, ScanControl] = {}
         self.buses: OrderedDict[str, EventBus] = OrderedDict()
         self._lock = threading.Lock()
         self._pool = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="klar-scan")
@@ -74,13 +79,14 @@ class ScanManager:
         if bool(req.url) == bool(req.html):
             raise ValueError("give exactly one of url or html")
         job = ScanJob(url=req.url, html=req.html, ui_lang=req.ui_lang, criteria=req.criteria,
-                      allow_form_submit=allow_form_submit, form_origins=form_origins)
+                      allow_form_submit=allow_form_submit, form_origins=form_origins, control=ScanControl())
         resolve_criteria(job.criteria)  # raises ValueError on unknown criteria
         with self._lock:
             if len(self.live) >= self.s.settings.max_queue:
                 raise QueueFull(f"{len(self.live)} scans queued or running (KLAR_QUEUE_MAX={self.s.settings.max_queue})")
             scan = new_scan(self.s.settings, job, model=self.s.llm.model)
             self.live[scan.id] = scan
+            self.controls[scan.id] = job.control
             bus = EventBus()
             self.buses[scan.id] = bus
             while len(self.buses) > self.KEEP_BUSES:
@@ -112,6 +118,20 @@ class ScanManager:
             self.s.store.save_scan(scan)
             with self._lock:
                 self.live.pop(scan.id, None)
+                self.controls.pop(scan.id, None)
+
+    def control(self, scan_id: str, action: str) -> dict:
+        """action: pause | resume | stop. Takes effect at the scan's next pause point; the
+        worker then publishes a "control" event. Raises NotRunning for a finished scan."""
+        with self._lock:
+            ctl = self.controls.get(scan_id)
+        if ctl is None:
+            raise NotRunning(scan_id)
+        {"pause": ctl.pause, "resume": ctl.resume, "stop": ctl.stop}[action]()
+        bus = self.bus(scan_id)
+        if bus is not None and action == "stop":
+            bus.publish("control", {"scan_id": scan_id, **ctl.state()})
+        return {"scan_id": scan_id, **ctl.state()}
 
     def get(self, scan_id: str) -> Scan | None:
         with self._lock:
@@ -123,6 +143,9 @@ class ScanManager:
                     snap = apply_reviews(snap, self.s.store.reviews_for(scan_id))
                     if snap.stats:
                         count_outcomes(snap)
+                    ctl = self.controls.get(scan_id)
+                    if ctl is not None:  # a page reloaded while the scan is paused shows it
+                        snap.stats.update(ctl.state())
                     return snap
                 except RuntimeError:
                     continue

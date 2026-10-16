@@ -65,7 +65,7 @@ export function classifyStartError(status: number, detail: string, host: string)
 
 /* ---- A check that failed while running (M20–M26) ------------------------------ */
 
-/** Fallback for servers without `stats.error_code`: regexes on `stats.error` (UX-6). */
+/** Fallback for servers without `stats.error_code`: regexes on `stats.error`. */
 export function errorCodeFromText(error: string | null | undefined): ErrorCode {
   const e = error ?? ''
   if (/ScanTimeout|KLAR_SCAN_TIMEOUT/.test(e)) return 'scan_timeout'

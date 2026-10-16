@@ -137,7 +137,7 @@ export function formatDuration(seconds: number): string {
   return new Intl.NumberFormat(tag, { style: 'unit', unit: 'minute', unitDisplay: 'long' }).format(Math.round(seconds / 60))
 }
 
-/** "5 minutes ago", "yesterday" (Recent checks, UX-10). */
+/** "5 minutes ago", "yesterday" (Recent checks). */
 export function formatRelative(iso: string, now = Date.now()): string {
   const d = Date.parse(iso)
   if (Number.isNaN(d)) return iso

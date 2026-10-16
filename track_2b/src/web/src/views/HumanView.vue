@@ -120,7 +120,7 @@ function toggleCheck(code: string) {
 }
 const done = computed(() => all.value.filter((c) => checked.value.has(c.code)).length)
 
-/** UX-16: automatic rules (axe-core) may hit a criterion Klar. does not pre-check. */
+/** Automatic rules (axe-core) may hit a criterion Klar. does not pre-check. */
 function ruleHits(code: string): number {
   return scan.value?.findings.filter((f) => f.criterion === code && (f.outcome === 'failed' || f.outcome === 'cantTell')).length ?? 0
 }

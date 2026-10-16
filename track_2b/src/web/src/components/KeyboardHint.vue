@@ -17,7 +17,7 @@ defineProps<{ keys: string[] }>()
   gap: 3px;
   vertical-align: middle;
 }
-/* UX-27: no key hints on touch screens or small viewports. */
+/* No key hints on touch screens or small viewports. */
 @media (hover: none), (max-width: 767px) {
   .kh {
     display: none;

@@ -9,8 +9,7 @@
 | Datasets we publish (generated test cases, model responses, metadata) | Community Data License Agreement – Permissive 2.0 (CDLA-Permissive-2.0), see [`data/testset/LICENSE-CDLA-Permissive-2.0.txt`](../data/testset/LICENSE-CDLA-Permissive-2.0.txt) |
 | Demo website `data/demo-site/` (fictional municipality, text and images) | CC-BY-4.0; its generator in `scripts/` is Apache-2.0 |
 
-The name "Klar." and its logo are not licensed
-under Apache-2.0 (Apache-2.0 §6 grants no trademark rights).
+The name "Klar." and its logo are not licensed under Apache-2.0 (Apache-2.0 §6 grants no trademark rights).
 
 ## Models (not redistributed in this repository)
 
@@ -25,6 +24,8 @@ under Apache-2.0 (Apache-2.0 §6 grants no trademark rights).
 |---|---|---|---|
 | axe-core (Deque Systems, Inc.) | 4.13.0 | MPL-2.0 | `src/klar/capture/vendor/` (licence, third-party notices and provenance in `SOURCE.txt`) |
 | W3C ACT Rules test cases | see `data/testset/act/` | W3C Software and Document Notice and License | `data/testset/act/` (notice in `LICENSE-W3C.md`) |
+| Natural Earth admin-0 boundaries, 1:50m (outline of Switzerland) | 5.1.2 | Public domain | `docs/report/assets/fig_people.svg` |
+| Material Symbols icons (Google): blind, eyeglasses, keyboard, psychology | — | Apache-2.0 | `docs/report/assets/fig_people.svg` |
 
 ## Python runtime dependencies
 

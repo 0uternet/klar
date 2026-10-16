@@ -6,7 +6,7 @@
 import type { CriterionInfo, Method, Principle } from '@/types'
 import { CRITERIA, understandingUrl } from '@/data/wcag'
 
-/** Grep target: this string must never appear in a production build (P0-5b). */
+/** Grep target: this string must never appear in a production build. */
 export const MOCK_SENTINEL = 'MOCK_SENTINEL: Klar. mock-up data, not a real scan'
 
 const T: Method = 'apertus_text'

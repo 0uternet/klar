@@ -96,7 +96,7 @@ register({
     },
     "c311.mismatch": {
         "en": "The page declares lang=\"{value}\" ({declared}), but almost all of its text is {actual}.",
-        "de": "Die Seite gibt lang=\"{value}\" ({declared}) an, doch fast der ganze Text ist {actual}.",
+        "de": "Die Seite gibt lang=\"{value}\" ({declared}) an, doch fast der ganze Text ist auf {actual}.",
         "fr": "La page déclare lang=\"{value}\" ({declared}), mais presque tout le texte est en {actual}.",
         "it": "La pagina dichiara lang=\"{value}\" ({declared}), ma quasi tutto il testo è in {actual}.",
     },
@@ -107,10 +107,10 @@ register({
         "it": "La lingua dichiarata ({declared}) è la lingua principale del testo.",
     },
     "c311.balanced": {
-        "en": "The page uses {declared} and {other} in about equal amounts. Whether the declared language is the default depends on the reading (most words or first used): a person must decide.",
-        "de": "Die Seite verwendet zwei Sprachen etwa gleich viel ({declared} und {other}). Ob die angegebene Sprache die Standardsprache ist, hängt von der Lesart ab (meiste Wörter oder zuerst verwendet): Eine Person muss entscheiden.",
-        "fr": "La page utilise deux langues à parts à peu près égales ({declared} et {other}). Que la langue déclarée soit la langue par défaut dépend de la lecture (le plus de mots ou la première utilisée) : une personne doit trancher.",
-        "it": "La pagina usa due lingue in misura simile ({declared} e {other}). Se la lingua dichiarata sia quella predefinita dipende dalla lettura (più parole o prima usata): una persona deve decidere.",
+        "en": "The page uses {declared} and {other} in about equal amounts. Whether the declared language counts as the default depends on the definition used (most words or first used): a person must decide.",
+        "de": "Die Seite verwendet zwei Sprachen etwa gleich viel ({declared} und {other}). Ob die angegebene Sprache als Standardsprache gilt, hängt von der verwendeten Definition ab (meiste Wörter oder zuerst verwendet): Eine Person muss entscheiden.",
+        "fr": "La page utilise deux langues à parts à peu près égales ({declared} et {other}). Savoir si la langue déclarée compte comme langue par défaut dépend de la définition retenue (langue la plus présente ou première utilisée) : une personne doit trancher.",
+        "it": "La pagina usa due lingue in misura simile ({declared} e {other}). Se la lingua dichiarata valga come predefinita dipende dalla definizione adottata (più parole o prima usata): una persona deve decidere.",
     },
     "c311.too_little": {
         "en": "The page has too little text to verify its declared language. A person must check.",
@@ -126,7 +126,7 @@ register({
     },
     "c311.apertus_other": {
         "en": "Apertus judged that the text is mainly written in {actual}, not in the declared {declared}.",
-        "de": "Apertus beurteilt, dass der Text hauptsächlich {actual} ist, nicht {declared} wie angegeben.",
+        "de": "Apertus beurteilt, dass der Text hauptsächlich auf {actual} geschrieben ist, nicht auf {declared} wie angegeben.",
         "fr": "Apertus juge que le texte est principalement en {actual}, et non en {declared} comme déclaré.",
         "it": "Apertus giudica che il testo sia soprattutto in {actual}, non in {declared} come dichiarato.",
     },
@@ -138,7 +138,7 @@ register({
     },
     "c311.impact": {
         "en": "Screen readers read the whole page with the wrong voice and pronunciation, which makes it hard to understand.",
-        "de": "Screenreader lesen die ganze Seite mit falscher Stimme und Aussprache vor; sie ist schwer zu verstehen.",
+        "de": "Screenreader lesen die ganze Seite mit falscher Stimme und Aussprache vor; dadurch ist die Seite schwer zu verstehen.",
         "fr": "Les lecteurs d'écran lisent toute la page avec une mauvaise voix et une mauvaise prononciation, ce qui la rend difficile à comprendre.",
         "it": "I lettori di schermo leggono tutta la pagina con la voce e la pronuncia sbagliate, rendendola difficile da capire.",
     },

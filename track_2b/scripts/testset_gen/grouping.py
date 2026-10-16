@@ -1,6 +1,6 @@
 """Template grouping and group-wise dev/test split (stdlib only).
 
-Why: dev and test must not share scenario families (EVAL-1). A prompt tuned on a dev case
+Why: dev and test must not share scenario families. A prompt tuned on a dev case
 must never have seen a near-copy of a test case.
 
 * Every case gets a *signature*: the word set of the text a checker would look at:

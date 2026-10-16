@@ -1,13 +1,14 @@
 # Klar. deployment
 
 Klar. is one web application (FastAPI API + Vue UI + headless Chromium) plus, optionally, an
-inference server for Apertus. It runs in the three target architectures: **(a) on-premise**, **(b) air-gapped**, **(c) sovereign Swiss cloud**.
+inference server for Apertus. It runs in three target architectures:
+**(a) on-premise**, **(b) air-gapped**, **(c) sovereign Swiss cloud**.
 
 ## 0. Two ways to run it, with the same three variables
 
 | Who | How | What it needs |
 |---|---|---|
-| **Judges, evaluators, anyone with Docker** | `make run` from `track_2b/` | Docker (Engine 24+ or Desktop) with Compose v2.24+, and GNU make. Nothing else. CI checks this path end to end (section 9). |
+| **Evaluators, anyone with Docker** | `make run` from `track_2b/` | Docker (Engine 24+ or Desktop) with Compose v2.24+, and GNU make. Nothing else. CI checks this path end to end (section 9). |
 | **Operators who do not run containers** | a native install (section 3d) | Python 3.12+, Node.js 22 to build the UI, and llama.cpp or vLLM for local inference |
 
 Both read the **same configuration**: `LLM_BASE_URL`, `LLM_NAME`, `LLM_API_KEY` (imposed by the
@@ -111,25 +112,17 @@ VLLM_GPU_MEMORY_UTILIZATION=0.92`. If the GPU also drives the desktop, lower the
 bundled model server that is running and healthy is used (`llm-gpu`, then `llm-cpu`), then `.env`.
 `make eval` falls back to replay mode; `make record` refuses to run without a live endpoint.
 
-**One GPU session: record the demo replay and evaluate** (not run by CI). From `track_2b/` on the
-GPU machine (Linux, or WSL2 on Windows), with `HF_TOKEN` in `.env`:
+**Record the demo replay and evaluate on a GPU** (not run by CI). From `track_2b/` on the GPU
+machine (Linux, or WSL2 on Windows), with `HF_TOKEN` in `.env`:
 
 ```sh
-sh deploy/gpu_session.sh
+make run-gpu DEMO=0                                           # Apertus 8B (vLLM) and the app
+make record                                                   # data/replay/*.jsonl + RECORDING.json
+make eval SPLIT=test SYSTEMS=axe,baseline,ours,ours_no_guard,ours_no_context OUT=eval/results/apertus-8b-gpu
 ```
 
-It runs these steps, logs to `var/gpu_session.log`, and remembers finished steps in
-`var/gpu_session.done`, so running it again resumes (`--redo <step>` repeats one step):
-1. **preflight:** driver ≥ 580, GPU visible from a container (NVIDIA Container Toolkit), at least
-   60 GB free, `HF_TOKEN` present unless the weights are cached;
-2. **start:** `make run-gpu DEMO=0`;
-3. **probe:** vLLM healthy, and Klar.'s vision probe answers;
-4. **record:** `make record`;
-5. **eval:** `make eval SPLIT=test OUT=eval/results/apertus-8b-gpu` with all five systems. Without
-   the tag `labels-v1` it runs the dev split and warns loudly;
-6. **hardware:** GPU, driver, CUDA, CPU, RAM and Docker versions in
-   `eval/results/apertus-8b-gpu/HARDWARE.json`;
-7. **summary:** the files to commit (`data/replay/` and the `OUT` folder).
+The test split runs only when `manifest.jsonl` is byte-identical to the tagged `labels-v1`.
+Commit `data/replay/` and the `OUT` folder.
 
 A Swiss-cloud run writes to its own folder: export `LLM_BASE_URL`, `LLM_NAME` and `LLM_API_KEY` in
 the shell (the shell wins over a running local server and over `.env`; the key stays out of the

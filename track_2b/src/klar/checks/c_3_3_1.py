@@ -414,13 +414,13 @@ register({
     },
     "c331.names_field": {
         "en": "After an invalid submission the message “{message}” names the field “{label}”.",
-        "de": "Nach einem ungültigen Absenden nennt die Meldung «{message}» das Feld «{label}».",
+        "de": "Nach dem Absenden mit ungültigen Werten nennt die Meldung «{message}» das Feld «{label}».",
         "fr": "Après un envoi invalide, le message « {message} » nomme le champ « {label} ».",
         "it": "Dopo un invio non valido il messaggio «{message}» nomina il campo «{label}».",
     },
     "c331.presentation_only": {
         "en": "After an invalid submission this field is only marked by colour, border or an icon. No text says what is wrong.",
-        "de": "Nach einem ungültigen Absenden wird dieses Feld nur mit Farbe, Rahmen oder Symbol markiert. Kein Text sagt, was falsch ist.",
+        "de": "Nach dem Absenden mit ungültigen Werten wird dieses Feld nur mit Farbe, Rahmen oder Symbol markiert. Kein Text sagt, was falsch ist.",
         "fr": "Après un envoi invalide, ce champ n'est signalé que par une couleur, une bordure ou une icône. Aucun texte ne dit ce qui ne va pas.",
         "it": "Dopo un invio non valido questo campo è segnalato solo da colore, bordo o icona. Nessun testo dice cosa non va.",
     },
@@ -428,7 +428,7 @@ register({
         "en": "The error text for this field exists but is not visible. Sighted users only see that something is marked.",
         "de": "Der Fehlertext zu diesem Feld existiert, ist aber nicht sichtbar. Sehende Nutzende sehen nur eine Markierung.",
         "fr": "Le texte d'erreur de ce champ existe mais n'est pas visible. Les personnes voyantes ne voient qu'un marquage.",
-        "it": "Il testo di errore di questo campo esiste ma non è visibile. Chi vede nota solo una marcatura.",
+        "it": "Il testo di errore di questo campo esiste ma non è visibile. Chi vede nota solo che qualcosa è evidenziato.",
     },
     "c331.apertus_field_and_problem": {
         "en": "Apertus judged that the message “{message}” names the field and says what is wrong.",
@@ -462,7 +462,7 @@ register({
     },
     "c331.apertus_generic": {
         "en": "The only message after an invalid submission is “{message}”: it names neither the field nor the problem.",
-        "de": "Die einzige Meldung nach einem ungültigen Absenden ist «{message}»: Sie nennt weder das Feld noch das Problem.",
+        "de": "Die einzige Meldung nach dem Absenden mit ungültigen Werten ist «{message}»: Sie nennt weder das Feld noch das Problem.",
         "fr": "Le seul message après un envoi invalide est « {message} » : il ne nomme ni le champ ni le problème.",
         "it": "L'unico messaggio dopo un invio non valido è «{message}»: non nomina né il campo né il problema.",
     },
@@ -486,26 +486,26 @@ register({
     },
     "c331.probe_failed": {
         "en": "Klar. could not complete the test submission of this form (the page did not respond in time). A person must check it.",
-        "de": "Klar. konnte das Testabsenden dieses Formulars nicht abschliessen (die Seite reagierte nicht rechtzeitig). Eine Person muss es prüfen.",
+        "de": "Klar. konnte das testweise Absenden dieses Formulars nicht abschliessen (die Seite reagierte nicht rechtzeitig). Eine Person muss es prüfen.",
         "fr": "Klar. n'a pas pu terminer l'envoi de test de ce formulaire (la page n'a pas répondu à temps). Une personne doit le vérifier.",
         "it": "Klar. non ha potuto completare l'invio di prova di questo modulo (la pagina non ha risposto in tempo). Una persona deve verificarlo.",
     },
     "c331.untested": {
         "en": "Klar. submits forms only on the demo site and on test pages. A person must submit this form with an invalid value and check the error messages.",
-        "de": "Klar. schickt Formulare nur auf der Demo-Site und auf Testseiten ab. Eine Person muss dieses Formular mit einem ungültigen Wert absenden und die Fehlermeldungen prüfen.",
+        "de": "Klar. schickt Formulare nur auf der Demo-Website und auf Testseiten ab. Eine Person muss dieses Formular mit einem ungültigen Wert absenden und die Fehlermeldungen prüfen.",
         "fr": "Klar. n'envoie des formulaires que sur le site de démonstration et les pages de test. Une personne doit envoyer ce formulaire avec une valeur invalide et vérifier les messages d'erreur.",
         "it": "Klar. invia moduli solo sul sito demo e sulle pagine di test. Una persona deve inviare questo modulo con un valore non valido e controllare i messaggi di errore.",
     },
     "c331.impact": {
         "en": "Screen-reader users and people with cognitive disabilities do not learn which field is wrong or why, and may give up.",
         "de": "Screenreader-Nutzende und Menschen mit kognitiven Einschränkungen erfahren nicht, welches Feld falsch ist und warum, und geben eventuell auf.",
-        "fr": "Les utilisateurs de lecteurs d'écran et les personnes avec un handicap cognitif ne savent pas quel champ est faux ni pourquoi, et risquent d'abandonner.",
+        "fr": "Les utilisateurs de lecteurs d'écran et les personnes avec un handicap cognitif ne savent pas quel champ est mal rempli ni pourquoi, et risquent d'abandonner.",
         "it": "Chi usa un lettore di schermo e le persone con disabilità cognitive non sanno quale campo è sbagliato né perché, e possono rinunciare.",
     },
     "c331.impact_ok": {
         "en": "Users learn in text which field is wrong.",
-        "de": "Nutzende erfahren als Text, welches Feld falsch ist.",
-        "fr": "Les utilisateurs apprennent par un texte quel champ est faux.",
+        "de": "Nutzende erfahren in Textform, welches Feld falsch ist.",
+        "fr": "Les utilisateurs apprennent par un texte quel champ est mal rempli.",
         "it": "Gli utenti sanno da un testo quale campo è sbagliato.",
     },
 })

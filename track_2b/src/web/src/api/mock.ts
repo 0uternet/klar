@@ -272,6 +272,15 @@ export const mockApi: KlarApi = {
     }
   },
 
+  async controlScan(id, action) {
+    // The mock-up plays a fixed timeline: it acknowledges the action without changing it.
+    const entry = ensure(id)
+    if (entry.scan.state === 'done' || entry.scan.state === 'error') throw new ApiError(409, 'The scan is not running')
+    const state = { paused: action === 'pause', stopping: action === 'stop' }
+    emit(entry, (h) => h.onControl?.(state))
+    return state
+  },
+
   async patchFinding(id, body) {
     const matches = findFinding(id)
     if (matches.length === 0) throw new ApiError(404, 'Finding not found')

@@ -4,6 +4,7 @@ import { Minus, X } from '@lucide/vue'
 import type { ProgressStep } from '@/types'
 import { KNOWN_STEPS } from '@/types'
 import { formatNumber, t } from '@/i18n'
+import { etaText, stepEta } from '@/lib/eta'
 import CountUp from './CountUp.vue'
 
 /**
@@ -16,10 +17,19 @@ const props = defineProps<{
   steps: ProgressStep[]
   /** The scan ended in error: steps that never ran read "Skipped" (the server does not emit them). */
   failed?: boolean
-  /** Plain title of the failure, shown on the failed step; the raw text stays under Details (UX-6). */
+  /** Plain title of the failure, shown on the failed step; the raw text stays under Details. */
   errorTitle?: string
+  /** Live clock and the arrival time of each step's last event: the time left counts down between events. */
+  now?: number
+  received?: Record<string, number>
+  paused?: boolean
 }>()
 
+/** "about 40 s left" for a running step with a known pace, else nothing. */
+function eta(s: ProgressStep): string {
+  const sec = props.now == null ? null : stepEta(s, props.now, props.received?.[s.step], !!props.paused)
+  return sec == null ? '' : t('scan.eta', { t: etaText(sec) })
+}
 const ordered = computed(() => {
   const known = KNOWN_STEPS.map((k) => props.steps.find((s) => s.step === k) ?? { step: k, state: 'pending', started_at: null, duration_ms: null, detail: null })
   const extra = props.steps.filter((s) => !(KNOWN_STEPS as readonly string[]).includes(s.step))
@@ -54,7 +64,7 @@ function detail(s: ProgressStep): string {
   // The plain failure title goes on the step that failed first, not on every step marked as failed.
   if (s.state === 'error') return ordered.value.find((x) => x.state === 'error') === s ? (props.errorTitle ?? '') : ''
   if (s.state === 'skipped') return t('scan.state.skipped')
-  // UX-21: no count on the axe-core step (its findings arrive later, after extraction).
+  // No count on the axe-core step (its findings arrive later, after extraction).
   // The render step's detail is the page title or address, already the page's H1.
   if (s.step === 'axe' || s.step === 'render') return ''
   return s.detail ?? ''
@@ -93,9 +103,18 @@ function fill(s: ProgressStep): number {
             <span v-if="duration(s)" class="step__time tabular" aria-hidden="true">{{ duration(s) }}</span>
           </Transition>
         </span>
-        <template v-if="s.step === 'apertus' && fraction(s) && s.state !== 'pending' && s.state !== 'skipped'">
+        <template v-if="s.step === 'extract' && s.state === 'running' && fraction(s)">
           <span class="step__detail tabular">
-            {{ questions(fraction(s)!)[0] }}<CountUp :value="fraction(s)![0]" :duration="560" :format="fmt" />{{ questions(fraction(s)!)[1] }}
+            {{ t('scan.checks', { x: fmt(fraction(s)![0]), y: fmt(fraction(s)![1]) }) }}<template v-if="eta(s)"> · {{ eta(s) }}</template>
+          </span>
+          <span class="step__bar" aria-hidden="true">
+            <span class="step__bar-fill" :style="{ transform: `scaleX(${fraction(s)![0] / fraction(s)![1]})` }" />
+          </span>
+        </template>
+        <template v-else-if="s.step === 'apertus' && fraction(s) && s.state !== 'pending' && s.state !== 'skipped'">
+          <span class="step__detail tabular">
+            {{ questions(fraction(s)!)[0] }}<CountUp :value="fraction(s)![0]" :duration="560" :format="fmt" />{{ questions(fraction(s)!)[1]
+            }}<template v-if="eta(s)"> · {{ eta(s) }}</template>
           </span>
           <span class="step__bar" aria-hidden="true">
             <span class="step__bar-fill" :style="{ transform: `scaleX(${fraction(s)![0] / fraction(s)![1]})` }" />

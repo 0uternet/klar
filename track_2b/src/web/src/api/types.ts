@@ -7,6 +7,8 @@ import type {
   Health,
   PatchFindingRequest,
   Scan,
+  ScanControlAction,
+  ScanControlState,
   ScanEventHandlers,
   ScanSummary,
 } from '@/types'
@@ -22,6 +24,8 @@ export interface KlarApi {
   listScans(limit?: number): Promise<ScanSummary[]>
   /** Subscribe to live events. Returns an unsubscribe function. */
   subscribe(id: string, handlers: ScanEventHandlers): () => void
+  /** Pause, resume or stop a running scan (takes effect at its next step, check or question). */
+  controlScan(id: string, action: ScanControlAction): Promise<ScanControlState>
   patchFinding(id: string, body: PatchFindingRequest): Promise<Finding>
   /** Triggers a file download of the export. */
   exportScan(scan: Scan, format: ExportFormat): Promise<void>

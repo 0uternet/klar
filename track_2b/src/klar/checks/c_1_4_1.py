@@ -62,9 +62,9 @@ register({
         "it": "Il link si distingue dal testo circostante non solo per il colore ({cues}).",
     },
     "c141.link_contrast_ok": {
-        "en": "The link has no underline, but its colour differs from the surrounding text by {ratio} (at least 3:1): {link} vs {text}.",
+        "en": "The link has no underline, but its colour has a contrast of {ratio} with the surrounding text (at least 3:1): {link} vs {text}.",
         "de": "Der Link ist nicht unterstrichen, aber seine Farbe unterscheidet sich vom umgebenden Text um {ratio} (mindestens 3:1): {link} gegenüber {text}.",
-        "fr": "Le lien n'est pas souligné, mais sa couleur diffère du texte environnant de {ratio} (au moins 3:1) : {link} contre {text}.",
+        "fr": "Le lien n'est pas souligné, mais le contraste entre sa couleur et celle du texte environnant est de {ratio} (au moins 3:1) : {link} contre {text}.",
         "it": "Il link non è sottolineato, ma il suo colore differisce dal testo circostante di {ratio} (almeno 3:1): {link} rispetto a {text}.",
     },
     "c141.link_colour_only": {
@@ -80,15 +80,15 @@ register({
         "it": "L'elemento attivo si distingue dagli altri non solo per il colore ({cues}).",
     },
     "c141.state_inverted": {
-        "en": "The active item («{on}») is shown only by an inverted colour scheme ({ratio} between active and inactive). Lightness counts as a cue, but with no shape, mark or underline the meaning rests on a convention. A person must decide.",
+        "en": "The active item (“{on}”) is shown only by an inverted colour scheme ({ratio} between active and inactive). Lightness counts as a cue, but with no shape, mark or underline the meaning rests on a convention. A person must decide.",
         "de": "Das aktive Element («{on}») ist nur durch ein umgekehrtes Farbschema erkennbar ({ratio} zwischen aktiv und inaktiv). Helligkeit zählt als Hinweis, ohne Form, Zeichen oder Unterstreichung beruht die Bedeutung aber auf einer Konvention. Eine Person muss entscheiden.",
-        "fr": "L'élément actif («{on}») n'est signalé que par des couleurs inversées ({ratio} entre actif et inactif). La luminosité compte comme indice, mais sans forme, marque ni soulignement, le sens repose sur une convention. Une personne doit trancher.",
+        "fr": "L'élément actif (« {on} ») n'est signalé que par des couleurs inversées ({ratio} entre actif et inactif). La luminosité compte comme indice, mais sans forme, marque ni soulignement, le sens repose sur une convention. Une personne doit trancher.",
         "it": "L'elemento attivo («{on}») è indicato solo da uno schema di colori invertito ({ratio} tra attivo e inattivo). La luminosità conta come indizio, ma senza forma, segno o sottolineatura il significato si basa su una convenzione. Una persona deve decidere.",
     },
     "c141.state_hue_only": {
-        "en": "The active item («{on}») differs from the others only by a colour of similar lightness ({ratio}, 3:1 needed), with no shape, mark or underline.",
+        "en": "The active item (“{on}”) differs from the others only by a colour of similar lightness ({ratio}, 3:1 needed), with no shape, mark or underline.",
         "de": "Das aktive Element («{on}») unterscheidet sich von den anderen nur durch eine Farbe ähnlicher Helligkeit ({ratio}, nötig sind 3:1), ohne Form, Zeichen oder Unterstreichung.",
-        "fr": "L'élément actif («{on}») ne se distingue des autres que par une couleur de luminosité semblable ({ratio}, 3:1 requis), sans forme, marque ni soulignement.",
+        "fr": "L'élément actif (« {on} ») ne se distingue des autres que par une couleur de luminosité semblable ({ratio}, 3:1 requis), sans forme, marque ni soulignement.",
         "it": "L'elemento attivo («{on}») si distingue dagli altri solo per un colore di luminosità simile ({ratio}, serve 3:1), senza forma, segno o sottolineatura.",
     },
     "c141.apertus_colour_only": {
@@ -99,7 +99,7 @@ register({
     },
     "c141.apertus_redundant": {
         "en": "Apertus: colour is used in this {what}, but text, symbols, patterns or labels give the same information.",
-        "de": "Apertus: In diesem Bereich ({what}) wird Farbe verwendet, aber Text, Symbole, Muster oder Beschriftungen geben dieselbe Information.",
+        "de": "Apertus: In diesem Bereich ({what}) wird Farbe verwendet, aber Text, Symbole, Muster oder Beschriftungen vermitteln dieselbe Information.",
         "fr": "Apertus : la couleur est utilisée dans cette zone ({what}), mais du texte, des symboles, des motifs ou des étiquettes donnent la même information.",
         "it": "Apertus: in questa zona ({what}) si usa il colore, ma testo, simboli, motivi o etichette danno la stessa informazione.",
     },
@@ -107,7 +107,7 @@ register({
         "en": "Apertus: the colour in this {what} is decoration or emphasis and carries no information.",
         "de": "Apertus: Die Farbe in diesem Bereich ({what}) ist Dekoration oder Hervorhebung und trägt keine Information.",
         "fr": "Apertus : la couleur de cette zone ({what}) est décorative ou sert à souligner, elle ne porte aucune information.",
-        "it": "Apertus: il colore in questa zona ({what}) è decorazione o enfasi e non porta informazioni.",
+        "it": "Apertus: il colore in questa zona ({what}) è decorazione o enfasi e non trasmette informazioni.",
     },
     "c141.apertus_unclear": {
         "en": "Apertus: the colour in this {what} seems to mean something, but the page does not say what ({facts}). A person must check it.",
@@ -116,10 +116,10 @@ register({
         "it": "Apertus: il colore in questa zona ({what}) sembra significare qualcosa, ma la pagina non dice cosa ({facts}). Una persona deve verificare.",
     },
     "c141.over_cap": {
-        "en": "Colour coding possible here ({facts}), but the per-page limit of image questions is reached. A person must check it.",
-        "de": "Hier ist eine Farbcodierung möglich ({facts}), aber die Höchstzahl an Bildfragen pro Seite ist erreicht. Eine Person muss es prüfen.",
-        "fr": "Un codage par couleur est possible ici ({facts}), mais la limite de questions sur image par page est atteinte. Une personne doit vérifier.",
-        "it": "Qui è possibile una codifica a colori ({facts}), ma il limite di domande su immagini per pagina è raggiunto. Una persona deve verificare.",
+        "en": "Colour may carry information here ({facts}), but the per-page limit of image questions is reached. A person must check it.",
+        "de": "Hier vermittelt Farbe möglicherweise Information ({facts}), aber die Höchstzahl an Bildfragen pro Seite ist erreicht. Eine Person muss es prüfen.",
+        "fr": "La couleur porte peut-être une information ici ({facts}), mais la limite de questions sur image par page est atteinte. Une personne doit vérifier.",
+        "it": "Qui il colore potrebbe trasmettere informazioni ({facts}), ma il limite di domande su immagini per pagina è raggiunto. Una persona deve verificare.",
     },
     "c141.facts": {
         "en": "{marked} of {items} items coloured, {empty} of them without text",
@@ -140,7 +140,7 @@ register({
     "c141.impact": {
         "en": "People who cannot tell these colours apart (colour-vision deficiency, low vision, monochrome screens) miss this information.",
         "de": "Wer diese Farben nicht unterscheiden kann (Farbsehschwäche, Sehbehinderung, Graustufen-Bildschirm), verpasst diese Information.",
-        "fr": "Les personnes qui ne distinguent pas ces couleurs (trouble de la vision des couleurs, malvoyance, écran monochrome) manquent cette information.",
+        "fr": "Les personnes qui ne distinguent pas ces couleurs (trouble de la vision des couleurs, malvoyance, écran monochrome) n'ont pas accès à cette information.",
         "it": "Chi non distingue questi colori (deficit nella visione dei colori, ipovisione, schermo monocromatico) perde questa informazione.",
     },
     "c141.impact_link": {
@@ -163,13 +163,13 @@ register({
     },
     "c141.fix_hint_state": {
         "en": "Add a non-colour mark to the active item: a check mark, an underline, a bold label or a thicker border.",
-        "de": "Ergänzen Sie das aktive Element um ein Merkmal ohne Farbe: ein Häkchen, eine Unterstreichung, fette Schrift oder einen dickeren Rahmen.",
-        "fr": "Ajoutez à l'élément actif une marque sans couleur : une coche, un soulignement, un libellé en gras ou une bordure plus épaisse.",
+        "de": "Ergänzen Sie das aktive Element um ein Merkmal, das nicht auf Farbe beruht: ein Häkchen, eine Unterstreichung, fette Schrift oder einen dickeren Rahmen.",
+        "fr": "Ajoutez à l'élément actif un repère autre que la couleur : une coche, un soulignement, un libellé en gras ou une bordure plus épaisse.",
         "it": "Aggiungete all'elemento attivo un segno non cromatico: un segno di spunta, una sottolineatura, un'etichetta in grassetto o un bordo più spesso.",
     },
     "c141.fix_hint": {
         "en": "Repeat the information that the colour carries in text, a symbol, a pattern or a direct label.",
-        "de": "Wiederholen Sie die Information der Farbe als Text, Symbol, Muster oder direkte Beschriftung.",
+        "de": "Geben Sie die Information, die die Farbe vermittelt, zusätzlich als Text, Symbol, Muster oder direkte Beschriftung wieder.",
         "fr": "Répétez l'information portée par la couleur sous forme de texte, de symbole, de motif ou d'étiquette directe.",
         "it": "Ripetete l'informazione data dal colore con un testo, un simbolo, un motivo o un'etichetta diretta.",
     },

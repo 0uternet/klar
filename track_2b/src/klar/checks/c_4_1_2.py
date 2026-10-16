@@ -248,12 +248,12 @@ register({
         "en": "Apertus judged that this {tag} is itself used as a button or link, but it has no role: screen readers do not announce it as one.",
         "de": "Apertus beurteilt, dass dieses {tag}-Element selbst als Schaltfläche oder Link dient, aber keine Rolle hat: Screenreader kündigen es nicht so an.",
         "fr": "Apertus juge que cet élément {tag} sert lui-même de bouton ou de lien, mais il n'a pas de rôle : les lecteurs d'écran ne l'annoncent pas ainsi.",
-        "it": "Apertus giudica che questo elemento {tag} funga da pulsante o link, ma non ha un ruolo: i lettori di schermo non lo annunciano così.",
+        "it": "Apertus giudica che questo elemento {tag} funga da pulsante o link, ma non ha un ruolo: i lettori di schermo non lo annunciano come tale.",
     },
     "c412.apertus_duplicate": {
         "en": "Apertus judged that this click area repeats a link or button inside it, which assistive technology can use.",
         "de": "Apertus beurteilt, dass diese Klickfläche einen Link oder eine Schaltfläche darin wiederholt, die Hilfsmittel nutzen können.",
-        "fr": "Apertus juge que cette zone cliquable répète un lien ou un bouton qu'elle contient, utilisable par les aides techniques.",
+        "fr": "Apertus juge que cette zone cliquable répète un lien ou un bouton qu'elle contient, utilisable par les technologies d'assistance.",
         "it": "Apertus giudica che quest'area cliccabile ripeta un link o un pulsante al suo interno, usabile dalle tecnologie assistive.",
     },
     "c412.apertus_widget_area": {
@@ -265,18 +265,18 @@ register({
     "c412.click_unsure": {
         "en": "This {tag} reacts to the mouse, touch or keys but has no role. Whether it is used as a button or link is unclear: a person must check it.",
         "de": "Dieses {tag}-Element reagiert auf Maus, Touch oder Tasten, hat aber keine Rolle. Ob es als Schaltfläche oder Link dient, ist unklar: Eine Person muss es prüfen.",
-        "fr": "Cet élément {tag} réagit à la souris, au toucher ou au clavier mais n'a pas de rôle. S'il sert de bouton ou de lien n'est pas clair : une personne doit vérifier.",
+        "fr": "Cet élément {tag} réagit à la souris, au toucher ou au clavier mais n'a pas de rôle. On ne sait pas s'il sert de bouton ou de lien : une personne doit vérifier.",
         "it": "Questo elemento {tag} reagisce a mouse, tocco o tasti ma non ha un ruolo. Se funga da pulsante o link non è chiaro: una persona deve verificare.",
     },
     "c412.hidden_duplicate": {
         "en": "A mouse-only click area hidden from assistive technology and not focusable; it duplicates another control.",
-        "de": "Eine reine Mausfläche, für Hilfsmittel verborgen und nicht fokussierbar; sie doppelt ein anderes Bedienelement.",
-        "fr": "Une zone cliquable pour la souris, masquée aux aides techniques et non focalisable ; elle double un autre contrôle.",
+        "de": "Eine nur per Maus nutzbare Klickfläche, für Hilfsmittel verborgen und nicht fokussierbar; sie doppelt ein anderes Bedienelement.",
+        "fr": "Une zone cliquable pour la souris, masquée aux technologies d'assistance et non focalisable ; elle double un autre contrôle.",
         "it": "Un'area cliccabile solo col mouse, nascosta alle tecnologie assistive e non focalizzabile; duplica un altro controllo.",
     },
     "c412.no_checked": {
         "en": "This custom {role} has no aria-checked: screen readers cannot say whether it is on or off.",
-        "de": "Dieses eigene {role}-Element hat kein aria-checked: Screenreader können nicht sagen, ob es an oder aus ist.",
+        "de": "Dieses selbst gebaute {role}-Element hat kein aria-checked: Screenreader können nicht sagen, ob es an oder aus ist.",
         "fr": "Ce {role} personnalisé n'a pas d'aria-checked : les lecteurs d'écran ne peuvent pas dire s'il est activé.",
         "it": "Questo {role} personalizzato non ha aria-checked: i lettori di schermo non possono dire se è attivo.",
     },
@@ -288,14 +288,14 @@ register({
     },
     "c412.widget_ok": {
         "en": "A custom {role} with an exposed role and name “{name}”.",
-        "de": "Ein eigenes {role}-Element mit vermittelter Rolle und dem Namen «{name}».",
+        "de": "Ein selbst gebautes {role}-Element mit vermittelter Rolle und dem Namen «{name}».",
         "fr": "Un {role} personnalisé avec rôle et nom « {name} » exposés.",
         "it": "Un {role} personalizzato con ruolo e nome «{name}» esposti.",
     },
     "c412.dual_link": {
         "en": "This link navigates and also opens a sub-menu (aria-haspopup / aria-expanded). Whether link or menu button is the right role is disputed: a person must decide.",
         "de": "Dieser Link navigiert und öffnet zugleich ein Untermenü (aria-haspopup / aria-expanded). Ob Link oder Menüschaltfläche die richtige Rolle ist, ist umstritten: Eine Person muss entscheiden.",
-        "fr": "Ce lien navigue et ouvre aussi un sous-menu (aria-haspopup / aria-expanded). Le bon rôle (lien ou bouton de menu) est discuté : une personne doit trancher.",
+        "fr": "Ce lien mène à une page et ouvre aussi un sous-menu (aria-haspopup / aria-expanded). Le bon rôle (lien ou bouton de menu) est discuté : une personne doit trancher.",
         "it": "Questo link naviga e apre anche un sottomenu (aria-haspopup / aria-expanded). Se il ruolo giusto sia link o pulsante di menu è discusso: una persona deve decidere.",
     },
     "c412.details": {
@@ -331,8 +331,8 @@ register({
     "c412.state_missing": {
         "en": "Clicking this control shows or hides content, but it exposes no state (no aria-expanded): screen-reader users do not know whether it is open.",
         "de": "Ein Klick blendet Inhalte ein oder aus, das Element vermittelt aber keinen Zustand (kein aria-expanded): Screenreader-Nutzende wissen nicht, ob es offen ist.",
-        "fr": "Un clic affiche ou masque du contenu, mais le contrôle n'expose aucun état (pas d'aria-expanded) : on ne sait pas s'il est ouvert.",
-        "it": "Un clic mostra o nasconde contenuti, ma il controllo non espone alcuno stato (niente aria-expanded): non si sa se è aperto.",
+        "fr": "Un clic affiche ou masque du contenu, mais le contrôle n'expose aucun état (pas d'aria-expanded) : les utilisateurs de lecteurs d'écran ne savent pas s'il est ouvert.",
+        "it": "Un clic mostra o nasconde contenuti, ma il controllo non espone alcuno stato (niente aria-expanded): chi usa un lettore di schermo non sa se è aperto.",
     },
     "c412.link_toggle": {
         "en": "This link to “#” opens or shows content instead of navigating. Experts disagree whether it needs the button role: a person must decide.",
@@ -347,22 +347,22 @@ register({
         "it": "Questo controllo indica il suo stato solo cambiando nome («{name}»). Gli esperti non concordano: una persona deve decidere.",
     },
     "c412.fragment_only": {
-        "en": "This button only changes the address fragment, like an in-page link. Which role is right is disputed: a person must decide.",
-        "de": "Diese Schaltfläche ändert nur den Adressanker, wie ein Seitenlink. Welche Rolle richtig ist, ist umstritten: Eine Person muss entscheiden.",
-        "fr": "Ce bouton ne change que l'ancre de l'adresse, comme un lien interne. Le bon rôle est discuté : une personne doit trancher.",
-        "it": "Questo pulsante cambia solo l'ancora dell'indirizzo, come un link interno. Il ruolo giusto è discusso: una persona deve decidere.",
+        "en": "This button only changes the part of the address after #, like an in-page link. Which role is right is disputed: a person must decide.",
+        "de": "Diese Schaltfläche ändert nur den Teil der Adresse nach #, wie ein Link innerhalb der Seite. Welche Rolle richtig ist, ist umstritten: Eine Person muss entscheiden.",
+        "fr": "Ce bouton ne change que la partie de l'adresse après #, comme un lien interne. Le bon rôle est discuté : une personne doit trancher.",
+        "it": "Questo pulsante cambia solo la parte dell'indirizzo dopo #, come un link interno. Il ruolo giusto è discusso: una persona deve decidere.",
     },
     "c412.apertus_describes": {
         "en": "Apertus judged that the name “{name}” says what this icon-only control does.",
         "de": "Apertus beurteilt, dass der Name «{name}» sagt, was dieses Symbol-Element tut.",
         "fr": "Apertus juge que le nom « {name} » dit ce que fait ce contrôle à icône.",
-        "it": "Apertus giudica che il nome «{name}» dica cosa fa questo controllo con icona.",
+        "it": "Apertus giudica che il nome «{name}» dica cosa fa questo controllo con sola icona.",
     },
     "c412.apertus_meaningless": {
         "en": "Apertus judged that the name “{name}” does not say what this icon-only control does.",
         "de": "Apertus beurteilt, dass der Name «{name}» nicht sagt, was dieses Symbol-Element tut.",
         "fr": "Apertus juge que le nom « {name} » ne dit pas ce que fait ce contrôle à icône.",
-        "it": "Apertus giudica che il nome «{name}» non dica cosa fa questo controllo con icona.",
+        "it": "Apertus giudica che il nome «{name}» non dica cosa fa questo controllo con sola icona.",
     },
     "c412.apertus_unsure": {
         "en": "Apertus could not decide whether the name “{name}” is meaningful. A person must check it.",
@@ -371,7 +371,7 @@ register({
         "it": "Apertus non ha potuto decidere se il nome «{name}» sia significativo. Una persona deve verificare.",
     },
     "c412.impact": {
-        "en": "Screen-reader and voice users cannot tell what this control is, what it is called or what state it is in.",
+        "en": "Screen-reader and voice-control users cannot tell what this control is, what it is called or what state it is in.",
         "de": "Screenreader- und Sprachsteuerungs-Nutzende erfahren nicht, was dieses Element ist, wie es heisst oder in welchem Zustand es ist.",
         "fr": "Les utilisateurs de lecteurs d'écran ou de commande vocale ne savent pas ce qu'est ce contrôle, son nom ou son état.",
         "it": "Chi usa lettori di schermo o comandi vocali non sa cosa sia questo controllo, come si chiami o in che stato sia.",
@@ -379,7 +379,7 @@ register({
     "c412.impact_ok": {
         "en": "Assistive technology can announce this control's role, name and state.",
         "de": "Hilfsmittel können Rolle, Name und Zustand dieses Elements ansagen.",
-        "fr": "Les aides techniques peuvent annoncer le rôle, le nom et l'état de ce contrôle.",
+        "fr": "Les technologies d'assistance peuvent annoncer le rôle, le nom et l'état de ce contrôle.",
         "it": "Le tecnologie assistive possono annunciare ruolo, nome e stato di questo controllo.",
     },
 })

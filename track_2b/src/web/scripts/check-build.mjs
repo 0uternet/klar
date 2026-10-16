@@ -45,7 +45,7 @@ for (const file of walk(path.join(root, 'src'))) {
   }
 }
 
-// UX-36: no conformance claims in any UI string (all locales) or human-check guide.
+// No conformance claims in any UI string (all locales) or human-check guide.
 const banned = /compliant|certified|score|100 ?%/i
 for (const file of [...walk(path.join(root, 'src/i18n')).filter((f) => /\/(en|de|fr|it)\.ts$/.test(f.replace(/\\/g, '/'))), path.join(root, 'src/data/human-guides.ts')]) {
   const lines = fs.readFileSync(file, 'utf8').split('\n')
@@ -54,7 +54,7 @@ for (const file of [...walk(path.join(root, 'src/i18n')).filter((f) => /\/(en|de
     if (m) errors.push(`${path.relative(root, file)}:${i + 1}: banned word "${m[0]}"`)
   })
 }
-// UX-7: a guide never states what Klar. does.
+// A guide never states what Klar. does.
 {
   const file = path.join(root, 'src/data/human-guides.ts')
   fs.readFileSync(file, 'utf8')

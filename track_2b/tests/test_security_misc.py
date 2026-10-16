@@ -50,7 +50,7 @@ def test_form_probe_submits_nothing_to_other_origins(render_html):
 
 
 def test_prompts_contain_no_test_set_strings():
-    """P0-1: the data owner's leakage check (prompts/lexicons/demo vs the test split)."""
+    """The data owner's leakage check (prompts/lexicons/demo vs the test split)."""
     script = ROOT / "scripts" / "check_leakage.py"
     if not script.is_file() or not (ROOT / "data" / "testset" / "manifest.jsonl").is_file():
         pytest.skip("leakage script or test set not present")

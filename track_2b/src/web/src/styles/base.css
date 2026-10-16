@@ -262,7 +262,7 @@ samp {
 .btn:hover {
   text-decoration: none;
 }
-/* FE-3 (WCAG 1.4.10): on narrow screens a long label wraps instead of widening the page. */
+/* WCAG 1.4.10: on narrow screens a long label wraps instead of widening the page. */
 @media (max-width: 480px) {
   .btn {
     max-width: 100%;

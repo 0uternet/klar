@@ -60,13 +60,13 @@ register({
         "en": "The boundary of this field is hard to see: the best contrast of its border or fill against the surroundings is {ratio} (3:1 needed; border {border}, fill {fill}, outside {outside}).",
         "de": "Der Rand dieses Feldes ist schwer zu erkennen: Der beste Kontrast von Rahmen oder Füllung zur Umgebung beträgt {ratio} (nötig sind 3:1; Rahmen {border}, Füllung {fill}, aussen {outside}).",
         "fr": "Le contour de ce champ est peu visible : le meilleur contraste de sa bordure ou de son fond avec l'entourage est de {ratio} (3:1 requis ; bordure {border}, fond {fill}, extérieur {outside}).",
-        "it": "Il bordo di questo campo è poco visibile: il miglior contrasto del bordo o dello sfondo rispetto all'ambiente è {ratio} (serve 3:1; bordo {border}, sfondo {fill}, esterno {outside}).",
+        "it": "Il bordo di questo campo è poco visibile: il miglior contrasto del bordo o dello sfondo rispetto ai colori circostanti è {ratio} (serve 3:1; bordo {border}, sfondo {fill}, esterno {outside}).",
     },
     "c1411.input_pass": {
         "en": "The boundary of this field has {ratio} against its surroundings (3:1 needed).",
         "de": "Der Rand dieses Feldes hat {ratio} Kontrast zur Umgebung (nötig sind 3:1).",
         "fr": "Le contour de ce champ atteint {ratio} par rapport à son entourage (3:1 requis).",
-        "it": "Il bordo di questo campo ha {ratio} rispetto all'ambiente (serve 3:1).",
+        "it": "Il bordo di questo campo ha {ratio} rispetto ai colori circostanti (serve 3:1).",
     },
     "c1411.inactive": {
         "en": "Inactive (disabled) component: its low contrast ({ratio}) is exempt from 1.4.11.",
@@ -118,15 +118,15 @@ register({
     },
     "c1411.apertus_required": {
         "en": "Apertus: a low-contrast part of this graphic is needed to understand it, and the text does not give the same information ({facts}).",
-        "de": "Apertus: Ein kontrastarmer Teil dieser Grafik ist zum Verständnis nötig, und der Text gibt nicht dieselbe Information ({facts}).",
+        "de": "Apertus: Ein kontrastarmer Teil dieser Grafik ist zum Verständnis nötig, und der Text vermittelt nicht dieselbe Information ({facts}).",
         "fr": "Apertus : une partie peu contrastée de ce graphique est nécessaire pour le comprendre, et le texte ne donne pas la même information ({facts}).",
         "it": "Apertus: una parte poco contrastata di questo grafico è necessaria per capirlo e il testo non dà la stessa informazione ({facts}).",
     },
     "c1411.apertus_labelled": {
-        "en": "Apertus: the low-contrast parts are also given as text (labels or values) in or next to the graphic, so they are not required ({facts}).",
-        "de": "Apertus: Die kontrastarmen Teile sind auch als Text (Beschriftungen oder Werte) in oder neben der Grafik angegeben und daher nicht nötig ({facts}).",
-        "fr": "Apertus : les parties peu contrastées sont aussi données sous forme de texte (étiquettes ou valeurs) dans le graphique ou à côté ; elles ne sont donc pas nécessaires ({facts}).",
-        "it": "Apertus: le parti poco contrastate sono date anche come testo (etichette o valori) nel grafico o accanto, quindi non sono necessarie ({facts}).",
+        "en": "Apertus: the low-contrast parts are also given as text (labels or values) in or next to the graphic, so they are not needed to understand it ({facts}).",
+        "de": "Apertus: Die kontrastarmen Teile sind auch als Text (Beschriftungen oder Werte) in oder neben der Grafik angegeben und daher zum Verständnis nicht nötig ({facts}).",
+        "fr": "Apertus : les parties peu contrastées sont aussi données sous forme de texte (étiquettes ou valeurs) dans le graphique ou à côté ; elles ne sont donc pas nécessaires pour le comprendre ({facts}).",
+        "it": "Apertus: le parti poco contrastate sono date anche come testo (etichette o valori) nel grafico o accanto, quindi non sono necessarie per capirlo ({facts}).",
     },
     "c1411.apertus_decorative": {
         "en": "Apertus: this graphic is decorative and conveys no information ({facts}).",
@@ -153,22 +153,28 @@ register({
         "it": "Parti di questo grafico sono sotto 3:1 ({facts}), ma il limite di domande su immagini per pagina è raggiunto. Una persona deve verificare.",
     },
     "c1411.impact": {
-        "en": "People with low vision may not see this control or graphic part, or may not find where to click or type.",
-        "de": "Menschen mit Sehbehinderung sehen dieses Bedienelement oder diesen Grafikteil eventuell nicht und finden nicht, wo sie klicken oder tippen sollen.",
-        "fr": "Les personnes malvoyantes risquent de ne pas voir ce contrôle ou cette partie graphique, ni où cliquer ou saisir.",
-        "it": "Le persone ipovedenti potrebbero non vedere questo controllo o questa parte grafica, né dove cliccare o scrivere.",
+        "en": "People with low vision may not see this control, so they may not find where to click or type.",
+        "de": "Menschen mit Sehbehinderung sehen dieses Bedienelement womöglich nicht und finden nicht, wo sie klicken oder tippen sollen.",
+        "fr": "Les personnes malvoyantes risquent de ne pas voir ce contrôle, et donc de ne pas trouver où cliquer ou saisir.",
+        "it": "Le persone ipovedenti potrebbero non vedere questo controllo e non trovare dove cliccare o scrivere.",
+    },
+    "c1411.impact_graphic": {
+        "en": "People with low vision may miss the parts of this graphic that carry its information.",
+        "de": "Menschen mit Sehbehinderung übersehen womöglich die Teile dieser Grafik, die die Information tragen.",
+        "fr": "Les personnes malvoyantes risquent de ne pas voir les parties de ce graphique qui portent l'information.",
+        "it": "Le persone ipovedenti potrebbero non vedere le parti di questo grafico che trasmettono l'informazione.",
     },
     "c1411.impact_focus": {
         "en": "Keyboard users with low vision may lose track of where the focus is.",
-        "de": "Tastaturnutzende mit Sehbehinderung verlieren eventuell den Überblick, wo der Fokus ist.",
+        "de": "Tastatur-Nutzende mit Sehbehinderung verlieren eventuell den Überblick, wo der Fokus ist.",
         "fr": "Les personnes malvoyantes qui naviguent au clavier risquent de perdre de vue où se trouve le focus.",
         "it": "Chi naviga con la tastiera e ha un'ipovisione potrebbe perdere di vista dove si trova il focus.",
     },
     "c1411.impact_ok": {
-        "en": "People with low vision can make out this component or graphic.",
-        "de": "Menschen mit Sehbehinderung können dieses Element oder diese Grafik erkennen.",
-        "fr": "Les personnes malvoyantes peuvent distinguer ce composant ou ce graphique.",
-        "it": "Le persone ipovedenti possono distinguere questo componente o grafico.",
+        "en": "The measured parts stand out enough for people with low vision to see them.",
+        "de": "Die gemessenen Teile heben sich genügend ab, damit Menschen mit Sehbehinderung sie erkennen können.",
+        "fr": "Les parties mesurées ressortent assez pour que les personnes malvoyantes les voient.",
+        "it": "Le parti misurate si distinguono abbastanza perché le persone ipovedenti le vedano.",
     },
     "c1411.impact_exempt": {
         "en": "No contrast requirement applies here.",
@@ -185,7 +191,7 @@ register({
     "c1411.fix_hint_graphic": {
         "en": "Darken the low-contrast parts to at least 3:1, or write their information as text (labels, values) in or next to the graphic.",
         "de": "Dunkeln Sie die kontrastarmen Teile auf mindestens 3:1 ab oder schreiben Sie ihre Information als Text (Beschriftungen, Werte) in oder neben die Grafik.",
-        "fr": "Foncez les parties peu contrastées jusqu'à au moins 3:1, ou donnez leur information en texte (étiquettes, valeurs) dans le graphique ou à côté.",
+        "fr": "Assombrissez les parties peu contrastées jusqu'à au moins 3:1, ou donnez leur information en texte (étiquettes, valeurs) dans le graphique ou à côté.",
         "it": "Scurite le parti poco contrastate fino ad almeno 3:1, oppure date la loro informazione come testo (etichette, valori) nel grafico o accanto.",
     },
     "c1411.ind.outline": {"en": "outline", "de": "Umriss", "fr": "contour", "it": "contorno"},
@@ -470,7 +476,7 @@ class NonTextContrast(BaseCheck):
         if cat not in CATEGORY_OUTCOME:
             cat = "unclear"
         outcome = CATEGORY_OUTCOME[cat]
-        impact = {"failed": "c1411.impact", "passed": "c1411.impact_ok"}.get(outcome, "impact.review")
+        impact = {"failed": "c1411.impact_graphic", "passed": "c1411.impact_ok"}.get(outcome, "impact.review")
         quote = (answer.get("quote") or "").strip()
         excerpt = quote or (c.accessible_name if c.accessible_name and c.accessible_name in c.html else c.html[:300])
         return self.finding(c, outcome=outcome, source="apertus",

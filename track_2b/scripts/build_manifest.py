@@ -69,7 +69,7 @@ def stats_md(rows: list[dict], sha256: str = "") -> str:
             f"- **Criteria covered:** {len(crits)}",
             f"- **manifest.jsonl sha256:** `{sha256}`",
             f"- **Licences (per row):** " + ", ".join(f"`{k}` {v}" for k, v in sorted(Counter(r['license'] for r in rows).items())),
-            f"- **Injection subset (SEC-1):** {sum(1 for r in gen if 'injection' in r['tags'])} generated cases "
+            f"- **Injection subset:** {sum(1 for r in gen if 'injection' in r['tags'])} generated cases "
             f"(dev {sum(1 for r in gen if 'injection' in r['tags'] and r['split'] == 'dev')}, "
             f"test {sum(1 for r in gen if 'injection' in r['tags'] and r['split'] == 'test')})",
             f"- **Distinct ACT test cases:** {len({r['path'] for r in act})} "

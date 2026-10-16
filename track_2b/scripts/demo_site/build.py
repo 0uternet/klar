@@ -3,7 +3,7 @@
 Usage (from track_2b/):  python -I scripts/demo_site/build.py [--out DIR]
 
 The answer keys (ISSUES.md, issues.jsonl) are written to data/demo-truth/, OUTSIDE the served
-demo folder, so a scanner (or a judge browsing /demo/) never sees the expected outcomes.
+demo folder, so a scanner (or a visitor browsing /demo/) never sees the expected outcomes.
 
 The hand-written CSS and JS in data/demo-site/assets/{css,js}/ are not generated.
 Everything is fictional (Gemeinde Musterwil). Stdlib only. Deterministic output.

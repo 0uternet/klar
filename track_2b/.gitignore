@@ -33,7 +33,3 @@ var/
 models/
 .pytest_cache/
 *.egg-info/
-
-# Local developer helpers, not part of the submission
-run.ps1
-run-native.sh

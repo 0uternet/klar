@@ -1,0 +1,67 @@
+{
+  "model": "swiss-ai/Apertus-v1.5-8B",
+  "served_models": [
+    {
+      "id": "swiss-ai/Apertus-v1.5-8B",
+      "root": "swiss-ai/Apertus-v1.5-8B",
+      "owned_by": "vllm",
+      "max_model_len": 32768
+    }
+  ],
+  "revision": "ef4bbc54d6fe658bc782280ff9f3b53a10a9758f",
+  "revision_source": "huggingface cache refs/main of the host vLLM server (HF_HUB_OFFLINE=1)",
+  "endpoint_host": "host.docker.internal",
+  "mode": "local",
+  "recorded_at": "2026-10-16T01:06:36+00:00",
+  "klar_commit": "b9ae6434281fb6eec71aec14588a132f2579cc9f",
+  "klar_commit_dirty": true,
+  "klar_version": "0.1.0",
+  "record": {
+    "pages": 34,
+    "errors": 0,
+    "failed": 754,
+    "cantTell": 283,
+    "passed": 2193,
+    "not_recorded": 0,
+    "llm_errors": 0,
+    "llm_calls": 408,
+    "tokens_in": 247894,
+    "tokens_out": 23231,
+    "replay_loose_hits": 0,
+    "ai_requests": {
+      "local": 408,
+      "swiss_cloud": 0,
+      "external": 0
+    }
+  },
+  "record_exit_code": 0,
+  "replay_check": {
+    "ok": true,
+    "summary": "replay-check (fresh replay, exact keys): OK · mode=replay · model=swiss-ai/Apertus-v1.5-8B · pages=34 · errors=0 · failed=754 · review=283 · passed=2193 · not_recorded=0 · llm_errors=0 · loose_hits=0 · ai_requests=local 0, swiss_cloud 0, external 0",
+    "pages": 34,
+    "errors": 0,
+    "failed": 754,
+    "cantTell": 283,
+    "passed": 2193,
+    "not_recorded": 0,
+    "llm_errors": 0,
+    "llm_calls": 0,
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "replay_loose_hits": 0,
+    "ai_requests": {
+      "local": 0,
+      "swiss_cloud": 0,
+      "external": 0
+    }
+  },
+  "files": {
+    "swiss-ai-apertus-v1.5-8b.jsonl": 407
+  },
+  "records_total": 407,
+  "appended_later": {
+    "klar eval --split test": 863,
+    "klar eval --split dev": 215,
+    "live scans of the two real pages offered on the home page": 82
+  }
+}

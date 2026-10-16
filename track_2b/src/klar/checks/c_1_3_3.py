@@ -146,10 +146,10 @@ register({
         "it": "L'istruzione nomina l'elemento solo con un nome non visibile sullo schermo. Gli esperti non concordano: una persona deve decidere.",
     },
     "c133.apertus_purpose_only": {
-        "en": "The instruction gives the purpose of the control, which only overlaps its visible label. Whether that names it is a judgement call: a person must decide.",
-        "de": "Die Anleitung nennt den Zweck des Bedienelements, der sich nur teilweise mit seiner Beschriftung deckt. Ob es damit benannt ist, muss eine Person entscheiden.",
-        "fr": "La consigne indique le but du contrôle, qui ne recoupe qu'en partie son libellé visible. Une personne doit décider si cela suffit à le nommer.",
-        "it": "L'istruzione indica lo scopo del comando, che coincide solo in parte con la sua etichetta visibile. Una persona deve decidere se basta a nominarlo.",
+        "en": "The instruction gives the purpose of the control, which only partly matches its visible label. Whether that identifies it is a judgement call: a person must decide.",
+        "de": "Die Anleitung nennt den Zweck des Bedienelements, der sich nur teilweise mit seiner sichtbaren Beschriftung deckt. Ob es damit bestimmt ist, ist Ermessenssache: Eine Person muss entscheiden.",
+        "fr": "La consigne indique le but du contrôle, qui ne recoupe qu'en partie son libellé visible. Une personne doit décider si cela suffit à l'identifier.",
+        "it": "L'istruzione indica lo scopo del comando, che coincide solo in parte con la sua etichetta visibile. Se basti a identificarlo è una questione di giudizio: una persona deve decidere.",
     },
     "c133.apertus_not_instruction": {
         "en": "Apertus judged that the sensory words describe the physical world or decoration, not how to use the page.",
@@ -159,8 +159,8 @@ register({
     },
     "c133.apertus_visible_ungrounded": {
         "en": "Apertus says the instruction names the item by its visible text, but it contains none of the visible texts of the nearby controls. A person must check whether it relies on shape, colour or position only.",
-        "de": "Apertus meint, die Anleitung nenne das Element über seinen sichtbaren Text, doch sie enthält keinen sichtbaren Text der Bedienelemente in der Nähe. Eine Person muss prüfen, ob sie sich nur auf Form, Farbe oder Position stützt.",
-        "fr": "Apertus estime que la consigne nomme l'élément par son texte visible, mais elle ne contient aucun texte visible des commandes voisines. Une personne doit vérifier si elle repose uniquement sur la forme, la couleur ou la position.",
+        "de": "Apertus meint, die Anleitung nenne das Element mit seinem sichtbaren Text, doch sie enthält keinen sichtbaren Text der Bedienelemente in der Nähe. Eine Person muss prüfen, ob sie sich nur auf Form, Farbe oder Position stützt.",
+        "fr": "Apertus estime que la consigne nomme l'élément par son texte visible, mais elle ne contient aucun texte visible des contrôles voisins. Une personne doit vérifier si elle repose uniquement sur la forme, la couleur ou la position.",
         "it": "Apertus ritiene che l'istruzione nomini l'elemento con il suo testo visibile, ma non contiene alcun testo visibile dei comandi vicini. Una persona deve verificare se si basa solo su forma, colore o posizione.",
     },
     "c133.apertus_unsure": {
@@ -179,7 +179,7 @@ register({
         "it": "Le persone cieche o ipovedenti non trovano l'elemento con questa istruzione, perché non ne percepiscono forma, colore o posizione.",
     },
     "c133.impact_ok": {
-        "en": "Everyone can follow this instruction, also without seeing or hearing the cue.",
+        "en": "Everyone can follow this instruction, even without seeing or hearing the cue.",
         "de": "Alle können dieser Anleitung folgen, auch ohne das Merkmal zu sehen oder zu hören.",
         "fr": "Tout le monde peut suivre cette consigne, même sans voir ni entendre le repère.",
         "it": "Tutti possono seguire questa istruzione, anche senza vedere o sentire il segnale.",

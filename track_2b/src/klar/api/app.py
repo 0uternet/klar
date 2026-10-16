@@ -25,7 +25,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from klar import __version__
-from klar.api.manager import QueueFull, Services
+from klar.api.manager import NotRunning, QueueFull, Services
 from klar.checks import registry
 from klar.config import Settings
 from klar.models import CriterionInfo, Finding, FindingPatch, Health, Scan, ScanCreated, ScanRequest
@@ -189,6 +189,32 @@ def create_app(settings: Settings | None = None, *, services: Services | None = 
         if scan is None:
             raise HTTPException(404, "scan not found")
         return scan
+
+    def control(scan_id: str, action: str) -> dict:
+        if not SCAN_ID.match(scan_id):
+            raise HTTPException(404, "scan not found")
+        try:
+            return svc.scans.control(scan_id, action)
+        except NotRunning as exc:
+            if svc.scans.get(scan_id) is None:
+                raise HTTPException(404, "scan not found") from exc
+            raise HTTPException(409, "the scan is not running") from exc
+
+    @app.post("/api/scans/{scan_id}/pause")
+    def pause_scan(scan_id: str) -> dict:
+        """Pause at the next step, check or model question. The paused time does not count
+        against KLAR_SCAN_TIMEOUT."""
+        return control(scan_id, "pause")
+
+    @app.post("/api/scans/{scan_id}/resume")
+    def resume_scan(scan_id: str) -> dict:
+        return control(scan_id, "resume")
+
+    @app.post("/api/scans/{scan_id}/stop")
+    def stop_scan(scan_id: str) -> dict:
+        """Stop at the next step, check or model question; the scan ends "done" with the
+        findings so far, and the elements not judged are noted "stopped"."""
+        return control(scan_id, "stop")
 
     @app.get("/api/scans/{scan_id}/files/{name}")
     def scan_file(scan_id: str, name: str) -> FileResponse:

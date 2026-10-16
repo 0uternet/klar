@@ -107,7 +107,7 @@ register({
     "c222.decorative": {
         "en": "Content without text moves for more than 5 seconds. Whether decorative motion needs a pause control is debated.",
         "de": "Inhalt ohne Text bewegt sich länger als 5 Sekunden. Ob dekorative Bewegung eine Pause-Möglichkeit braucht, ist umstritten.",
-        "fr": "Un contenu sans texte bouge plus de 5 secondes. Qu'un mouvement décoratif exige une pause est débattu.",
+        "fr": "Un contenu sans texte bouge plus de 5 secondes. La nécessité d'une pause pour un mouvement décoratif est débattue.",
         "it": "Un contenuto senza testo si muove per più di 5 secondi. Se un movimento decorativo richieda una pausa è controverso.",
     },
     "c222.verified": {
@@ -119,7 +119,7 @@ register({
     "c222.reduced_only": {
         "en": "The motion stops only when the browser asks for reduced motion; the page itself offers no control. Whether that counts as a mechanism is disputed.",
         "de": "Die Bewegung stoppt nur, wenn der Browser reduzierte Bewegung verlangt; die Seite selbst bietet kein Bedienelement. Ob das als Mechanismus gilt, ist umstritten.",
-        "fr": "Le mouvement ne s'arrête que si le navigateur demande un mouvement réduit ; la page n'offre aucun contrôle. Que cela compte comme mécanisme est contesté.",
+        "fr": "Le mouvement ne s'arrête que si le navigateur demande un mouvement réduit ; la page n'offre aucun contrôle. Cela compte-t-il comme mécanisme ? Les avis divergent.",
         "it": "Il movimento si ferma solo se il browser chiede movimento ridotto; la pagina non offre alcun comando. Se ciò valga come meccanismo è controverso.",
     },
     "c222.settings_link": {
@@ -130,7 +130,7 @@ register({
     },
     "c222.not_tested_external": {
         "en": "Not tested on external sites: Klar. clicks controls only on the demo and test pages. A person must check that \"{control}\" pauses or stops this moving content.",
-        "de": "Auf externen Websites nicht getestet: Klar. klickt Bedienelemente nur auf der Demo und den Testseiten. Eine Person muss prüfen, dass «{control}» diesen bewegten Inhalt anhält oder stoppt.",
+        "de": "Auf externen Websites nicht getestet: Klar. klickt Bedienelemente nur auf der Demo-Website und auf Testseiten. Eine Person muss prüfen, ob «{control}» diesen bewegten Inhalt anhält oder stoppt.",
         "fr": "Non testé sur les sites externes : Klar. ne clique sur des contrôles que sur la démo et les pages de test. Une personne doit vérifier que « {control} » met en pause ou arrête ce contenu en mouvement.",
         "it": "Non verificato sui siti esterni: Klar. clicca sui comandi solo sulla demo e sulle pagine di test. Una persona deve verificare che «{control}» metta in pausa o fermi questo contenuto in movimento.",
     },
@@ -181,7 +181,7 @@ register({
     },
     "c222.apertus_none": {
         "en": "Apertus judged that none of the controls next to this moving content pauses, stops or hides it.",
-        "de": "Apertus beurteilt, dass keines der Bedienelemente bei diesem bewegten Inhalt ihn anhält, stoppt oder ausblendet.",
+        "de": "Apertus beurteilt, dass sich dieser bewegte Inhalt mit keinem der Bedienelemente daneben anhalten, stoppen oder ausblenden lässt.",
         "fr": "Selon Apertus, aucun des contrôles proches de ce contenu en mouvement ne le met en pause, ne l'arrête ni ne le masque.",
         "it": "Secondo Apertus nessuno dei comandi vicini a questo contenuto in movimento lo mette in pausa, lo ferma o lo nasconde.",
     },
@@ -205,7 +205,7 @@ register({
     },
     "c222.fix": {
         "en": "Add a visible pause button in or next to the moving content that stops it until the user restarts it.",
-        "de": "Fügen Sie im oder neben dem bewegten Inhalt eine sichtbare Pause-Schaltfläche hinzu, die ihn stoppt, bis er wieder gestartet wird.",
+        "de": "Fügen Sie in oder neben dem bewegten Inhalt eine sichtbare Pause-Schaltfläche hinzu, die ihn stoppt, bis er wieder gestartet wird.",
         "fr": "Ajoutez dans ou à côté du contenu en mouvement un bouton pause visible qui l'arrête jusqu'à ce que l'utilisateur le relance.",
         "it": "Aggiungete nel contenuto in movimento o accanto un pulsante pausa visibile che lo ferma finché l'utente non lo riavvia.",
     },

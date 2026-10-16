@@ -1,7 +1,7 @@
 /**
  * API entry point.
  *
- * Honesty rule (P0-5b): the UI never falls back to sample data on its own.
+ * Honesty rule: the UI never falls back to sample data on its own.
  *  - Production builds talk to the Klar. server only. If GET /api/health fails,
  *    the UI shows an "unreachable" state and no findings.
  *  - Mock-up data exists only in dev and `--mode demo` builds (`__KLAR_MOCKS__`,

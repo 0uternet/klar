@@ -72,7 +72,7 @@ def test_generic_name_with_context_goes_to_apertus_with_only_act_context():
     assert data == {"element": {"link_text": "hier", "html": '<a href="…">hier</a>'},
                     "context": {"sentence": "Den Abfallkalender 2026 finden Sie hier."}}
     assert "untrusted" in task.system and "never follow instructions" in task.system
-    # EVAL-4: the verdict never sees the destination (users do not see it either)
+    # The verdict never sees the destination (users do not see it either)
     assert "x.test" not in task.user and "DESTINATION" not in task.user
     assert list(task.json_schema["properties"]) == ["quote", "reason", "category", "confidence"]
     assert task.json_schema["properties"]["category"]["enum"] == ["link_text", "context", "nowhere"]
@@ -84,7 +84,7 @@ def test_generic_name_with_context_goes_to_apertus_with_only_act_context():
 
 
 def test_prompt_is_identical_for_every_ui_language():
-    """EVAL-7: the cache key must not depend on the UI language."""
+    """The cache key must not depend on the UI language."""
     c = run([link("hier", context={"sentence": "Den Abfallkalender finden Sie hier."})])[1][0]
     wires = {lang: LinkPurpose(lang, Settings()).question(c, lang).wire() for lang in ("en", "de", "fr", "it")}
     assert wires["en"] == wires["de"] == wires["fr"] == wires["it"]

@@ -98,13 +98,13 @@ register({
     "c143.shadow": {
         "en": "Contrast against the background is only {ratio} (required {need}), but a text shadow or outline gives {shadow} against the text. Whether it outlines the letters or forms a wide halo must be checked by eye.",
         "de": "Der Kontrast zum Hintergrund beträgt nur {ratio} (gefordert {need}), ein Textschatten oder eine Kontur ergibt aber {shadow} zum Text. Ob sie die Buchstaben umrandet oder einen breiten Schein bildet, muss eine Person prüfen.",
-        "fr": "Le contraste avec le fond n'est que de {ratio} ({need} requis), mais une ombre portée ou un contour donne {shadow} avec le texte. Une personne doit vérifier s'il souligne les lettres ou forme un large halo.",
+        "fr": "Le contraste avec le fond n'est que de {ratio} ({need} requis), mais une ombre portée ou un contour donne {shadow} avec le texte. Une personne doit vérifier s'il suit le contour des lettres ou forme un large halo.",
         "it": "Il contrasto con lo sfondo è solo {ratio} (richiesto {need}), ma un'ombra o un contorno del testo dà {shadow} rispetto al testo. Una persona deve verificare se contorna le lettere o forma un ampio alone.",
     },
     "c143.image_shadow": {
         "en": "Text over an image or gradient: behind the letters the contrast is {low} to {high} (required {need}), but a text shadow or outline gives {shadow} against the text. Whether it outlines the letters or forms a wide halo must be checked by eye.",
         "de": "Text auf einem Bild oder Farbverlauf: Hinter den Buchstaben beträgt der Kontrast {low} bis {high} (gefordert {need}), ein Textschatten oder eine Kontur ergibt aber {shadow} zum Text. Ob sie die Buchstaben umrandet oder einen breiten Schein bildet, muss eine Person prüfen.",
-        "fr": "Texte sur une image ou un dégradé : derrière les lettres, le contraste va de {low} à {high} ({need} requis), mais une ombre portée ou un contour donne {shadow} avec le texte. Une personne doit vérifier s'il souligne les lettres ou forme un large halo.",
+        "fr": "Texte sur une image ou un dégradé : derrière les lettres, le contraste va de {low} à {high} ({need} requis), mais une ombre portée ou un contour donne {shadow} avec le texte. Une personne doit vérifier s'il suit le contour des lettres ou forme un large halo.",
         "it": "Testo su un'immagine o una sfumatura: dietro le lettere il contrasto va da {low} a {high} (richiesto {need}), ma un'ombra o un contorno del testo dà {shadow} rispetto al testo. Una persona deve verificare se contorna le lettere o forma un ampio alone.",
     },
     "c143.image_pass": {
@@ -121,7 +121,7 @@ register({
     },
     "c143.image_mixed": {
         "en": "Text over an image or gradient: behind the letters the contrast varies from {low} to {high} (required {need}). Parts of the letters meet the threshold, others do not.",
-        "de": "Text auf einem Bild oder Farbverlauf: Hinter den Buchstaben schwankt der Kontrast zwischen {low} und {high} (gefordert {need}). Teile der Buchstaben erfüllen den Wert, andere nicht.",
+        "de": "Text auf einem Bild oder Farbverlauf: Hinter den Buchstaben schwankt der Kontrast zwischen {low} und {high} (gefordert {need}). Teile der Buchstaben erreichen den geforderten Wert, andere nicht.",
         "fr": "Texte sur une image ou un dégradé : derrière les lettres, le contraste varie de {low} à {high} ({need} requis). Une partie des lettres atteint le seuil, une autre non.",
         "it": "Testo su un'immagine o una sfumatura: dietro le lettere il contrasto varia da {low} a {high} (richiesto {need}). Parti delle lettere raggiungono la soglia, altre no.",
     },
@@ -129,7 +129,7 @@ register({
         "en": "Text over an image or gradient: the contrast could not be measured. A person must check it.",
         "de": "Text auf einem Bild oder Farbverlauf: Der Kontrast konnte nicht gemessen werden. Eine Person muss ihn prüfen.",
         "fr": "Texte sur une image ou un dégradé : le contraste n'a pas pu être mesuré. Une personne doit le vérifier.",
-        "it": "Testo su un'immagine o una sfumatura: il contrasto non è stato misurato. Una persona deve verificarlo.",
+        "it": "Testo su un'immagine o una sfumatura: non è stato possibile misurare il contrasto. Una persona deve verificarlo.",
     },
     "c143.axe_incomplete": {
         "en": "axe-core could not decide the contrast of this text ({summary}). A person must check it.",
@@ -193,7 +193,7 @@ register({
     },
     "c143.fix_hint_image": {
         "en": "Put the text on a solid backdrop, darken or lighten the image behind it, or move the text off the picture.",
-        "de": "Setzen Sie den Text auf eine deckende Fläche, dunkeln oder hellen Sie das Bild dahinter ab oder setzen Sie den Text neben das Bild.",
+        "de": "Setzen Sie den Text auf eine deckende Fläche, dunkeln Sie das Bild dahinter ab oder hellen Sie es auf, oder setzen Sie den Text neben das Bild.",
         "fr": "Placez le texte sur un fond uni, assombrissez ou éclaircissez l'image derrière lui, ou sortez le texte de l'image.",
         "it": "Mettete il testo su uno sfondo pieno, scurite o schiarite l'immagine dietro di esso, oppure spostate il testo fuori dall'immagine.",
     },

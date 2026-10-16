@@ -28,7 +28,7 @@ const evaluated = (code: string): boolean => statuses.value.get(code)?.evaluated
 /**
  * A criterion Klar. does not pre-check (planned, human or unknown) never shows a
  * failure marker, even when axe-core rules hit it: it gets a neutral "flagged by
- * automatic rules" marker instead, without claiming coverage (UX-7/UX-16).
+ * automatic rules" marker instead, without claiming coverage.
  */
 const prechecks = (code: string): boolean => !['planned', 'human', 'unknown'].includes(kind(code))
 const ruleHits = (code: string): number => {

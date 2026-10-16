@@ -40,7 +40,7 @@ const loading = ref(true)
 const notFound = ref(false)
 const loadError = ref<string | null>(null)
 
-/** H1 = the page title, the URL as a linked fact under it (UX-11). */
+/** H1 = the page title, the URL as a linked fact under it. */
 const head = computed(() => (scan.value ? scanTitle(scan.value) : null))
 const headTitle = computed(() => head.value?.title ?? t('report.pastedHtml'))
 /** The address shown under the H1, unless the H1 already is that address. */
@@ -84,7 +84,7 @@ const counts = computed(() => {
   for (const f of findings.value) c[f.outcome]++
   return c
 })
-/** UX-4: the review scope is Failed + Needs review; passed rows never need a decision. */
+/** The review scope is Failed + Needs review; passed rows never need a decision. */
 const progress = computed(() => reviewProgress(findings.value))
 const remaining = computed(() => progress.value.total - progress.value.done)
 /** Who pre-checked the review scope: code (rules and patterns) or Apertus. */
@@ -105,7 +105,7 @@ const tokens = computed(() => {
     : null
 })
 
-/* ---- Problems and run notes (UX-2, UX-6, UX-23) ------------------------------- */
+/* ---- Problems and run notes ------------------------------- */
 
 const notes = computed(() => (scan.value ? runNotes(scan.value, findings.value, isDemoUrl(scan.value.url)) : []))
 
@@ -184,7 +184,7 @@ const filtered = computed(() => {
 })
 
 /**
- * Criterion sections (UX-4): most failures first. Each holds its rows to review;
+ * Criterion sections: most failures first. Each holds its rows to review;
  * passed and not-applicable rows fold into "{n} with no problem".
  */
 const showAllOk = ref(false)
@@ -489,7 +489,7 @@ function reload() {
 }
 
 const panelOpen = computed(() => !!selected.value)
-/** Below 1280 px the panel is a modal dialog (UX-14). */
+/** Below 1280 px the panel is a modal dialog. */
 const overlay = computed(() => panelOpen.value && !docked.value)
 watch(overlay, (o) => (modalOpen.value = o), { immediate: true })
 
@@ -672,7 +672,7 @@ function trapTab(e: KeyboardEvent) {
           </TransitionGroup>
         </section>
 
-        <!-- Coverage, below the findings (UX-4) -->
+        <!-- Coverage, below the findings -->
         <section class="container rep__section" aria-labelledby="rep-coverage">
           <h2 id="rep-coverage" class="rep__h2 rep__h2--spaced">{{ t('report.coverage') }}</h2>
           <CoverageMap :scan="scan" :findings="findings" :selected="filters.criterion || null" interactive @select="selectCriterion" />
@@ -684,7 +684,7 @@ function trapTab(e: KeyboardEvent) {
       </template>
     </div>
 
-    <!-- Detail panel: docked beside the list on wide screens, a modal dialog below 1280 px (UX-14) -->
+    <!-- Detail panel: docked beside the list on wide screens, a modal dialog below 1280 px -->
     <Transition name="fade">
       <div v-if="overlay" class="rep__scrim" aria-hidden="true" @click="close" />
     </Transition>

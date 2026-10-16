@@ -133,7 +133,7 @@ register({
         "en": "The title “{title}” names the organisation; on the home page that is its topic.",
         "de": "Der Titel «{title}» nennt die Organisation; auf der Startseite ist das ihr Thema.",
         "fr": "Le titre « {title} » nomme l'organisation ; sur la page d'accueil, c'est son sujet.",
-        "it": "Il titolo «{title}» indica l'organizzazione; nella pagina iniziale è il suo argomento.",
+        "it": "Il titolo «{title}» indica l'organizzazione: nella pagina iniziale è proprio questo l'argomento.",
     },
     "c242.apertus_section_or_umbrella": {
         "en": "The title “{title}” names a section or a broad category rather than this page's specific content. Experts disagree whether that is enough: a person must decide.",
@@ -142,7 +142,7 @@ register({
         "it": "Il titolo «{title}» indica una sezione o una categoria generica invece del contenuto specifico di questa pagina. Gli esperti non concordano: una persona deve decidere.",
     },
     "c242.apertus_different_topic": {
-        "en": "Apertus judged that the title “{title}” names another topic than the page, which is about “{heading}”.",
+        "en": "Apertus judged that the title “{title}” names a different topic from the page, which is about “{heading}”.",
         "de": "Apertus beurteilt, dass der Titel «{title}» ein anderes Thema nennt als die Seite, die von «{heading}» handelt.",
         "fr": "Apertus juge que le titre « {title} » nomme un autre sujet que la page, qui traite de « {heading} ».",
         "it": "Apertus giudica che il titolo «{title}» indichi un altro argomento rispetto alla pagina, che tratta di «{heading}».",
@@ -167,7 +167,7 @@ register({
     },
     "c242.impact_ok": {
         "en": "Screen-reader users and people switching tabs know which page they are on.",
-        "de": "Screenreader-Nutzende und wer zwischen Tabs wechselt, wissen, auf welcher Seite sie sind.",
+        "de": "Screenreader-Nutzende und Personen, die zwischen Tabs wechseln, wissen, auf welcher Seite sie sind.",
         "fr": "Les utilisateurs de lecteurs d'écran et les personnes qui changent d'onglet savent sur quelle page ils sont.",
         "it": "Chi usa un lettore di schermo o passa da una scheda all'altra sa in quale pagina si trova.",
     },
@@ -185,7 +185,7 @@ register({
     },
     "c242.impact_other_page": {
         "en": "On that page, screen-reader users and people switching tabs cannot tell what it is about.",
-        "de": "Auf jener Seite erkennen Screenreader-Nutzende und wer zwischen Tabs wechselt nicht, worum es geht.",
+        "de": "Auf jener Seite erkennen Screenreader-Nutzende und Personen, die zwischen Tabs wechseln, nicht, worum es geht.",
         "fr": "Sur cette autre page, les utilisateurs de lecteurs d'écran et les personnes qui changent d'onglet ne savent pas de quoi elle traite.",
         "it": "Su quell'altra pagina, chi usa un lettore di schermo o passa da una scheda all'altra non capisce di cosa tratti.",
     },

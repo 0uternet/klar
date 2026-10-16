@@ -15,7 +15,7 @@ MESSAGES: dict[str, dict[str, str]] = {
     "disclaimer": {
         "en": "Klar. pre-checks {n} of 50 WCAG 2.1 AA criteria ({m} with an Apertus judgement). This report does not certify conformance.",
         "de": "Klar. prüft {n} von 50 Kriterien der WCAG 2.1 AA vor ({m} mit einer Beurteilung durch Apertus). Dieser Bericht bescheinigt keine Konformität.",
-        "fr": "Klar. pré-contrôle {n} des 50 critères WCAG 2.1 AA ({m} avec un jugement d'Apertus). Ce rapport ne certifie pas la conformité.",
+        "fr": "Klar. pré-vérifie {n} des 50 critères WCAG 2.1 AA ({m} avec un jugement d'Apertus). Ce rapport ne certifie pas la conformité.",
         "it": "Klar. pre-verifica {n} dei 50 criteri WCAG 2.1 AA ({m} con una valutazione di Apertus). Questo rapporto non certifica la conformità.",
     },
     # --- notes for cantTell: say plainly WHY a person must decide -----------------------
@@ -33,7 +33,7 @@ MESSAGES: dict[str, dict[str, str]] = {
     },
     "note.not_grounded": {
         "en": "Apertus' answer did not match the page ({reason}), so Klar. discarded it. Please check this element yourself.",
-        "de": "Die Antwort von Apertus passte nicht zur Seite und ist nicht belegt ({reason}); Klar. hat sie verworfen. Bitte prüfen Sie das Element selbst.",
+        "de": "Die Antwort von Apertus passte nicht zur Seite ({reason}); Klar. hat sie verworfen. Bitte prüfen Sie das Element selbst.",
         "fr": "La réponse d'Apertus ne correspondait pas à la page ({reason}) ; Klar. l'a écartée. Merci de vérifier cet élément vous-même.",
         "it": "La risposta di Apertus non corrispondeva alla pagina ({reason}); Klar. l'ha scartata. Verificate voi stessi questo elemento.",
     },
@@ -51,7 +51,7 @@ MESSAGES: dict[str, dict[str, str]] = {
     },
     "note.budget": {
         "en": "This scan reached its limit of questions to the model before this element. Please check it yourself.",
-        "de": "Dieser Scan hat sein Limit an Fragen an das Modell vor diesem Element erreicht. Bitte prüfen Sie es selbst.",
+        "de": "Dieser Scan hat bereits vor diesem Element die maximale Anzahl Fragen an das Modell erreicht. Bitte prüfen Sie es selbst.",
         "fr": "Cette analyse a atteint sa limite de questions au modèle avant cet élément. Merci de le vérifier vous-même.",
         "it": "Questa scansione ha raggiunto il limite di domande al modello prima di questo elemento. Verificatelo voi stessi.",
     },
@@ -73,7 +73,19 @@ MESSAGES: dict[str, dict[str, str]] = {
         "fr": "L'analyse a atteint sa limite de temps avant que cet élément soit jugé. Merci de le vérifier vous-même.",
         "it": "La scansione ha raggiunto il limite di tempo prima che questo elemento fosse giudicato. Verificatelo voi stessi.",
     },
+    "note.stopped": {
+        "en": "The scan was stopped before this element was judged. Please check it yourself.",
+        "de": "Der Scan wurde gestoppt, bevor dieses Element beurteilt wurde. Bitte prüfen Sie es selbst.",
+        "fr": "L'analyse a été arrêtée avant que cet élément soit jugé. Merci de le vérifier vous-même.",
+        "it": "La scansione è stata interrotta prima che questo elemento fosse giudicato. Verificatelo voi stessi.",
+    },
 
+    "impact.not_applicable": {
+        "en": "This criterion does not apply to this element.",
+        "de": "Dieses Kriterium gilt für dieses Element nicht.",
+        "fr": "Ce critère ne s'applique pas à cet élément.",
+        "it": "Questo criterio non si applica a questo elemento.",
+    },
     "impact.review": {
         "en": "A person must decide whether this element is a barrier.",
         "de": "Eine Person muss entscheiden, ob dieses Element eine Barriere ist.",
@@ -114,7 +126,7 @@ MESSAGES: dict[str, dict[str, str]] = {
     },
     "c312.page_mismatch": {
         "en": "The main text of this page is {actual_noun_en}, but the page declares lang=\"{declared_code}\". Fix the page language first (3.1.1 Language of Page); the language of parts is checked once it is right.",
-        "de": "Der Haupttext dieser Seite ist {actual_pred}, die Seite deklariert aber lang=\"{declared_code}\". Korrigieren Sie zuerst die Seitensprache (3.1.1 Sprache der Seite); die Sprache von Teilen wird danach geprüft.",
+        "de": "Der Haupttext dieser Seite ist {actual_pred}, die Seite deklariert aber lang=\"{declared_code}\". Korrigieren Sie zuerst die Seitensprache (3.1.1 Sprache der Seite); die Sprache von Textteilen wird danach geprüft.",
         "fr": "Le texte principal de cette page est en {actual_noun}, mais la page déclare lang=\"{declared_code}\". Corrigez d'abord la langue de la page (3.1.1 Langue de la page) ; la langue des passages sera vérifiée ensuite.",
         "it": "Il testo principale di questa pagina è in {actual_noun}, ma la pagina dichiara lang=\"{declared_code}\". Correggete prima la lingua della pagina (3.1.1 Lingua della pagina); la lingua delle parti sarà verificata dopo.",
     },
@@ -131,14 +143,14 @@ MESSAGES: dict[str, dict[str, str]] = {
         "it": "«{text}» è il nome di una lingua scritto in quella lingua; serve lang=\"{code}\" perché sia pronunciato correttamente.",
     },
     "c312.impact_exception": {
-        "en": "No change needed: names and everyday loanwords are read with the voice of the page.",
-        "de": "Keine Änderung nötig: Namen und gebräuchliche Lehnwörter werden mit der Stimme der Seite gelesen.",
-        "fr": "Aucune modification nécessaire : les noms et les emprunts courants sont lus avec la voix de la page.",
-        "it": "Nessuna modifica necessaria: i nomi e i prestiti comuni sono letti con la voce della pagina.",
+        "en": "No change needed: text like this is read with the voice of the page.",
+        "de": "Keine Änderung nötig: Solcher Text wird mit der Stimme der Seite vorgelesen.",
+        "fr": "Aucune modification nécessaire : ce type de texte est lu avec la voix de la page.",
+        "it": "Nessuna modifica necessaria: un testo di questo tipo è letto con la voce della pagina.",
     },
     "c312.tagged_ok": {
         "en": "The passage is marked lang=\"{code}\" and the language detector agrees.",
-        "de": "Die Passage ist mit lang=\"{code}\" ausgezeichnet und die Spracherkennung stimmt zu.",
+        "de": "Die Passage ist mit lang=\"{code}\" ausgezeichnet, und die Spracherkennung bestätigt das.",
         "fr": "Le passage est balisé lang=\"{code}\" et le détecteur de langue le confirme.",
         "it": "Il passaggio è marcato lang=\"{code}\" e il rilevatore di lingua lo conferma.",
     },
@@ -196,13 +208,13 @@ MESSAGES: dict[str, dict[str, str]] = {
         "fr": "Apertus classe « {quote} » comme {category} : la nécessité d'un attribut lang relève de l'appréciation. Une personne doit trancher.",
         "it": "Apertus classifica «{quote}» come {category}: se serva l'attributo lang è una questione di giudizio. Una persona deve decidere.",
     },
-    "c312.cat.greeting_or_formula": {"en": "a short greeting or formula", "de": "kurze Grussformel", "fr": "courte formule de salutation", "it": "breve formula di saluto"},
+    "c312.cat.greeting_or_formula": {"en": "a short greeting or set phrase", "de": "kurze Grussformel oder feste Wendung", "fr": "courte salutation ou formule toute faite", "it": "breve saluto o formula fissa"},
     "c312.cat.title_of_work": {"en": "the title of a work", "de": "Werktitel", "fr": "titre d'une œuvre", "it": "titolo di un'opera"},
     "c312.cat.proper_name": {"en": "a proper name", "de": "Eigenname", "fr": "nom propre", "it": "nome proprio"},
     "c312.cat.institution": {"en": "the name of an institution", "de": "Name einer Institution", "fr": "nom d'institution", "it": "nome di un'istituzione"},
     "c312.cat.place_or_address": {"en": "a place name or address", "de": "Ortsname oder Adresse", "fr": "nom de lieu ou adresse", "it": "nome di luogo o indirizzo"},
     "c312.cat.technical_term": {"en": "a technical term", "de": "Fachbegriff", "fr": "terme technique", "it": "termine tecnico"},
-    "c312.cat.loanword_in_vernacular": {"en": "a loanword of everyday language", "de": "Lehnwort der Alltagssprache", "fr": "emprunt de la langue courante", "it": "prestito della lingua corrente"},
+    "c312.cat.loanword_in_vernacular": {"en": "an everyday loanword", "de": "Lehnwort der Alltagssprache", "fr": "emprunt de la langue courante", "it": "prestito della lingua corrente"},
     # --- 2.4.4 Link purpose (in context) ----------------------------------------
     "c244.url_text": {
         "en": "The link text is the address itself, which identifies the destination.",
@@ -218,7 +230,7 @@ MESSAGES: dict[str, dict[str, str]] = {
     },
     "c244.no_context": {
         "en": "“{name}” does not say where the link goes, and no sentence, paragraph, list item or table cell around it explains it.",
-        "de": "«{name}» sagt nicht, wohin der Link führt, und kein Satz, Absatz, Listeneintrag oder keine Tabellenzelle darum herum erklärt es.",
+        "de": "«{name}» sagt nicht, wohin der Link führt, und auch der umgebende Satz, Absatz, Listeneintrag oder die Tabellenzelle erklärt es nicht.",
         "fr": "« {name} » n'indique pas où mène le lien, et aucune phrase, aucun paragraphe, élément de liste ou cellule de tableau autour ne l'explique.",
         "it": "«{name}» non dice dove porta il link, e nessuna frase, paragrafo, voce di elenco o cella di tabella intorno lo spiega.",
     },
@@ -267,18 +279,18 @@ MESSAGES: dict[str, dict[str, str]] = {
     "c244.title_only": {
         "en": "“{name}” is explained only by its title attribute, which keyboard and touch users do not get (technique H33): a person must decide.",
         "de": "«{name}» wird nur durch sein title-Attribut erklärt, das Tastatur- und Touch-Nutzende nicht erhalten (Technik H33): Eine Person muss entscheiden.",
-        "fr": "« {name} » n'est expliqué que par son attribut title, que les personnes au clavier ou sur écran tactile ne reçoivent pas (technique H33) : une personne doit trancher.",
+        "fr": "« {name} » n'est expliqué que par son attribut title, que les personnes utilisant le clavier ou un écran tactile ne voient pas (technique H33) : une personne doit trancher.",
         "it": "«{name}» è spiegato solo dal suo attributo title, che chi usa tastiera o touch non riceve (tecnica H33): una persona deve decidere.",
     },
     "c244.impact_maybe": {
         "en": "Screen-reader users who list the links may hear “{name}” without knowing where it leads.",
-        "de": "Screenreader-Nutzende, die sich die Links auflisten lassen, hören eventuell «{name}», ohne zu wissen, wohin er führt.",
+        "de": "Screenreader-Nutzende, die sich die Links auflisten lassen, hören eventuell «{name}», ohne zu wissen, wohin der Link führt.",
         "fr": "Les utilisateurs de lecteurs d'écran qui listent les liens risquent d'entendre « {name} » sans savoir où il mène.",
         "it": "Chi usa un lettore di schermo ed elenca i link potrebbe sentire «{name}» senza sapere dove porta.",
     },
     "c244.impact": {
         "en": "Screen-reader users who list the links hear “{name}” without knowing where it leads.",
-        "de": "Screenreader-Nutzende, die sich die Links auflisten lassen, hören «{name}», ohne zu wissen, wohin er führt.",
+        "de": "Screenreader-Nutzende, die sich die Links auflisten lassen, hören «{name}», ohne zu wissen, wohin der Link führt.",
         "fr": "Les utilisateurs de lecteurs d'écran qui listent les liens entendent « {name} » sans savoir où il mène.",
         "it": "Chi usa un lettore di schermo ed elenca i link sente «{name}» senza sapere dove porta.",
     },
@@ -335,7 +347,7 @@ MESSAGES: dict[str, dict[str, str]] = {
         "en": "Apertus judged that this image carries information but is hidden from screen readers ({type}).",
         "de": "Apertus beurteilt, dass dieses Bild Information trägt, aber vor Screenreadern verborgen ist ({type}).",
         "fr": "Apertus juge que cette image porte une information mais qu'elle est masquée aux lecteurs d'écran ({type}).",
-        "it": "Apertus giudica che questa immagine porti informazioni ma sia nascosta ai lettori di schermo ({type}).",
+        "it": "Apertus giudica che questa immagine trasmetta informazioni ma sia nascosta ai lettori di schermo ({type}).",
     },
     "c111.apertus_unsure": {
         "en": "Apertus could not decide whether the text alternative “{alt}” is adequate. A person must check it.",
@@ -381,7 +393,7 @@ MESSAGES: dict[str, dict[str, str]] = {
     "c111.impact_hidden": {
         "en": "Screen-reader users miss the information in this image because it is hidden from them.",
         "de": "Screenreader-Nutzenden entgeht die Information in diesem Bild, weil es vor ihnen verborgen ist.",
-        "fr": "Les utilisateurs de lecteurs d'écran manquent l'information de cette image, car elle leur est masquée.",
+        "fr": "Les utilisateurs de lecteurs d'écran n'ont pas accès à l'information de cette image, car elle leur est masquée.",
         "it": "Chi usa un lettore di schermo perde l'informazione di questa immagine, perché gli è nascosta.",
     },
     "c111.impact_ok": {
@@ -411,7 +423,7 @@ MESSAGES: dict[str, dict[str, str]] = {
     "c111.fix_hint_complex": {
         "en": "Keep a short alternative text and add a long description next to the image (for example the data as a table).",
         "de": "Behalten Sie einen kurzen Alternativtext und ergänzen Sie neben dem Bild eine ausführliche Beschreibung (zum Beispiel die Daten als Tabelle).",
-        "fr": "Gardez une alternative courte et ajoutez une description détaillée à côté de l'image (par exemple les données sous forme de tableau).",
+        "fr": "Gardez un texte alternatif court et ajoutez une description détaillée à côté de l'image (par exemple les données sous forme de tableau).",
         "it": "Mantenete un'alternativa breve e aggiungete una descrizione estesa accanto all'immagine (per esempio i dati in una tabella).",
     },
 }

@@ -16,7 +16,7 @@ check() { # TITLE OUTPUT
 
 # 1. Absolute local paths (Windows user folders, Linux home directories).
 check "absolute local paths" \
-  "$(git grep -n -I -i -E 'C:\\Users|C:/Users|/c/Users|/home/[a-z][a-z0-9_-]*/|AppData' -- "$self")"
+  "$(git grep -n -I -i -E 'C:\\Users|C:/Users|/c/Users|(^|[^[:alnum:]_.-])/home/[a-z][a-z0-9_-]*/|AppData' -- "$self")"
 
 # 2. Co-Authored-By trailers, in tracked files and in the commit messages.
 check "Co-Authored-By in tracked files" "$(git grep -n -I -i -E '^[[:space:]]*co-authored-by:' -- "$self")"
